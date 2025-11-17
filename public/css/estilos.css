@@ -1,0 +1,198 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: rgb(255, 0, 0);
+    background: radial-gradient(circle, rgba(255, 0, 0, 1) 0%, rgba(255, 255, 255, 1) 49%, rgba(255, 5, 5, 1) 100%);
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 600px;
+    margin: auto;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s;
+}
+
+.container:hover {
+    transform: scale(1.02);
+}
+
+.logo {
+    display: block;
+    margin: 0 auto 20px;
+    max-width: 150px;
+}
+
+h1 {
+    text-align: center;
+    color: black;
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 2px rgba(255, 0, 0, 0.3);
+}
+
+label {
+    display: block;
+    margin: 10px 0 5px;
+    color: black;
+    font-weight: bold;
+}
+
+/* Estilos para inputs y textareas */
+input[type="text"],
+input[type="date"],
+textarea {
+    width: 100%;
+    padding: 12px;
+    margin: 5px 0 15px;
+    border: 2px solid #d50000;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+input[type="text"]:focus,
+input[type="date"]:focus,
+textarea:focus {
+    border-color: #ff5722;
+    box-shadow: 0 0 5px rgba(255, 87, 34, 0.5);
+    outline: none; 
+}
+
+/* Estilos para select */
+select {
+    width: 100%;
+    padding: 12px; /* Aumentar padding para mayor área de clic */
+    margin: 5px 0 15px;
+    border: 2px solid #d50000; /* Borde rojo */
+    border-radius: 5px;
+    font-size: 16px;
+    background-color: #f9f9f9; /* Fondo claro diferente al de los inputs */
+    color: #333; /* Color de texto */
+    appearance: none; /* Eliminar el estilo predeterminado del navegador */
+    background-image: asset('img/im3.png'); /* Icono aquí */
+    background-repeat: no-repeat;
+    background-position: right 10px center; /* Posición del icono */
+    background-size: 12px; /* Tamaño del icono */
+    transition: border-color 0.3s, box-shadow 0.3s; /* Transiciones suaves */
+}
+
+select:focus {
+    border-color: #ff5722; /* Color naranja al enfocar */
+    box-shadow: 0 0 5px rgba(255, 87, 34, 0.5); /* Efecto de sombra */
+    outline: none; /* Sin contorno */
+}
+
+/* Opciones dentro del select */
+option {
+    background-color: white; /* Fondo blanco para las opciones */
+    color: #333; /* Color del texto */
+}
+
+/* Estilos para checkbox y radio */
+.checkbox-group {
+    margin: 15px 0;
+}
+
+.checkbox-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.checkbox {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.checkbox input[type="radio"] {
+    margin-right: 10px;
+}
+
+/* Estilos para botones */
+button {
+    background-color: #d50000; 
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 18px;
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+}
+
+button:hover {
+    background-color: #b00000; 
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Sombra al pasar el mouse */
+}
+
+/* Estilos para alertas */
+.alert {
+    color: green;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.success {
+    color: green;
+    text-align: center;
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+.error {
+    color: red;
+    text-align: center;
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+/* Ajustes para el logo */
+.logo {
+    display: block;
+    margin: 0 auto 20px;
+    max-width: 300px;
+    width: 100%; 
+    height: auto; 
+}
+.resultado-container {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+.resultado-container h2 {
+    margin-top: 0;
+}
+
+.horario-disponible {
+    color: green;
+    font-weight: bold;
+    margin: 5px 0;
+    padding: 5px;
+    border: 1px solid green;
+    border-radius: 4px;
+    background-color: #e9f8e9; /* Color de fondo ligero */
+}
+
+.horario-no-disponible {
+    color: red;
+    font-weight: bold;
+    margin: 5px 0;
+    padding: 5px;
+    border: 1px solid red;
+    border-radius: 4px;
+    background-color: #f8e9e9; /* Color de fondo ligero */
+}

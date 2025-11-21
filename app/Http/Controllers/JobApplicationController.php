@@ -42,8 +42,8 @@ class JobApplicationController extends Controller
             'full_name' => 'required|string|max:255',
             'ci' => 'required|string|max:20',
             'phone' => 'required|string|max:20',
-            'cv' => 'required|file|mimes:pdf,doc,docx|max:5120', // 5MB - REQUIRED
-            'extra_documents.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:5120',
+            'cv' => 'required|max:20480', // 20MB
+            'extra_documents.*' => 'nullable|max:20480', // 20MB each
         ]);
 
         $cvPath = null;
@@ -89,8 +89,8 @@ class JobApplicationController extends Controller
             'full_name' => 'required|string|max:255',
             'ci' => 'required|string|max:20',
             'phone' => 'required|string|max:20',
-            'cv' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
-            'extra_documents.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:5120',
+            'cv' => 'nullable|max:20480', // 20MB
+            'extra_documents.*' => 'nullable|max:20480', // 20MB each
         ]);
 
         $cvPath = $jobApplication->cv;

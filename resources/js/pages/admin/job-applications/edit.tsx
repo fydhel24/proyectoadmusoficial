@@ -54,10 +54,10 @@ export default function Edit({ application }: Props) {
         e.preventDefault();
         put(route('admin.job-applications.update', application.id), {
             onSuccess: () => {
-                toast.success('Aplicación actualizada exitosamente');
+                toast.success('✅ Aplicación actualizada exitosamente');
             },
             onError: () => {
-                toast.error('Error al actualizar la aplicación');
+                toast.error('❌ Error al actualizar la aplicación');
             },
         });
     };
@@ -121,7 +121,12 @@ export default function Edit({ application }: Props) {
                                 />
                                 {errors.full_name && (
                                     <Alert variant="destructive">
-                                        <AlertDescription>{errors.full_name}</AlertDescription>
+                                        <AlertDescription>
+                                            {errors.full_name === 'validation.required' ?
+                                                'El nombre completo es obligatorio' :
+                                                'El nombre debe tener al menos 2 caracteres'
+                                            }
+                                        </AlertDescription>
                                     </Alert>
                                 )}
                             </div>
@@ -142,7 +147,12 @@ export default function Edit({ application }: Props) {
                                 />
                                 {errors.ci && (
                                     <Alert variant="destructive">
-                                        <AlertDescription>{errors.ci}</AlertDescription>
+                                        <AlertDescription>
+                                            {errors.ci === 'validation.required' ?
+                                                'La cédula de identidad es obligatoria' :
+                                                'Ingresa una cédula válida (solo números y guiones)'
+                                            }
+                                        </AlertDescription>
                                     </Alert>
                                 )}
                             </div>
@@ -163,7 +173,12 @@ export default function Edit({ application }: Props) {
                                 />
                                 {errors.phone && (
                                     <Alert variant="destructive">
-                                        <AlertDescription>{errors.phone}</AlertDescription>
+                                        <AlertDescription>
+                                            {errors.phone === 'validation.required' ?
+                                                'El número de teléfono es obligatorio' :
+                                                'Ingresa un número de teléfono válido'
+                                            }
+                                        </AlertDescription>
                                     </Alert>
                                 )}
                             </div>
@@ -199,11 +214,18 @@ export default function Edit({ application }: Props) {
                                     )}
                                 </div>
                                 <p className="text-sm text-gray-500">
-                                    Formatos aceptados: PDF, DOC, DOCX. Tamaño máximo: 5MB
+                                    Formatos aceptados: PDF, DOC, DOCX. Tamaño máximo: 20MB
                                 </p>
                                 {errors.cv && (
                                     <Alert variant="destructive">
-                                        <AlertDescription>{errors.cv}</AlertDescription>
+                                        <AlertDescription>
+                                            {errors.cv.includes('mimes') ?
+                                                'Solo se aceptan archivos PDF, DOC o DOCX' :
+                                                errors.cv.includes('max') ?
+                                                'El archivo es demasiado grande (máximo 20MB)' :
+                                                'Error con el archivo del CV'
+                                            }
+                                        </AlertDescription>
                                     </Alert>
                                 )}
                             </div>
@@ -246,11 +268,18 @@ export default function Edit({ application }: Props) {
                                     )}
                                 </div>
                                 <p className="text-sm text-gray-500">
-                                    Formatos aceptados: PDF, DOC, DOCX, JPG, JPEG, PNG. Tamaño máximo por archivo: 5MB
+                                    Formatos aceptados: PDF, DOC, DOCX, JPG, JPEG, PNG. Tamaño máximo por archivo: 20MB
                                 </p>
                                 {errors.extra_documents && (
                                     <Alert variant="destructive">
-                                        <AlertDescription>{errors.extra_documents}</AlertDescription>
+                                        <AlertDescription>
+                                            {errors.extra_documents.includes('mimes') ?
+                                                'Solo se aceptan archivos PDF, DOC, DOCX, JPG, JPEG o PNG' :
+                                                errors.extra_documents.includes('max') ?
+                                                'Uno o más archivos superan el límite de 20MB' :
+                                                'Error con los documentos adicionales'
+                                            }
+                                        </AlertDescription>
                                     </Alert>
                                 )}
                             </div>

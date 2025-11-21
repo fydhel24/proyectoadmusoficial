@@ -65,10 +65,10 @@ export default function Index({ applications, filters }: Props) {
         destroy(route('admin.job-applications.destroy', application.id), {
             preserveScroll: true,
             onSuccess: () => {
-                toast.success('Aplicación eliminada exitosamente');
+                toast.success('✅ Aplicación eliminada exitosamente');
             },
             onError: () => {
-                toast.error('Error al eliminar la aplicación');
+                toast.error('❌ Error al eliminar la aplicación');
             },
         });
     };

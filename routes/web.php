@@ -1,5 +1,5 @@
-
 <?php
+
 use App\Http\Controllers\JobApplicationController;
 use App\Http\Controllers\AsignacionTareaController;
 use App\Http\Controllers\BookingController;
@@ -590,21 +590,20 @@ Route::middleware(['auth'])->group(function () {
     // También necesitarás la ruta para actualizar:
     Route::put('/reportes/{id}', [ReporteVentaController::class, 'update'])->name('reportes.update');
 
-// Job Applications Routes
+    // Job Applications Routes
+
+    // Admin routes for job applications
+    Route::middleware(['auth'])->group(function () {
+        Route::resource('admin/job-applications', JobApplicationController::class, [
+            'as' => 'admin'
+        ]);
+    });
+
+    require __DIR__ . '/settings.php';
+    require __DIR__ . '/auth.php';
+});
 Route::get('/trabaja-con-nosotros', [JobApplicationController::class, 'create'])->name('job-applications.create');
 Route::post('/trabaja-con-nosotros', [JobApplicationController::class, 'store'])->name('job-applications.store');
-
-// Admin routes for job applications
-Route::middleware(['auth'])->group(function () {
-    Route::resource('admin/job-applications', JobApplicationController::class, [
-        'as' => 'admin'
-    ]);
-});
-
-require __DIR__ . '/settings.php';
-require __DIR__ . '/auth.php';
-
-});
 
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';

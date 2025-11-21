@@ -155,6 +155,9 @@ export default function Header() {
                     <NavLink href="#contactanos" active={isSectionActive('contactanos')} onClick={scrollToSection('#contactanos')}>
                         Contáctanos
                     </NavLink>
+                    <NavLink href="/trabaja-con-nosotros" active={false} onClick={scrollToSection('/trabaja-con-nosotros')}>
+                        Trabaja con Nosotros
+                    </NavLink>
                 </nav>
 
                 {/* Botón Login / Dashboard */}
@@ -279,6 +282,9 @@ export default function Header() {
                     </MobileNavLink>
                     <MobileNavLink href="#contactanos" active={isSectionActive('contactanos')} onClick={scrollToSection('#contactanos')}>
                         Contáctanos
+                    </MobileNavLink>
+                    <MobileNavLink href="/trabaja-con-nosotros" active={false} onClick={scrollToSection('/trabaja-con-nosotros')}>
+                        Trabaja con Nosotros
                     </MobileNavLink>
 
                     <div className="border-t border-white/10 pt-4">

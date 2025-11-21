@@ -1,5 +1,6 @@
-<?php
 
+<?php
+use App\Http\Controllers\JobApplicationController;
 use App\Http\Controllers\AsignacionTareaController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\CamarografoController;
@@ -589,6 +590,17 @@ Route::middleware(['auth'])->group(function () {
     // También necesitarás la ruta para actualizar:
     Route::put('/reportes/{id}', [ReporteVentaController::class, 'update'])->name('reportes.update');
 
+// Job Applications Routes
+Route::get('/trabaja-con-nosotros', [JobApplicationController::class, 'create'])->name('job-applications.create');
+Route::post('/trabaja-con-nosotros', [JobApplicationController::class, 'store'])->name('job-applications.store');
+
+// Admin routes for job applications
+Route::middleware(['auth'])->group(function () {
+    Route::get('/admin/job-applications', [JobApplicationController::class, 'index'])->name('admin.job-applications.index');
+});
+
+require __DIR__ . '/settings.php';
+require __DIR__ . '/auth.php';
 
 });
 

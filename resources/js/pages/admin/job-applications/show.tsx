@@ -1,9 +1,11 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
+import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { Toaster } from 'sonner';
 import { Download, Edit, ArrowLeft, FileText, User, Phone, IdCard, Calendar } from 'lucide-react';
 
 interface JobApplication {
@@ -40,7 +42,18 @@ export default function Show({ application }: Props) {
     };
 
     return (
-        <>
+        <AppLayout
+            breadcrumbs={[
+                {
+                    title: 'Aplicaciones de Trabajo',
+                    href: route('admin.job-applications.index'),
+                },
+                {
+                    title: application.full_name,
+                    href: route('admin.job-applications.show', application.id),
+                },
+            ]}
+        >
             <Head title={`Aplicación - ${application.full_name}`} />
 
             <div className="space-y-6">
@@ -222,6 +235,7 @@ export default function Show({ application }: Props) {
                     </CardContent>
                 </Card>
             </div>
-        </>
+            <Toaster richColors position="top-right" />
+        </AppLayout>
     );
 }

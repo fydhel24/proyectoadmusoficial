@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Head, Link, router, useForm } from '@inertiajs/react';
+import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Toaster, toast } from 'sonner';
 import { Download, Edit, Eye, FileText, Phone, Search, Trash2, User } from 'lucide-react';
 
 interface JobApplication {
@@ -62,6 +64,12 @@ export default function Index({ applications, filters }: Props) {
     const handleDelete = (application: JobApplication) => {
         destroy(route('admin.job-applications.destroy', application.id), {
             preserveScroll: true,
+            onSuccess: () => {
+                toast.success('Aplicación eliminada exitosamente');
+            },
+            onError: () => {
+                toast.error('Error al eliminar la aplicación');
+            },
         });
     };
 
@@ -71,7 +79,14 @@ export default function Index({ applications, filters }: Props) {
     };
 
     return (
-        <>
+        <AppLayout
+            breadcrumbs={[
+                {
+                    title: 'Aplicaciones de Trabajo',
+                    href: route('admin.job-applications.index'),
+                },
+            ]}
+        >
             <Head title="Aplicaciones de Trabajo" />
 
             <div className="space-y-6">
@@ -322,6 +337,7 @@ export default function Index({ applications, filters }: Props) {
                     </CardContent>
                 </Card>
             </div>
-        </>
-    );
-}
+            <Toaster richColors position="top-right" />
+                </AppLayout>
+            );
+        }

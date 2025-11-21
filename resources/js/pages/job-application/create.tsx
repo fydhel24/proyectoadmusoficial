@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Toaster, toast } from 'sonner';
 import { Upload, FileText, User, Phone, IdCard } from 'lucide-react';
 
 export default function Create() {
@@ -37,9 +38,13 @@ export default function Create() {
         e.preventDefault();
         post(route('job-applications.store'), {
             onSuccess: () => {
+                toast.success('¡Aplicación enviada exitosamente! Te contactaremos pronto.');
                 reset();
                 setCvPreview(null);
                 setExtraDocumentsPreview([]);
+            },
+            onError: () => {
+                toast.error('Error al enviar la aplicación. Por favor, inténtalo de nuevo.');
             },
         });
     };
@@ -140,6 +145,14 @@ export default function Create() {
                                         <FileText className="h-4 w-4" />
                                         Currículum Vitae (CV) *
                                     </Label>
+                                    <Input
+                                        id="cv"
+                                        type="file"
+                                        accept=".pdf,.doc,.docx"
+                                        onChange={handleCvChange}
+                                        required
+                                        className="hidden"
+                                    />
                                     <div className="flex items-center gap-4">
                                         <Input
                                             id="cv"
@@ -223,6 +236,7 @@ export default function Create() {
                         </CardContent>
                     </Card>
                 </div>
+                <Toaster richColors position="top-right" />
             </div>
         </>
     );

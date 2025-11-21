@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Head, useForm } from '@inertiajs/react';
+import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Toaster, toast } from 'sonner';
 import { Upload, FileText, User, Phone, IdCard, ArrowLeft } from 'lucide-react';
 import { Link } from '@inertiajs/react';
 
@@ -50,11 +52,29 @@ export default function Edit({ application }: Props) {
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(route('admin.job-applications.update', application.id));
+        put(route('admin.job-applications.update', application.id), {
+            onSuccess: () => {
+                toast.success('Aplicación actualizada exitosamente');
+            },
+            onError: () => {
+                toast.error('Error al actualizar la aplicación');
+            },
+        });
     };
 
     return (
-        <>
+        <AppLayout
+            breadcrumbs={[
+                {
+                    title: 'Aplicaciones de Trabajo',
+                    href: route('admin.job-applications.index'),
+                },
+                {
+                    title: `Editar - ${application.full_name}`,
+                    href: route('admin.job-applications.edit', application.id),
+                },
+            ]}
+        >
             <Head title={`Editar Aplicación - ${application.full_name}`} />
 
             <div className="space-y-6">
@@ -254,6 +274,7 @@ export default function Edit({ application }: Props) {
                     </CardContent>
                 </Card>
             </div>
-        </>
+            <Toaster richColors position="top-right" />
+        </AppLayout>
     );
 }

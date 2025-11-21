@@ -42,7 +42,7 @@ class JobApplicationController extends Controller
             'full_name' => 'required|string|max:255',
             'ci' => 'required|string|max:20',
             'phone' => 'required|string|max:20',
-            'cv' => 'nullable|file|mimes:pdf,doc,docx|max:5120', // 5MB
+            'cv' => 'required|file|mimes:pdf,doc,docx|max:5120', // 5MB - REQUIRED
             'extra_documents.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:5120',
         ]);
 

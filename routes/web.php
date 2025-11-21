@@ -596,7 +596,9 @@ Route::post('/trabaja-con-nosotros', [JobApplicationController::class, 'store'])
 
 // Admin routes for job applications
 Route::middleware(['auth'])->group(function () {
-    Route::get('/admin/job-applications', [JobApplicationController::class, 'index'])->name('admin.job-applications.index');
+    Route::resource('admin/job-applications', JobApplicationController::class, [
+        'as' => 'admin'
+    ]);
 });
 
 require __DIR__ . '/settings.php';

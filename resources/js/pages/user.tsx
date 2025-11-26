@@ -1,36 +1,35 @@
-import React, { useEffect, useState } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
-import axios from 'axios';
+import { Close as CloseIcon, Delete as DeleteIcon, Edit as EditIcon, LockReset as LockResetIcon, Search as SearchIcon } from '@mui/icons-material';
+
 import {
     Box,
+    Button,
+    Checkbox,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    FormControl,
+    IconButton,
+    InputLabel,
+    MenuItem,
+    Paper,
+    Select,
     Table,
     TableBody,
     TableCell,
     TableContainer,
     TableHead,
     TableRow,
-    Paper,
     TextField,
-    IconButton,
-    useTheme,
-    useMediaQuery,
-    Checkbox,
-    Button,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    FormControlLabel,
-    FormGroup,
     Typography,
-    Select,
-    MenuItem,
-    InputLabel,
-    FormControl,
+    useMediaQuery,
+    useTheme,
 } from '@mui/material';
-import { Search as SearchIcon, Edit as EditIcon, Delete as DeleteIcon, Close as CloseIcon } from '@mui/icons-material';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -146,16 +145,12 @@ export default function UsersPermissions() {
 
     // Filtrar usuarios por nombre o email
     const filteredUsers = users.filter(
-        (u) =>
-            u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            u.email.toLowerCase().includes(searchTerm.toLowerCase())
+        (u) => u.name.toLowerCase().includes(searchTerm.toLowerCase()) || u.email.toLowerCase().includes(searchTerm.toLowerCase()),
     );
 
     // Manejar selección de filas
     const handleRowCheckbox = (userId: number) => {
-        setSelectedRows((prev) =>
-            prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId]
-        );
+        setSelectedRows((prev) => (prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId]));
     };
 
     // Checkbox de cabecera (seleccionar todos)
@@ -165,6 +160,21 @@ export default function UsersPermissions() {
         } else {
             setSelectedRows(filteredUsers.map((u) => u.id));
         }
+    };
+    const handleResetPassword = (id: number) => {
+        if (!confirm('¿Seguro que deseas restablecer la contraseña? Se pondrá igual al email.')) {
+            return;
+        }
+
+        axios
+            .put(`/users/${id}/reset-password`)
+            .then(() => {
+                alert('Contraseña restablecida correctamente');
+            })
+            .catch((error) => {
+                console.error('Error al restablecer la contraseña:', error);
+                alert('Hubo un error al restablecer la contraseña');
+            });
     };
 
     return (
@@ -190,14 +200,8 @@ export default function UsersPermissions() {
                             ),
                         }}
                     />
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        sx={{ ml: 2 }}
-                        onClick={openCreateModal}
-                        startIcon={<EditIcon />}
-                    >
-                        Nuevo Usuario
+                    <Button variant="contained" color="primary" sx={{ ml: 2 }} onClick={openCreateModal} startIcon={<EditIcon />}>
+                        Nuevo Usuarioooooo
                     </Button>
                 </Box>
 
@@ -281,23 +285,25 @@ export default function UsersPermissions() {
                                     <TableCell>{user.name}</TableCell>
                                     <TableCell>{user.email}</TableCell>
                                     <TableCell>
-                                        {user.roles && user.roles.length > 0
-                                            ? user.roles.map((r) => r.name).join(', ')
-                                            : <span className="italic text-gray-400">Sin rol</span>}
+                                        {user.roles && user.roles.length > 0 ? (
+                                            user.roles.map((r) => r.name).join(', ')
+                                        ) : (
+                                            <span className="text-gray-400 italic">Sin rol</span>
+                                        )}
                                     </TableCell>
                                     <TableCell>
-                                        <IconButton
-                                            color="primary"
-                                            onClick={() => openEditModal(user)}
-                                            aria-label="Editar"
-                                        >
+                                        <IconButton color="primary" onClick={() => openEditModal(user)} aria-label="Editar">
                                             <EditIcon />
                                         </IconButton>
                                         <IconButton
-                                            color="error"
-                                            onClick={() => handleDeleteUser(user.id)}
-                                            aria-label="Eliminar"
+                                            color="secondary"
+                                            onClick={() => handleResetPassword(user.id)}
+                                            aria-label="Restablecer contraseña"
                                         >
+                                            <LockResetIcon />
+                                        </IconButton>
+
+                                        <IconButton color="error" onClick={() => handleDeleteUser(user.id)} aria-label="Eliminar">
                                             <DeleteIcon />
                                         </IconButton>
                                     </TableCell>
@@ -311,9 +317,7 @@ export default function UsersPermissions() {
             {/* Modal Material UI */}
             <Dialog open={showModal} onClose={() => setShowModal(false)} maxWidth="sm" fullWidth>
                 <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Typography variant="h6">
-                        {isEditMode ? 'Editar Usuario' : 'Crear Nuevo Usuario'}
-                    </Typography>
+                    <Typography variant="h6">{isEditMode ? 'Editar Usuario' : 'Crear Nuevo Usuario'}</Typography>
                     <IconButton onClick={() => setShowModal(false)}>
                         <CloseIcon />
                     </IconButton>
@@ -348,12 +352,7 @@ export default function UsersPermissions() {
                     )}
                     <FormControl fullWidth sx={{ mb: 2 }}>
                         <InputLabel id="select-role-label">Rol</InputLabel>
-                        <Select
-                            labelId="select-role-label"
-                            value={selectedRole || ''}
-                            label="Rol"
-                            onChange={(e) => setSelectedRole(e.target.value)}
-                        >
+                        <Select labelId="select-role-label" value={selectedRole || ''} label="Rol" onChange={(e) => setSelectedRole(e.target.value)}>
                             <MenuItem value="">
                                 <em>Seleccionar rol</em>
                             </MenuItem>
@@ -366,21 +365,10 @@ export default function UsersPermissions() {
                     </FormControl>
                 </DialogContent>
                 <DialogActions>
-                    <Button
-                        onClick={() => setShowModal(false)}
-                        color="inherit"
-                        variant="outlined"
-                        disabled={loading}
-                        startIcon={<CloseIcon />}
-                    >
+                    <Button onClick={() => setShowModal(false)} color="inherit" variant="outlined" disabled={loading} startIcon={<CloseIcon />}>
                         Cancelar
                     </Button>
-                    <Button
-                        onClick={handleSubmit}
-                        color="primary"
-                        variant="contained"
-                        disabled={loading}
-                    >
+                    <Button onClick={handleSubmit} color="primary" variant="contained" disabled={loading}>
                         {loading ? 'Guardando...' : isEditMode ? 'Actualizar' : 'Crear'}
                     </Button>
                 </DialogActions>

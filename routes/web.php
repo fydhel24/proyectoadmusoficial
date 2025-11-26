@@ -128,6 +128,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/users', [UserController::class, 'store']);
     Route::put('/users/{user}', [UserController::class, 'update']);
     Route::delete('/users/{user}', [UserController::class, 'destroy']);
+    Route::put('/users/{id}/reset-password', [UserController::class, 'resetPassword']);
+
     Route::get('/api/roles', fn() => response()->json(Role::all()));
     Route::get('/roles', function () {
         return Inertia::render('roles');

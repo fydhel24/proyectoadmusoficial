@@ -34,28 +34,6 @@ class UserController extends Controller
 
         return response()->json(['message' => 'Usuario creado con éxito', 'user' => $user], 201);
     }
-
-    /* public function update(Request $request, User $user)
-    {
-        $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|email|unique:users,email,' . $user->id,
-            'password' => 'nullable|min:6|confirmed',
-            'role' => 'required|exists:roles,name',
-        ]);
-
-        $user->update([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => $request->password
-                ? Hash::make($request->password)
-                : $user->password,
-        ]);
-
-        $user->syncRoles([$request->role]);
-
-        return response()->json($user);
-    } */
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -84,5 +62,15 @@ class UserController extends Controller
     {
         $user->delete();
         return response()->json(null, 204);
+    }
+    public function resetPassword($id)
+    {
+        $user = User::findOrFail($id);
+
+        // Establecer nueva contraseña igual al email
+        $user->password = bcrypt($user->email);
+        $user->save();
+
+        return response()->json(['message' => 'Contraseña restablecida correctamente']);
     }
 }

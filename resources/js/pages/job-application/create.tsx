@@ -95,7 +95,7 @@ export default function Create() {
                     {/* Título */}
                     <div className="mb-8 text-center">
                         <h1 className="font-montserrat mb-2 text-5xl font-extrabold tracking-tight text-white drop-shadow-lg">
-                            ¡Unete a nuestro Equipo!!!
+                            ¡Unete a nuestro Equipo!
                         </h1>
                         <h3 className="font-roboto-slab mb-4 text-3xl font-bold tracking-tight text-white uppercase drop-shadow-md">
                             ADMUS PRODUCTIONS

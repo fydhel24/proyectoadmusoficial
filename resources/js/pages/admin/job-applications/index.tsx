@@ -14,6 +14,7 @@ interface JobApplication {
     id: number;
     full_name: string;
     ci: string;
+    area:string
     phone: string;
     cv: string | null;
     extra_documents: string[] | null;
@@ -158,8 +159,9 @@ export default function Index({ applications, filters }: Props) {
                                         <TableRow>
                                             <TableHead>Nombre Completo</TableHead>
                                             <TableHead>Cédula</TableHead>
-                                            <TableHead>Teléfono</TableHead>
-                                            <TableHead>Fecha de Aplicación</TableHead>
+                                            <TableHead>Area</TableHead>
+                                            <TableHead>Celular</TableHead>
+                                            <TableHead>Fecha de Postulacion</TableHead>
                                             <TableHead>Documentos</TableHead>
                                             <TableHead className="text-right">Acciones</TableHead>
                                         </TableRow>
@@ -174,6 +176,7 @@ export default function Index({ applications, filters }: Props) {
                                                     </div>
                                                 </TableCell>
                                                 <TableCell>{application.ci}</TableCell>
+                                                <TableCell>{application.area}</TableCell>
                                                 <TableCell>
                                                     <div className="flex items-center gap-2">
                                                         <Phone className="h-4 w-4 text-muted-foreground" />

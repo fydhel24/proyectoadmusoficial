@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('full_name');
             $table->string('ci');
+            $table->string('area');
             $table->string('phone');
             $table->string('cv')->nullable(); // path to file
             $table->json('extra_documents')->nullable(); // array of file paths

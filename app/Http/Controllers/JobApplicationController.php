@@ -18,8 +18,8 @@ class JobApplicationController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('full_name', 'like', "%{$search}%")
-                  ->orWhere('ci', 'like', "%{$search}%")
-                  ->orWhere('phone', 'like', "%{$search}%");
+                    ->orWhere('ci', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%");
             });
         }
 
@@ -41,6 +41,7 @@ class JobApplicationController extends Controller
         $request->validate([
             'full_name' => 'required|string|max:255',
             'ci' => 'required|string|max:20',
+            'area' => 'required|string',
             'phone' => 'required|string|max:20',
             'cv' => 'required|max:20480', // 20MB
             'extra_documents.*' => 'nullable|max:20480', // 20MB each
@@ -61,6 +62,7 @@ class JobApplicationController extends Controller
         JobApplication::create([
             'full_name' => $request->full_name,
             'ci' => $request->ci,
+            'area' => $request->area,
             'phone' => $request->phone,
             'cv' => $cvPath,
             'extra_documents' => $extraDocuments,
@@ -88,6 +90,7 @@ class JobApplicationController extends Controller
         $request->validate([
             'full_name' => 'required|string|max:255',
             'ci' => 'required|string|max:20',
+            'area' => 'required|string',
             'phone' => 'required|string|max:20',
             'cv' => 'nullable|max:20480', // 20MB
             'extra_documents.*' => 'nullable|max:20480', // 20MB each
@@ -121,6 +124,7 @@ class JobApplicationController extends Controller
         $jobApplication->update([
             'full_name' => $request->full_name,
             'ci' => $request->ci,
+            'area' => $request->area,
             'phone' => $request->phone,
             'cv' => $cvPath,
             'extra_documents' => $extraDocuments,

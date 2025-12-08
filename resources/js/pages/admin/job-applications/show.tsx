@@ -2,7 +2,6 @@ import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Toaster } from 'sonner';
@@ -12,6 +11,7 @@ interface JobApplication {
     id: number;
     full_name: string;
     ci: string;
+    area: string;
     phone: string;
     cv: string | null;
     extra_documents: string[] | null;
@@ -56,79 +56,104 @@ export default function Show({ application }: Props) {
         >
             <Head title={`Aplicación - ${application.full_name}`} />
 
-            <div className="space-y-6">
-                <div className="flex items-center justify-between">
+            <div className="space-y-8 p-10">
+                {/* HEADER */}
+                <div className="flex items-center justify-between w-full border-b pb-4">
                     <div className="flex items-center gap-4">
-                        <Button variant="outline" size="sm" asChild>
+                        <Button variant="outline" size="sm" asChild className="rounded-full">
                             <Link href={route('admin.job-applications.index')}>
                                 <ArrowLeft className="h-4 w-4 mr-2" />
                                 Volver
                             </Link>
                         </Button>
+
                         <div>
-                            <h1 className="text-3xl font-bold tracking-tight">Detalles de Aplicación</h1>
-                            <p className="text-muted-foreground">
-                                Información completa de la aplicación de {application.full_name}
+                            <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+                                Detalles de Postulación
+                            </h1>
+                            <p className="text-sm text-muted-foreground">
+                                Información completa de la postulación de <strong>{application.full_name}</strong>
                             </p>
                         </div>
                     </div>
-                    <Button asChild>
-                        <Link href={route('admin.job-applications.edit', application.id)}>
-                            <Edit className="h-4 w-4 mr-2" />
-                            Editar
-                        </Link>
-                    </Button>
                 </div>
 
-                <div className="grid gap-6 md:grid-cols-2">
-                    {/* Personal Information */}
-                    <Card>
+                {/* GRID MAIN */}
+                <div className="grid gap-8 md:grid-cols-2">
+
+                    {/* INFORMACIÓN PERSONAL */}
+                    <Card className="shadow-sm border border-gray-200 rounded-xl">
                         <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <User className="h-5 w-5" />
+                            <CardTitle className="flex items-center gap-2 text-xl font-semibold text-gray-800">
+                                <User className="h-5 w-5 text-blue-600" />
                                 Información Personal
                             </CardTitle>
                         </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="flex items-center gap-3">
-                                <User className="h-4 w-4 text-muted-foreground" />
+
+                        <CardContent className="space-y-6">
+
+                            {/* Nombre */}
+                            <div className="flex items-start gap-3">
+                                <User className="h-4 w-4 text-blue-500 mt-1" />
                                 <div>
-                                    <p className="text-sm font-medium">Nombre Completo</p>
-                                    <p className="text-sm text-muted-foreground">{application.full_name}</p>
+                                    <p className="text-sm font-semibold text-gray-700">Nombre Completo</p>
+                                    <p className="text-sm text-gray-600">{application.full_name}</p>
                                 </div>
                             </div>
+
                             <Separator />
-                            <div className="flex items-center gap-3">
-                                <IdCard className="h-4 w-4 text-muted-foreground" />
+
+                            {/* CI */}
+                            <div className="flex items-start gap-3">
+                                <IdCard className="h-4 w-4 text-blue-500 mt-1" />
                                 <div>
-                                    <p className="text-sm font-medium">Cédula de Identidad</p>
-                                    <p className="text-sm text-muted-foreground">{application.ci}</p>
+                                    <p className="text-sm font-semibold text-gray-700">Cédula de Identidad</p>
+                                    <p className="text-sm text-gray-600">{application.ci}</p>
                                 </div>
                             </div>
+
                             <Separator />
-                            <div className="flex items-center gap-3">
-                                <Phone className="h-4 w-4 text-muted-foreground" />
+
+                            {/* Área */}
+                            <div className="flex items-start gap-3">
+                                <IdCard className="h-4 w-4 text-blue-500 mt-1" />
                                 <div>
-                                    <p className="text-sm font-medium">Teléfono/Celular</p>
-                                    <p className="text-sm text-muted-foreground">{application.phone}</p>
+                                    <p className="text-sm font-semibold text-gray-700">Área de Postulación</p>
+                                    <p className="text-sm text-gray-600">{application.area}</p>
                                 </div>
                             </div>
+
                             <Separator />
-                            <div className="flex items-center gap-3">
-                                <Calendar className="h-4 w-4 text-muted-foreground" />
+
+                            {/* Teléfono */}
+                            <div className="flex items-start gap-3">
+                                <Phone className="h-4 w-4 text-blue-500 mt-1" />
                                 <div>
-                                    <p className="text-sm font-medium">Fecha de Aplicación</p>
-                                    <p className="text-sm text-muted-foreground">{formatDate(application.created_at)}</p>
+                                    <p className="text-sm font-semibold text-gray-700">Teléfono/Celular</p>
+                                    <p className="text-sm text-gray-600">{application.phone}</p>
                                 </div>
                             </div>
+
+                            <Separator />
+
+                            {/* Fecha de aplicación */}
+                            <div className="flex items-start gap-3">
+                                <Calendar className="h-4 w-4 text-blue-500 mt-1" />
+                                <div>
+                                    <p className="text-sm font-semibold text-gray-700">Fecha de Aplicación</p>
+                                    <p className="text-sm text-gray-600">{formatDate(application.created_at)}</p>
+                                </div>
+                            </div>
+
+                            {/* Si se editó */}
                             {application.updated_at !== application.created_at && (
                                 <>
                                     <Separator />
-                                    <div className="flex items-center gap-3">
-                                        <Calendar className="h-4 w-4 text-muted-foreground" />
+                                    <div className="flex items-start gap-3">
+                                        <Calendar className="h-4 w-4 text-blue-500 mt-1" />
                                         <div>
-                                            <p className="text-sm font-medium">Última Modificación</p>
-                                            <p className="text-sm text-muted-foreground">{formatDate(application.updated_at)}</p>
+                                            <p className="text-sm font-semibold text-gray-700">Última Modificación</p>
+                                            <p className="text-sm text-gray-600">{formatDate(application.updated_at)}</p>
                                         </div>
                                     </div>
                                 </>
@@ -136,65 +161,81 @@ export default function Show({ application }: Props) {
                         </CardContent>
                     </Card>
 
-                    {/* Documents */}
-                    <Card>
+                    {/* DOCUMENTOS */}
+                    <Card className="shadow-sm border border-gray-200 rounded-xl">
                         <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <FileText className="h-5 w-5" />
+                            <CardTitle className="flex items-center gap-2 text-xl font-semibold text-gray-800">
+                                <FileText className="h-5 w-5 text-blue-600" />
                                 Documentos
                             </CardTitle>
-                            <CardDescription>
-                                Archivos adjuntos en la aplicación
+                            <CardDescription className="text-gray-500">
+                                Archivos adjuntos proporcionados por el postulante
                             </CardDescription>
                         </CardHeader>
-                        <CardContent className="space-y-4">
+
+                        <CardContent className="space-y-5">
+
+                            {/* CV */}
                             {application.cv ? (
-                                <div className="flex items-center justify-between p-3 border rounded-lg">
+                                <div className="flex items-center justify-between p-4 border rounded-lg bg-gray-50 hover:bg-gray-100 transition">
                                     <div className="flex items-center gap-3">
                                         <FileText className="h-5 w-5 text-blue-600" />
                                         <div>
-                                            <p className="text-sm font-medium">Currículum Vitae</p>
-                                            <p className="text-xs text-muted-foreground">PDF/DOC</p>
+                                            <p className="text-sm font-semibold">Currículum Vitae</p>
+                                            <p className="text-xs text-gray-500">PDF / DOC</p>
                                         </div>
                                     </div>
+
                                     <Button
                                         variant="outline"
                                         size="sm"
-                                        onClick={() => handleDownload(
-                                            application.cv!,
-                                            `CV_${application.full_name.replace(/\s+/g, '_')}.pdf`
-                                        )}
+                                        className="rounded-full"
+                                        onClick={() =>
+                                            handleDownload(
+                                                application.cv!,
+                                                `CV_${application.full_name.replace(/\s+/g, '_')}.pdf`
+                                            )
+                                        }
                                     >
                                         <Download className="h-4 w-4 mr-1" />
                                         Descargar
                                     </Button>
                                 </div>
                             ) : (
-                                <div className="text-center py-4 text-muted-foreground">
-                                    <FileText className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                                <div className="text-center py-4 text-gray-500">
+                                    <FileText className="h-8 w-8 mx-auto mb-2 opacity-40" />
                                     <p className="text-sm">No se adjuntó currículum vitae</p>
                                 </div>
                             )}
 
+                            {/* DOCUMENTOS EXTRA */}
                             {application.extra_documents && application.extra_documents.length > 0 ? (
-                                <div className="space-y-3">
-                                    <h4 className="text-sm font-medium">Documentos Adicionales</h4>
+                                <div className="space-y-4">
+                                    <h4 className="text-sm font-semibold text-gray-700">Documentos Adicionales</h4>
+
                                     {application.extra_documents.map((doc, index) => (
-                                        <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                                        <div
+                                            key={index}
+                                            className="flex items-center justify-between p-4 border rounded-lg bg-gray-50 hover:bg-gray-100 transition"
+                                        >
                                             <div className="flex items-center gap-3">
                                                 <FileText className="h-4 w-4 text-green-600" />
                                                 <div>
-                                                    <p className="text-sm font-medium">Documento {index + 1}</p>
-                                                    <p className="text-xs text-muted-foreground">Archivo adjunto</p>
+                                                    <p className="text-sm font-semibold">Documento {index + 1}</p>
+                                                    <p className="text-xs text-gray-500">Archivo adjunto</p>
                                                 </div>
                                             </div>
+
                                             <Button
                                                 variant="outline"
                                                 size="sm"
-                                                onClick={() => handleDownload(
-                                                    doc,
-                                                    `Doc_${application.full_name.replace(/\s+/g, '_')}_${index + 1}.pdf`
-                                                )}
+                                                className="rounded-full"
+                                                onClick={() =>
+                                                    handleDownload(
+                                                        doc,
+                                                        `Doc_${application.full_name.replace(/\s+/g, '_')}_${index + 1}.pdf`
+                                                    )
+                                                }
                                             >
                                                 <Download className="h-4 w-4 mr-1" />
                                                 Descargar
@@ -203,38 +244,16 @@ export default function Show({ application }: Props) {
                                     ))}
                                 </div>
                             ) : (
-                                <div className="text-center py-4 text-muted-foreground">
-                                    <FileText className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                                <div className="text-center py-4 text-gray-500">
+                                    <FileText className="h-8 w-8 mx-auto mb-2 opacity-40" />
                                     <p className="text-sm">No se adjuntaron documentos adicionales</p>
                                 </div>
                             )}
                         </CardContent>
                     </Card>
                 </div>
-
-                {/* Application Status */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Estado de la Aplicación</CardTitle>
-                        <CardDescription>
-                            Información general sobre el estado de esta aplicación
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="flex items-center gap-4">
-                            <Badge variant="secondary" className="text-sm">
-                                ID: {application.id}
-                            </Badge>
-                            <Badge variant="outline" className="text-sm">
-                                Activa
-                            </Badge>
-                            <Badge variant="outline" className="text-sm">
-                                {application.extra_documents ? application.extra_documents.length + (application.cv ? 1 : 0) : (application.cv ? 1 : 0)} documento(s)
-                            </Badge>
-                        </div>
-                    </CardContent>
-                </Card>
             </div>
+
             <Toaster richColors position="top-right" />
         </AppLayout>
     );

@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
-import { Head, useForm } from '@inertiajs/react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Head, useForm } from '@inertiajs/react';
+import { FileText, IdCard, Phone, Upload, User } from 'lucide-react';
+import React, { useState } from 'react';
 import { Toaster, toast } from 'sonner';
-import { Upload, FileText, User, Phone, IdCard } from 'lucide-react';
 
 export default function Create() {
     const { data, setData, post, processing, errors, reset } = useForm({
         full_name: '',
         ci: '',
+        area: '',
         phone: '',
         cv: null as File | null,
         extra_documents: [] as File[],
@@ -40,16 +41,16 @@ export default function Create() {
         const maxSize = 20 * 1024 * 1024; // 20MB
 
         // Check each file size
-        const oversizedFiles = files.filter(file => file.size > maxSize);
+        const oversizedFiles = files.filter((file) => file.size > maxSize);
         if (oversizedFiles.length > 0) {
-            const oversizedNames = oversizedFiles.map(file => `${file.name} (${(file.size / (1024 * 1024)).toFixed(2)}MB)`).join(', ');
+            const oversizedNames = oversizedFiles.map((file) => `${file.name} (${(file.size / (1024 * 1024)).toFixed(2)}MB)`).join(', ');
             toast.error(`❌ Archivos demasiado grandes (máximo 20MB cada uno): ${oversizedNames}`);
             e.target.value = ''; // Clear the input
             return;
         }
 
         setData('extra_documents', files);
-        setExtraDocumentsPreview(files.map(file => file.name));
+        setExtraDocumentsPreview(files.map((file) => file.name));
     };
 
     const removeCv = () => {
@@ -100,26 +101,22 @@ export default function Create() {
         <>
             <Head title="Trabaja con Nosotros" />
 
-            <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
-                <div className="max-w-2xl mx-auto">
-                    <div className="text-center mb-8">
-                                <h1 className="text-4xl font-bold text-gray-900 mb-4">
-                                    ¡Trabaja con Nosotros!
-                                </h1>
-                                <p className="text-lg text-gray-600">
-                                    Únete a nuestro talentoso equipo. Completa el formulario y envía tus documentos para que podamos conocerte mejor.
-                                </p>
-                            </div>
+            <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 px-4 py-12 sm:px-6 lg:px-8">
+                <div className="mx-auto max-w-2xl">
+                    <div className="mb-8 text-center">
+                        <h1 className="mb-4 text-4xl font-bold text-gray-900">¡Trabaja con Nosotros!</h1>
+                        <p className="text-lg text-gray-600">
+                            Únete a nuestro talentoso equipo. Completa el formulario y envía tus documentos para que podamos conocerte mejor.
+                        </p>
+                    </div>
 
                     <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
-                                    <User className="h-5 w-5" />
-                                    Información Personal
-                                </CardTitle>
-                                <CardDescription>
-                                    Proporciona tus datos personales para que podamos contactarte.
-                                </CardDescription>
+                                <User className="h-5 w-5" />
+                                Información Personal
+                            </CardTitle>
+                            <CardDescription>Proporciona tus datos personales para que podamos contactarte.</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <form onSubmit={submit} className="space-y-6">
@@ -140,10 +137,9 @@ export default function Create() {
                                     {errors.full_name && (
                                         <Alert variant="destructive">
                                             <AlertDescription>
-                                                {errors.full_name === 'validation.required' ?
-                                                    'El nombre completo es obligatorio' :
-                                                    'El nombre debe tener al menos 2 caracteres'
-                                                }
+                                                {errors.full_name === 'validation.required'
+                                                    ? 'El nombre completo es obligatorio'
+                                                    : 'El nombre debe tener al menos 2 caracteres'}
                                             </AlertDescription>
                                         </Alert>
                                     )}
@@ -166,10 +162,9 @@ export default function Create() {
                                     {errors.ci && (
                                         <Alert variant="destructive">
                                             <AlertDescription>
-                                                {errors.ci === 'validation.required' ?
-                                                    'La cédula de identidad es obligatoria' :
-                                                    'Ingresa una cédula válida (solo números y guiones)'
-                                                }
+                                                {errors.ci === 'validation.required'
+                                                    ? 'La cédula de identidad es obligatoria'
+                                                    : 'Ingresa una cédula válida (solo números y guiones)'}
                                             </AlertDescription>
                                         </Alert>
                                     )}
@@ -192,11 +187,36 @@ export default function Create() {
                                     {errors.phone && (
                                         <Alert variant="destructive">
                                             <AlertDescription>
-                                                {errors.phone === 'validation.required' ?
-                                                    'El número de teléfono es obligatorio' :
-                                                    'Ingresa un número de teléfono válido'
-                                                }
+                                                {errors.phone === 'validation.required'
+                                                    ? 'El número de teléfono es obligatorio'
+                                                    : 'Ingresa un número de teléfono válido'}
                                             </AlertDescription>
+                                        </Alert>
+                                    )}
+                                </div>
+                                {/* AREA */}
+                                <div className="space-y-2">
+                                    <Label htmlFor="area">Área de Postulación *</Label>
+
+                                    <select
+                                        id="area"
+                                        value={data.area}
+                                        onChange={(e) => setData('area', e.target.value)}
+                                        required
+                                        className="w-full rounded-md border border-gray-300 p-2"
+                                    >
+                                        <option value="">Seleccione un área</option>
+                                        <option value="AREA DE PRODUCCION">Área de Producción</option>
+                                        <option value="EDICION">Edición</option>
+                                        <option value="CAMAROGRAFO">Camarógrafo</option>
+                                        <option value="MARKETING">Marketing</option>
+                                        <option value="EJECUTIVO DE VENTAS">Ejecutivo de Ventas</option>
+                                        <option value="ASESOR CREATIVO">Asesor Creativo</option>
+                                    </select>
+
+                                    {errors.area && (
+                                        <Alert variant="destructive">
+                                            <AlertDescription>El área es obligatoria</AlertDescription>
                                         </Alert>
                                     )}
                                 </div>
@@ -207,24 +227,12 @@ export default function Create() {
                                         <FileText className="h-4 w-4" />
                                         Currículum Vitae (CV) *
                                     </Label>
-                                    <Input
-                                        id="cv"
-                                        type="file"
-                                        accept=".pdf,.doc,.docx"
-                                        onChange={handleCvChange}
-                                        className="hidden"
-                                    />
+                                    <Input id="cv" type="file" accept=".pdf,.doc,.docx" onChange={handleCvChange} className="hidden" />
                                     <div className="flex items-center gap-4">
-                                        <Input
-                                            id="cv"
-                                            type="file"
-                                            accept=".pdf,.doc,.docx"
-                                            onChange={handleCvChange}
-                                            className="hidden"
-                                        />
+                                        <Input id="cv" type="file" accept=".pdf,.doc,.docx" onChange={handleCvChange} className="hidden" />
                                         <Label
                                             htmlFor="cv"
-                                            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-50"
+                                            className="flex cursor-pointer items-center gap-2 rounded-md border border-gray-300 px-4 py-2 hover:bg-gray-50"
                                         >
                                             <Upload className="h-4 w-4" />
                                             Seleccionar archivo
@@ -235,7 +243,7 @@ export default function Create() {
                                                 <button
                                                     type="button"
                                                     onClick={removeCv}
-                                                    className="text-red-500 hover:text-red-700 text-sm font-bold"
+                                                    className="text-sm font-bold text-red-500 hover:text-red-700"
                                                     title="Quitar archivo"
                                                 >
                                                     ✕
@@ -243,20 +251,17 @@ export default function Create() {
                                             </div>
                                         )}
                                     </div>
-                                    <p className="text-sm text-gray-500">
-                                        📄 Formatos aceptados: PDF, DOC, DOCX (máximo 20MB)
-                                    </p>
+                                    <p className="text-sm text-gray-500">📄 Formatos aceptados: PDF, DOC, DOCX (máximo 20MB)</p>
                                     {errors.cv && (
                                         <Alert variant="destructive">
                                             <AlertDescription>
-                                                {errors.cv.includes('required') || errors.cv.includes('The cv field is required') ?
-                                                    'El currículum vitae es obligatorio para postular' :
-                                                    errors.cv.includes('mimes') || errors.cv.includes('The cv must be a file of type') ?
-                                                    'Solo se aceptan archivos PDF, DOC o DOCX' :
-                                                    errors.cv.includes('max') || errors.cv.includes('The cv may not be greater than') ?
-                                                        'El archivo es demasiado grande (máximo 20MB)' :
-                                                    `Error con el archivo del CV: ${errors.cv}`
-                                                }
+                                                {errors.cv.includes('required') || errors.cv.includes('The cv field is required')
+                                                    ? 'El currículum vitae es obligatorio para postular'
+                                                    : errors.cv.includes('mimes') || errors.cv.includes('The cv must be a file of type')
+                                                      ? 'Solo se aceptan archivos PDF, DOC o DOCX'
+                                                      : errors.cv.includes('max') || errors.cv.includes('The cv may not be greater than')
+                                                        ? 'El archivo es demasiado grande (máximo 20MB)'
+                                                        : `Error con el archivo del CV: ${errors.cv}`}
                                             </AlertDescription>
                                         </Alert>
                                     )}
@@ -279,7 +284,7 @@ export default function Create() {
                                         />
                                         <Label
                                             htmlFor="extra_documents"
-                                            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-50"
+                                            className="flex cursor-pointer items-center gap-2 rounded-md border border-gray-300 px-4 py-2 hover:bg-gray-50"
                                         >
                                             <Upload className="h-4 w-4" />
                                             Seleccionar archivos
@@ -287,12 +292,15 @@ export default function Create() {
                                         {extraDocumentsPreview.length > 0 && (
                                             <div className="flex flex-wrap gap-2">
                                                 {extraDocumentsPreview.map((name, index) => (
-                                                    <div key={index} className="flex items-center gap-1 text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                                                        <span className="truncate max-w-32">{name}</span>
+                                                    <div
+                                                        key={index}
+                                                        className="flex items-center gap-1 rounded bg-blue-100 px-2 py-1 text-sm text-blue-800"
+                                                    >
+                                                        <span className="max-w-32 truncate">{name}</span>
                                                         <button
                                                             type="button"
                                                             onClick={() => removeExtraDocument(index)}
-                                                            className="text-red-500 hover:text-red-700 text-xs font-bold ml-1"
+                                                            className="ml-1 text-xs font-bold text-red-500 hover:text-red-700"
                                                             title="Quitar archivo"
                                                         >
                                                             ✕
@@ -308,23 +316,18 @@ export default function Create() {
                                     {errors.extra_documents && (
                                         <Alert variant="destructive">
                                             <AlertDescription>
-                                                {errors.extra_documents.includes('mimes') ?
-                                                    'Solo se aceptan archivos PDF, DOC, DOCX, JPG, JPEG o PNG' :
-                                                    errors.extra_documents.includes('max') ?
-                                                        'Uno o más archivos superan el límite de 20MB' :
-                                                    'Error con los documentos adicionales'
-                                                }
+                                                {errors.extra_documents.includes('mimes')
+                                                    ? 'Solo se aceptan archivos PDF, DOC, DOCX, JPG, JPEG o PNG'
+                                                    : errors.extra_documents.includes('max')
+                                                      ? 'Uno o más archivos superan el límite de 20MB'
+                                                      : 'Error con los documentos adicionales'}
                                             </AlertDescription>
                                         </Alert>
                                     )}
                                 </div>
 
                                 {/* Submit Button */}
-                                <Button
-                                    type="submit"
-                                    disabled={processing}
-                                    className="w-full bg-red-600 hover:bg-red-700"
-                                >
+                                <Button type="submit" disabled={processing} className="w-full bg-red-600 hover:bg-red-700">
                                     {processing ? '⏳ Enviando aplicación...' : '🚀 Enviar mi aplicación'}
                                 </Button>
                             </form>

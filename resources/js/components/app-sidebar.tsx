@@ -187,7 +187,7 @@ export function AppSidebar() {
                     { title: 'Usuarios', href: '/users', icon: PersonIcon },
                     { title: 'Roles', href: '/roles', icon: AdminPanelSettingsIcon },
                     { title: 'Gestion de tipos', href: '/tipos', icon: SettingsSuggestIcon }, // CAMBIADO
-                    { title: 'Aplicaciones de Trabajo', href: '/admin/job-applications', icon: WorkIcon },
+                    { title: 'Postulaciones de Trabajo', href: '/admin/job-applications', icon: WorkIcon },
                 ],
                 isCollapsible: true,
             },

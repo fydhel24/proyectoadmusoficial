@@ -51,7 +51,8 @@ type DiaSemana = {
 type Influencer = {
     id: number;
     name: string;
-    bookingId: number; // ✅ Este lo necesitas
+    start_time?: string; 
+    bookingId: number; 
 };
 
 type EmpresaConDisponibilidad = {
@@ -593,6 +594,7 @@ const Semanainfluencer = () => {
                                         fontWeight: 'bold',
                                         color: '#4A90E2',
                                         verticalAlign: 'middle',
+
                                         background: 'transparent',
                                         borderBottom: '1px solidrgb(232, 11, 11)',
                                     }}
@@ -840,22 +842,19 @@ const Semanainfluencer = () => {
                                                                     ).map((influencer, i) => (
                                                                         <Fade key={i} in timeout={400 + i * 80}>
                                                                             <Chip
-                                                                                avatar={
-                                                                                    <Avatar
-                                                                                        sx={{
-                                                                                            bgcolor: alpha(
-                                                                                                turno === 'mañana' ? '#4caf50' : '#2196f3',
-                                                                                                0.15,
-                                                                                            ),
-                                                                                            width: 18,
-                                                                                            height: 18,
-                                                                                        }}
-                                                                                    >
-                                                                                        <Person fontSize="inherit" />
-                                                                                    </Avatar>
-                                                                                }
+                                                                                
+                                                                                
                                                                                 label={
                                                                                     <span style={{ fontSize: '0.75rem' }}>
+                                                                                        <span
+                                                                                            style={{
+                                                                                                color: '#FFA726',
+                                                                                                fontSize: '0.8rem',
+                                                                                                marginRight: '4px',
+                                                                                            }}
+                                                                                        >
+                                                                                             {influencer.start_time ? `${influencer.start_time} ` : ''}
+                                                                                        </span>
                                                                                         {influencer.name.split(' ').slice(0, 2).join(' ')}
                                                                                     </span>
                                                                                 }

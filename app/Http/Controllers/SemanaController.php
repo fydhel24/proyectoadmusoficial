@@ -220,6 +220,8 @@ class SemanaController extends Controller
                     'id' => $b->user_id,
                     'name' => optional($b->user)->name,
                     'bookingId' => $b->id,
+                    'start_time' => Carbon::parse($b->start_time)->format('H:i'),
+                    'end_time' => Carbon::parse($b->end_time)->format('H:i'),
                 ])->values();
 
                 $influencersAsignados[$day][$turno] = $asignados;

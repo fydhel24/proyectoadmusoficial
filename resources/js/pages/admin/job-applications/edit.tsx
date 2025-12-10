@@ -183,7 +183,7 @@ export default function Edit({ application }: Props) {
                                     <option value="CAMAROGRAFO">Camarógrafo</option>
                                     <option value="MARKETING">Marketing</option>
                                     <option value="VENTAS">Ejecutivo de Ventas</option>
-                                    <option value="ASESOR">Creativo</option>
+                                    <option value="CREATIVO">Creativo</option>
                                     <option value="TALENTO">Talentos(Influencer)</option>
                                     <option value="PASANTE">Pasante</option>
                                 </select>

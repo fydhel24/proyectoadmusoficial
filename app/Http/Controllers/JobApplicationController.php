@@ -23,11 +23,16 @@ class JobApplicationController extends Controller
             });
         }
 
+        // Area filter functionality
+        if ($request->has('area') && !empty($request->area)) {
+            $query->where('area', $request->area);
+        }
+
         $applications = $query->latest()->paginate(10);
 
         return Inertia::render('admin/job-applications/index', [
             'applications' => $applications,
-            'filters' => $request->only(['search']),
+            'filters' => $request->only(['search', 'area']),
         ]);
     }
 

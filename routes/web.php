@@ -591,6 +591,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/reportes/{id}/editar', [ReporteVentaController::class, 'edit'])->name('reportes.edit');
     // También necesitarás la ruta para actualizar:
     Route::put('/reportes/{id}', [ReporteVentaController::class, 'update'])->name('reportes.update');
+    Route::delete('/clear-bookings', [SemanaController::class, 'clearBookings'])->name('clear.bookings');
 
     // Job Applications Routes
 

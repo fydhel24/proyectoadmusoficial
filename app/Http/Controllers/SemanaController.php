@@ -777,4 +777,48 @@ class SemanaController extends Controller
             'week' => $week, // También podrías enviar el objeto semana
         ]);
     }
+    // En SemanaController.php
+
+    public function clearBookings(Request $request)
+    {
+        $tipo = $request->query('tipo', 'actual'); // 'actual' o 'ultima'
+
+        if ($tipo === 'ultima') {
+            $semanaActual = Week::whereDate('start_date', '<=', Carbon::now())
+                ->whereDate('end_date', '>=', Carbon::now())
+                ->first();
+
+            if (!$semanaActual) {
+                return response()->json(['message' => 'No se encontró la semana actual.'], 404);
+            }
+
+            // Buscar la semana anterior (por fecha de inicio)
+            $semanaAnterior = Week::where('end_date', '<', $semanaActual->start_date)
+                ->orderBy('end_date', 'desc')
+                ->first();
+
+            if (!$semanaAnterior) {
+                return response()->json(['message' => 'No hay una semana anterior registrada.'], 404);
+            }
+
+            $weekIds = [$semanaAnterior->id];
+        } else {
+            // Semana actual
+            $semana = Week::whereDate('start_date', '<=', Carbon::now())
+                ->whereDate('end_date', '>=', Carbon::now())
+                ->first();
+
+            if (!$semana) {
+                return response()->json(['message' => 'No se encontró la semana actual.'], 404);
+            }
+
+            $weekIds = [$semana->id];
+        }
+
+        $deleted = Booking::whereIn('week_id', $weekIds)->delete();
+
+        return response()->json([
+            'message' => "Se eliminaron {$deleted} reservas de la semana " . ($tipo === 'ultima' ? 'anterior' : 'actual') . ".",
+        ]);
+    }
 }

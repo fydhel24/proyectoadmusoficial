@@ -1,6 +1,6 @@
 import AppLayout from '@/layouts/app-layout';
 import { usePage } from '@inertiajs/react';
-import { Add, Business, Close, Delete, NightsStay, Person, PictureAsPdf, Schedule, WbSunny } from '@mui/icons-material';
+import { Add, Business, Close, Delete, NightsStay, PictureAsPdf, Schedule, WbSunny } from '@mui/icons-material';
 import {
     alpha,
     Avatar,
@@ -51,8 +51,8 @@ type DiaSemana = {
 type Influencer = {
     id: number;
     name: string;
-    start_time?: string; 
-    bookingId: number; 
+    start_time?: string;
+    bookingId: number;
 };
 
 type EmpresaConDisponibilidad = {
@@ -352,6 +352,25 @@ const Semanainfluencer = () => {
                             }}
                         >
                             Generar Reporte PDF
+                        </Button>
+                        {/* Botón: Eliminar bookings de la semana actual */}
+                        <Button
+                            variant="outlined"
+                            color="warning"
+                            onClick={async () => {
+                                if (window.confirm('¿Eliminar todas las reservas de la SEMANA ACTUAL? Esta acción no se puede deshacer.')) {
+                                    try {
+                                        const res = await axios.delete('/clear-bookings', { params: { tipo: 'actual' } });
+                                        alert(res.data.message);
+                                        window.location.reload();
+                                    } catch (e) {
+                                        alert('Error al eliminar las reservas.');
+                                    }
+                                }
+                            }}
+                            sx={{ textTransform: 'none', fontWeight: 'bold', borderRadius: 3, px: 3, py: 1 }}
+                        >
+                            Limpiar Asignaciones 
                         </Button>
                         <Button
                             variant="contained"
@@ -842,8 +861,6 @@ const Semanainfluencer = () => {
                                                                     ).map((influencer, i) => (
                                                                         <Fade key={i} in timeout={400 + i * 80}>
                                                                             <Chip
-                                                                                
-                                                                                
                                                                                 label={
                                                                                     <span style={{ fontSize: '0.75rem' }}>
                                                                                         <span
@@ -853,7 +870,7 @@ const Semanainfluencer = () => {
                                                                                                 marginRight: '4px',
                                                                                             }}
                                                                                         >
-                                                                                             {influencer.start_time ? `${influencer.start_time} ` : ''}
+                                                                                            {influencer.start_time ? `${influencer.start_time} ` : ''}
                                                                                         </span>
                                                                                         {influencer.name.split(' ').slice(0, 2).join(' ')}
                                                                                     </span>

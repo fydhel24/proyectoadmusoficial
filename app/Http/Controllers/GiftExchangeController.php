@@ -126,4 +126,10 @@ class GiftExchangeController extends Controller
 
         return response()->json($response);
     }
+    public function adminCompleteData()
+    {
+        // Se asume que el middleware en web.php ya validó que es un administrador.
+        $data = $this->manager->getCompleteCacheData();
+        return response()->json($data);
+    }
 }

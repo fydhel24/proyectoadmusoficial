@@ -63,6 +63,7 @@ export default function Participant({ initialAssignment, initialIsSorted, initia
                 // Después de la redirección exitosa, Inertia recarga el componente.
                 // El estado 'hasParticipated' y el mensaje de éxito vendrán en las nuevas props.
                 // Como el controlador ahora redirige, no necesitamos hacer nada aquí.
+                  window.location.reload();
             },
             onError: (err) => {
                 console.error('Error de validación/server:', err);

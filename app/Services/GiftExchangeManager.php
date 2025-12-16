@@ -155,4 +155,46 @@ class GiftExchangeManager
             'receiver_description' => $receiverData['descripcion'] ?? 'No disponible',
         ];
     }
+    public function getCompleteCacheData(): array
+    {
+        $participants = $this->getParticipants();
+        $results = Cache::get(self::RESULTS_KEY, collect());
+        $isSorted = $this->isSorted();
+
+        // Mapear los nombres de todos los usuarios (para una búsqueda rápida por ID)
+        $userNames = User::all(['id', 'name'])->pluck('name', 'id');
+
+        // Estructura de datos final: lista de participantes enriquecida
+        $data = $participants->map(function ($participant) use ($results, $userNames, $isSorted) {
+            
+            $giverId = $participant['user_id'];
+            $assignment = $results->firstWhere('giver_id', $giverId);
+            
+            $receiverName = null;
+            $receiverId = null;
+
+            if ($isSorted && $assignment) {
+                $receiverId = $assignment['receiver_id'];
+                // Obtener el nombre del receptor usando el array de nombres pre-cargado
+                $receiverName = $userNames->get($receiverId, 'Usuario Eliminado');
+            }
+
+            return [
+                'id' => $giverId,
+                'name' => $participant['name'],
+                'participa' => $participant['participa'],
+                'deseos' => $participant['descripcion'] ?? 'No especificado',
+                'asignacion' => [
+                    'receptor_id' => $receiverId,
+                    'receptor_name' => $receiverName,
+                ],
+            ];
+        })->values()->toArray(); // values() asegura que las claves sean numéricas (0, 1, 2...)
+
+        return [
+            'is_sorted' => $isSorted,
+            'participants_data' => $data,
+            'total_participantes' => $participants->where('participa', true)->count(),
+        ];
+    }
 }

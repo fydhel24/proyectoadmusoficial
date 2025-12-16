@@ -3,7 +3,7 @@
 // resources/js/Layouts/AppSidebar.tsx
 
 // 1. Imports de React e Inertia.js
-import { Link, usePage } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
 
@@ -170,10 +170,17 @@ export function AppSidebar() {
     const isMarketing = roles.includes('marketing');
     const isEmpresa = roles.includes('empresa');
     const isjefeventas = roles.includes('Jefe de Ventas');
+    const IsInvitado = roles.includes('Invitado');
 
     useEffect(() => {
         console.log('🔍 auth.user.roles =', roles);
     }, [roles]);
+
+    useEffect(() => {
+        if (IsInvitado && currentPath !== '/regaloview') {
+            router.visit('/regaloview');
+        }
+    }, [IsInvitado, currentPath]);
 
     // Construir secciones sin Dashboard
     const menuSections: MenuSection[] = [];
@@ -399,6 +406,16 @@ export function AppSidebar() {
                 isCollapsible: true,
             });
         }
+        if(IsInvitado){
+            menuSections.push({
+                title: 'Invitado',
+                icon: PeopleIcon,
+                items: [
+                    { title: 'Regalo secreto', href: '/regaloview', icon: BusinessIcon },
+                ],
+                isCollapsible: false,
+            });
+        }
     }
 
     return (
@@ -432,6 +449,25 @@ export function AppSidebar() {
                             >
                                 <DashboardIcon className="h-5 w-5 text-white" />
                                 <span className="font-medium">Panel Principal</span>
+                            </Link>
+                        </SidebarMenuButton>
+                        <SidebarMenuButton asChild>
+                            <Link
+                                href="/regaloview"
+                                prefetch
+                                className={
+                                    `flex items-center gap-2 rounded-md px-4 py-2 transition-colors duration-150 ` +
+                                    `${currentPath === '/dashboard' ? 'bg-gradient-to-r from-red-500 to-red-600 text-white' : 'text-white hover:bg-red-50 hover:text-gray-800'}`
+                                }
+                            >
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-white">
+                                    <path d="M5.7 21a2 2 0 0 1-3.5-2l8.6-14a6 6 0 0 1 10.4 6 2 2 0 1 1-3.464-2 2 2 0 1 0-3.464-2Z"/>
+                                    <path d="M17.75 7 15 2.1"/>
+                                    <path d="M10.9 4.8 13 9"/>
+                                    <path d="m7.9 9.7 2 4.4"/>
+                                    <path d="M4.9 14.7 7 18.9"/>
+                                </svg>
+                                <span className="font-medium">Navidad Admus</span>
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>

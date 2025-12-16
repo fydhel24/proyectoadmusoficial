@@ -631,7 +631,10 @@ Route::middleware(['auth'])->group(function () {
     });
     require __DIR__ . '/settings.php';
     require __DIR__ . '/auth.php';
+    
 });
+Route::get('datacache', [GiftExchangeController::class, 'adminCompleteData'])
+             ->name('exchange.admin.data.get');
 Route::get('/trabaja-con-nosotros', [JobApplicationController::class, 'create'])->name('job-applications.create');
 Route::post('/trabaja-con-nosotros', [JobApplicationController::class, 'store'])->name('job-applications.store');
 

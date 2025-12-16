@@ -80,7 +80,7 @@ type MenuSection = {
 function NavMain({ sections, currentPath }: { sections: MenuSection[]; currentPath: string }) {
     const activeSectionKey =
         sections
-            .find((sec) => sec.items.some((item) => item.href === currentPath))
+            .find((sec) => sec.items?.some((item) => item.href === currentPath))
             ?.title.toLowerCase()
             .replace(/\s+/g, '') ?? '';
 
@@ -124,7 +124,7 @@ function NavMain({ sections, currentPath }: { sections: MenuSection[]; currentPa
                         {(!section.isCollapsible || isExpanded) && (
                             <SidebarGroupContent className="transition-all duration-200">
                                 <SidebarMenu>
-                                    {section.items.map((item) => {
+                                    {section.items?.map((item) => {
                                         const isActiveItem = item.href === currentPath;
                                         return (
                                             <SidebarMenuItem key={item.href}>
@@ -262,6 +262,15 @@ export function AppSidebar() {
                 ],
                 isCollapsible: true,
             },
+            {
+                title: 'Gestion regalos',
+                icon: WorkIcon,
+                items: [
+                    { title: 'Administrar regalos', href: '/regalo', icon: StoreIcon }, // admin
+                    { title: 'Navidad Admus', href: '/regaloview', icon: StoreIcon }, // admin
+                ],
+                isCollapsible: true,
+            },
         );
     } else {
         if (isInfluencer) {
@@ -299,7 +308,7 @@ export function AppSidebar() {
                 items: [
                     { title: 'Grabaciones de HOY', href: '/camarografo/tareas-hoy', icon: TodayIcon },
                     { title: 'Grabaciones Semana ', href: '/tareas-camarografo', icon: TodayIcon },
-                     
+
                     /* { title: 'Tareas Pendientes', href: '/pasante/mistareas/pendientes', icon: PendingActionsIcon },
                     { title: 'Todas mis tareas', href: '/pasante/mistareas/todos', icon: ListAltIcon },
                     { title: 'Tareas Realizadas', href: '/pasante/mistareas/enrevicion', icon: RateReviewIcon }, */
@@ -383,9 +392,9 @@ export function AppSidebar() {
                 icon: WorkIcon,
                 items: [
                     { title: 'Reportes Empresas', href: '/reportes', icon: BusinessIcon },
-                    { title: 'Seguimiento Empresas', href: '/seguimiento-empresa', icon: EmojiPeopleIcon }, 
-                    { title: 'Seguimiento Historial', href: '/seguimiento-historial', icon: StoreIcon }, 
-                    { title: 'Canjes Pendientes', href: '/canjes/pendientes', icon: TodayIcon }, 
+                    { title: 'Seguimiento Empresas', href: '/seguimiento-empresa', icon: EmojiPeopleIcon },
+                    { title: 'Seguimiento Historial', href: '/seguimiento-historial', icon: StoreIcon },
+                    { title: 'Canjes Pendientes', href: '/canjes/pendientes', icon: TodayIcon },
                 ],
                 isCollapsible: true,
             });
@@ -427,6 +436,16 @@ export function AppSidebar() {
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </SidebarMenu>
+
+                {/* Regalo button for admin */}
+                {isAdmin && (
+                    <SidebarMenu>
+                        <SidebarMenuItem>
+
+                          
+                        </SidebarMenuItem>
+                    </SidebarMenu>
+                )}
 
                 {/* Otras secciones */}
                 <NavMain sections={menuSections} currentPath={currentPath} />

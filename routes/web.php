@@ -19,6 +19,7 @@ use App\Http\Controllers\CompanyLinkComprobanteController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DatoInfluencersController;
 use App\Http\Controllers\EditorController;
+use App\Http\Controllers\GiftExchangeController;
 use App\Http\Controllers\HorarioPersonalController;
 use App\Http\Controllers\InfluencerAvailabilityController;
 use App\Http\Controllers\InfluencerController;
@@ -601,7 +602,33 @@ Route::middleware(['auth'])->group(function () {
             'as' => 'admin'
         ]);
     });
+    // Rutas protegidas (el usuario debe estar logueado)
+    Route::post('participate', [GiftExchangeController::class, 'participate']);
+    Route::get('status', [GiftExchangeController::class, 'status']);
 
+    // Rutas que podrían ser solo para administradores
+    Route::post('init', [GiftExchangeController::class, 'initialize']);
+    Route::post('draw', [GiftExchangeController::class, 'draw']);
+    Route::get('/regalo', [GiftExchangeController::class, 'adminIndex'])->name('regalo.admin.index');
+    Route::get('/regaloview', [GiftExchangeController::class, 'participantView'])->name('regalo.participar');
+    // Endpoints de USUARIO
+    // URL: /exchange/status
+    Route::get('exchange/status', [GiftExchangeController::class, 'status'])->name('exchange.status.get');
+
+    // URL: /exchange/participate
+    // Usaremos el mismo nombre para que Ziggy lo encuentre con useForm
+    Route::post('exchange/participate', [GiftExchangeController::class, 'participate'])->name('exchange.participate');
+    // Endpoints de ADMINISTRADOR
+    Route::prefix('admin')->group(function () {
+        // URL: /exchange/admin/status
+        Route::get('status', [GiftExchangeController::class, 'adminStatus'])->name('exchange.admin.status.get');
+
+        // URL: /exchange/admin/init
+        Route::post('init', [GiftExchangeController::class, 'initialize'])->name('exchange.admin.init');
+
+        // URL: /exchange/admin/draw
+        Route::post('draw', [GiftExchangeController::class, 'draw'])->name('exchange.admin.draw');
+    });
     require __DIR__ . '/settings.php';
     require __DIR__ . '/auth.php';
 });

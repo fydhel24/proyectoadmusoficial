@@ -4,6 +4,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\InfluencerHistoryController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -29,3 +30,7 @@ Route::post('/auth/login', function (Request $request) {
         'password' => $user->password,
     ]);
 });
+
+// Influencer History Routes
+    Route::get('/influencers/list', [InfluencerHistoryController::class, 'list']);
+    Route::get('/influencers/{id}/history', [InfluencerHistoryController::class, 'history']);

@@ -601,6 +601,9 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('admin/job-applications', JobApplicationController::class, [
             'as' => 'admin'
         ]);
+        Route::get('admin/influencer-history', function () {
+            return Inertia::render('InfluencerHistory/Index');
+        })->name('admin.influencer.history');
     });
     // Rutas protegidas (el usuario debe estar logueado)
     Route::post('participate', [GiftExchangeController::class, 'participate']);

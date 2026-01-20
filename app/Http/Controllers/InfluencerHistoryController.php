@@ -51,15 +51,20 @@ class InfluencerHistoryController extends Controller
             $query->whereDate('start_time', '<=', $request->end_date);
         }
 
-        $history = $query->get()->map(function ($booking) {
+        // Group by company
+        $history = $query->get()->groupBy('company_id')->map(function ($bookings) {
+            $company = $bookings->first()->company;
             return [
-                'id' => $booking->id,
-                'company_name' => $booking->company ? $booking->company->name : 'N/A',
-                'company_logo' => $booking->company ? $booking->company->logo : null,
-                'date' => Carbon::parse($booking->start_time)->format('Y-m-d H:i'),
-                'status' => $booking->status,
+                'id' => $company ? $company->id : 0, // Fallback for safety
+                'company_name' => $company ? $company->name : 'N/A',
+                'company_logo' => $company ? $company->logo : null,
+                'count' => $bookings->count(),
+                'dates' => $bookings->map(function ($b) {
+                    return Carbon::parse($b->start_time)->format('Y-m-d H:i');
+                })->values(),
+                'latest_date' => Carbon::parse($bookings->first()->start_time)->format('Y-m-d H:i'),
             ];
-        });
+        })->values();
 
         return response()->json($history);
     }

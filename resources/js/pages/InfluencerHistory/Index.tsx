@@ -45,8 +45,9 @@ type HistoryItem = {
     id: number;
     company_name: string;
     company_logo: string | null;
-    date: string;
-    status: string;
+    count: number;
+    dates: string[];
+    latest_date: string;
 };
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -251,9 +252,18 @@ export default function InfluencerHistoryIndex() {
                         {hasSearched && (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 rounded-xl p-6 shadow-lg flex flex-col justify-between">
-                                    <h3 className="text-gray-400 font-medium text-sm uppercase tracking-wider">Total Empresas Visitadas</h3>
+                                    <h3 className="text-gray-400 font-medium text-sm uppercase tracking-wider">Empresas Distintas</h3>
                                     <div className="mt-4 flex items-baseline gap-2">
                                         <span className="text-4xl font-extrabold text-white">{history.length}</span>
+                                        <span className="text-sm text-gray-500">empresas</span>
+                                    </div>
+                                </div>
+                                <div className="bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 rounded-xl p-6 shadow-lg flex flex-col justify-between">
+                                    <h3 className="text-gray-400 font-medium text-sm uppercase tracking-wider">Total Visitas</h3>
+                                    <div className="mt-4 flex items-baseline gap-2">
+                                        <span className="text-4xl font-extrabold text-white">
+                                            {history.reduce((acc, curr) => acc + curr.count, 0)}
+                                        </span>
                                         <span className="text-sm text-gray-500">visitas</span>
                                     </div>
                                 </div>
@@ -292,11 +302,22 @@ export default function InfluencerHistoryIndex() {
                                                         ) : (
                                                             <div className="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-xs text-gray-400 font-mono">N/A</div>
                                                         )}
-                                                        <span className="text-white text-lg font-medium">{item.company_name}</span>
+                                                        <div>
+                                                            <div className="text-white text-lg font-medium">{item.company_name}</div>
+                                                            <div className="text-sm text-gray-400 mt-1">
+                                                                {item.count} {item.count === 1 ? 'visita' : 'visitas'}
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </TableCell>
-                                                <TableCell className="text-gray-300 py-4 text-base">
-                                                    {item.date}
+                                                <TableCell className="text-gray-300 py-4 text-base align-top">
+                                                    <div className="flex flex-col gap-1">
+                                                        {item.dates.map((date, index) => (
+                                                            <span key={index} className="text-gray-300">
+                                                                {date}
+                                                            </span>
+                                                        ))}
+                                                    </div>
                                                 </TableCell>
                                             </TableRow>
                                         ))

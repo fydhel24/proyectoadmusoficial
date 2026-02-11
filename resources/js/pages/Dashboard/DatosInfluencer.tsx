@@ -5,11 +5,10 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
-import type { PageProps } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import dayjs from 'dayjs';
 import { AnimatePresence, motion } from 'framer-motion';
-import { BarChart3, Calendar, ChevronRight, Clock, Eye, HandMetal, History, PhotoCamera, Target, TrendingUp, Zap } from 'lucide-react';
+import { BarChart3, Calendar, Camera, ChevronRight, Clock, Eye, HandMetal, History, Target, TrendingUp, Zap } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 // Interfaces
@@ -45,12 +44,14 @@ interface NextBooking {
     day_of_week: string;
 }
 
-interface DashboardProps extends PageProps {
-    user: {
-        id: number;
-        name: string;
-        email: string;
-        profile_photo_path: string | null;
+interface DashboardProps {
+    auth: {
+        user: {
+            id: number;
+            name: string;
+            email: string;
+            profile_photo_path: string | null;
+        };
     };
     workingWeeks: Week[];
     daysWorkedByWeek: DaysWorkedData[];
@@ -304,7 +305,7 @@ export default function DatosInfluencer({
                         <MetricCard
                             label="ASSETS DE PERFIL"
                             value={totalPhotos}
-                            icon={<PhotoCamera className="h-6 w-6" />}
+                            icon={<Camera className="h-6 w-6" />}
                             color="bg-rose-600"
                             desc="Fotos y material visual"
                         />

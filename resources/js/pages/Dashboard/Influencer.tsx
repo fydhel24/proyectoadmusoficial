@@ -1,11 +1,9 @@
 'use client';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
-import type { PageProps } from '@/types';
 import { Head } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Activity, BarChart3, Calendar, Clock, HandMetal, MapPin, Sparkles, Target, TrendingUp } from 'lucide-react';
@@ -43,12 +41,14 @@ interface NextBooking {
     day_of_week: string;
 }
 
-interface DashboardProps extends PageProps {
-    user: {
-        id: number;
-        name: string;
-        email: string;
-        profile_photo_path: string | null;
+interface DashboardProps {
+    auth: {
+        user: {
+            id: number;
+            name: string;
+            email: string;
+            profile_photo_path: string | null;
+        };
     };
     workingWeeks: Week[];
     daysWorkedByWeek: DaysWorkedData[];
@@ -67,20 +67,20 @@ interface DashboardProps extends PageProps {
 // Función para traducir días de la semana de inglés a español
 const translateDayToSpanish = (day: string): string => {
     const daysMap: { [key: string]: string } = {
-        'Monday': 'Lunes',
-        'Tuesday': 'Martes',
-        'Wednesday': 'Miércoles',
-        'Thursday': 'Jueves',
-        'Friday': 'Viernes',
-        'Saturday': 'Sábado',
-        'Sunday': 'Domingo',
-        'monday': 'Lunes',
-        'tuesday': 'Martes',
-        'wednesday': 'Miércoles',
-        'thursday': 'Jueves',
-        'friday': 'Viernes',
-        'saturday': 'Sábado',
-        'sunday': 'Domingo',
+        Monday: 'Lunes',
+        Tuesday: 'Martes',
+        Wednesday: 'Miércoles',
+        Thursday: 'Jueves',
+        Friday: 'Viernes',
+        Saturday: 'Sábado',
+        Sunday: 'Domingo',
+        monday: 'Lunes',
+        tuesday: 'Martes',
+        wednesday: 'Miércoles',
+        thursday: 'Jueves',
+        friday: 'Viernes',
+        saturday: 'Sábado',
+        sunday: 'Domingo',
     };
     return daysMap[day] || day;
 };
@@ -219,7 +219,9 @@ export default function InfluencerDashboard({
                             value={nextBooking ? nextBooking.company_name : 'N/A'}
                             icon={<Calendar className="h-6 w-6" />}
                             color="bg-red-600"
-                            desc={nextBooking ? `${translateDayToSpanish(nextBooking.day_of_week)} • ${nextBooking.start_time}` : 'Sin eventos próximos'}
+                            desc={
+                                nextBooking ? `${translateDayToSpanish(nextBooking.day_of_week)} • ${nextBooking.start_time}` : 'Sin eventos próximos'
+                            }
                             isText
                         />
                         <MetricCard

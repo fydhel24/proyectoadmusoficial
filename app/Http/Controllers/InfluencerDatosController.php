@@ -207,6 +207,19 @@ class InfluencerDatosController extends Controller
 
         $dato = $user->dato;
 
+        // Transformar las URLs de las fotos
+        $user->photos->each(function ($photo) {
+            if (!filter_var($photo->path, FILTER_VALIDATE_URL)) {
+                $photo->url = asset('storage/' . $photo->path);
+            } else {
+                $photo->url = $photo->path;
+            }
+        });
+
+        $profilePhoto = $user->photos->where('tipo', 'perfil')->sortByDesc('created_at')->first();
+        $coverPhoto = $user->photos->where('tipo', 'portada')->sortByDesc('created_at')->first();
+        $feedPhotos = $user->photos->where('tipo', 'foto')->sortByDesc('created_at')->values();
+
         $influencer = [
             'id'           => $user->id,
             'name'         => $user->name,
@@ -214,51 +227,33 @@ class InfluencerDatosController extends Controller
             'followers'    => $dato?->seguidores ?? '0',
             'category'     => $dato?->categoria ?? 'Sin categoría',
             'description'  => $dato?->descripcion ?? 'Sin descripción',
-            'avatar'       => $user->fotos->first()?->url ?? '/placeholder.svg',
-            'coverImage'   => $user->fotos->skip(1)->first()?->url ?? '/placeholder.svg',
+            'avatar'       => $profilePhoto?->url ?? '/placeholder.svg',
+            'coverImage'   => $coverPhoto?->url ?? '/placeholder.svg',
             'verified'     => true,
             'engagement'   => $dato?->engagement ?? '0%',
             'rating'       => $dato?->rating ?? '0',
 
             // Clasificados por tipo
-            'gallery' => $user->fotos->pluck('url')->toArray(),
+            'gallery' => $user->photos->where('tipo', 'foto')->pluck('url')->toArray(),
 
             'videos' => $user->videos->map(fn($video) => [
                 'id'        => $video->id,
                 'title'     => $video->nombre ?? 'Video sin título',
                 'url'       => $video->url,
-                'thumbnail' => '/video-thumbnail.jpg', // puedes personalizar
+                'thumbnail' => '/video-thumbnail.jpg',
                 'duration'  => 'N/A',
                 'views'     => 'N/A',
                 'likes'     => 'N/A',
             ])->toArray(),
 
-            'rawData' => $user->datos->map(fn($d) => json_decode($d->path, true))
-                ->collapse()
-                ->toArray(),
-
             // Perfil extendido
             'specialties'    => $dato && $dato->especialidades
                 ? explode(',', $dato->especialidades)
                 : [],
-            'socialNetworks' => $dato && $dato->redes_sociales
-                ? json_decode($dato->redes_sociales, true)
-                : [],
-            'location'       => $dato?->ubicacion ?? '',
-            'joinDate'       => $dato?->fecha_alta ?? '',
-            'bio'            => $dato?->bio ?? '',
-            'languages'      => $dato && $dato->idiomas
-                ? explode(',', $dato->idiomas)
-                : [],
-            'packages'       => $dato && $dato->paquetes
-                ? json_decode($dato->paquetes, true)
-                : [],
-            'reviews'        => $dato && $dato->reseñas
-                ? json_decode($dato->reseñas, true)
-                : [],
-            'totalReviews'   => $dato?->total_reseñas ?? 0,
-            'responseTime'   => $dato?->tiempo_respuesta ?? '',
-            'availability'   => 'available',
+            'photos' => $user->photos,
+            'profilePhoto' => $profilePhoto,
+            'coverPhoto' => $coverPhoto,
+            'feedPhotos' => $feedPhotos,
         ];
 
         return Inertia::render('portafolio/InfluencerProfile', [

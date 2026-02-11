@@ -195,7 +195,7 @@ export default function Header() {
                     ) : (
                         <Link href="/login">
                             <Button className="bg-red-600 hover:bg-red-700 text-white border-none shadow-[0_0_15px_rgba(220,38,38,0.4)] transition-all duration-300 hover:scale-105">
-                                Login
+                                Iniciar Sesion
                             </Button>
                         </Link>
                     )}

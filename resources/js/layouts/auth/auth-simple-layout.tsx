@@ -13,18 +13,19 @@ export default function AuthSimpleLayout({ children, title, description }: Props
     return (
         <div className="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden bg-[#FDF5E6]"> {/* Fondo general del layout con el beige claro */}
 
-            {/* Fondo con imagen (fondo4.png, asumiendo que es beige) */}
-            <div
-                aria-hidden="true"
-                className="absolute inset-0 z-0"
-                style={{
-                    backgroundImage: "url('/Gflores/fondo4.png')",
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    backgroundRepeat: 'no-repeat',
-                    opacity: 0.8, // Ligera opacidad para que el fondo beige de base se vea un poco y el texto resalte
-                }}
-            />
+            {/* Fondo con Video */}
+            <div aria-hidden="true" className="absolute inset-0 z-0">
+                <video
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="h-full w-full object-cover"
+                >
+                    <source src="/assets/auth/fondologinadmus.mp4" type="video/mp4" />
+                </video>
+                <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]" /> {/* Overlay para legibilidad */}
+            </div>
 
             {/* Logo de la aplicación con animación */}
             <motion.div
@@ -43,32 +44,11 @@ export default function AuthSimpleLayout({ children, title, description }: Props
             <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, ease: 'easeOut', delay: 0.2 }} // Añade un pequeño delay para que aparezca después del logo
-                className="relative z-10 w-full max-w-md bg-[#FDF5E6]/80 backdrop-blur-md p-8 rounded-xl shadow-2xl border border-[#C0C0C0]/50 space-y-6" // Fondo beige semitransparente, borde suave
+                transition={{ duration: 0.6, ease: 'easeOut', delay: 0.2 }}
+                className="relative z-10 w-full max-w-5xl bg-white/5 backdrop-blur-xl rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-white/10 overflow-hidden"
             >
-                <div className="text-center space-y-2">
-                    <motion.h1
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.4 }}
-                        className="text-3xl font-extrabold text-[#6B5B4C] select-none" // Título en color de contraste oscuro
-                    >
-                        {title}
-                    </motion.h1>
-                    {description && (
-                        <motion.p
-                            initial={{ opacity: 0, y: -10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, delay: 0.5 }}
-                            className="text-sm text-[#A9A9A9] select-none" // Descripción en color secundario
-                        >
-                            {description}
-                        </motion.p>
-                    )}
-                </div>
-
-                {/* Contenido del formulario (se renderizará el Login.tsx aquí) */}
-                <div>{children}</div>
+                {/* Contenido (Login.tsx manejará el grid interno) */}
+                <div className="w-full h-full">{children}</div>
             </motion.div>
         </div>
     );

@@ -10,7 +10,19 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
-import { Briefcase, Calendar, Camera, Edit2, Heart, Image as ImageIcon, MapPin, MoreHorizontal, Plus, Trash2, User as UserIcon } from 'lucide-react';
+import {
+    Briefcase,
+    Calendar,
+    Camera,
+    Edit2,
+    Image as ImageIcon,
+    MapPin,
+    MoreHorizontal,
+    Plus,
+    Settings,
+    Trash2,
+    User as UserIcon,
+} from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -19,7 +31,7 @@ interface Photo {
     path: string;
     url: string;
     nombre: string;
-    tipo: string;
+    tipo: string; // 'foto', 'perfil', 'portada'
     created_at: string;
 }
 
@@ -40,14 +52,17 @@ interface Props {
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Perfil',
+        title: 'Mi Perfil Premium',
         href: '/facebook-profile',
     },
 ];
 
-export default function FacebookStyle({ profileUser, profilePhoto, coverPhoto, feedPhotos, isOwnProfile }: Props) {
+export default function FacebookStyle({ profileUser, profilePhoto, coverPhoto, feedPhotos = [], isOwnProfile }: Props) {
     const [uploadType, setUploadType] = useState<'foto' | 'perfil' | 'portada'>('foto');
     const [isUploadOpen, setIsUploadOpen] = useState(false);
+
+    // Asegurarse de que feedPhotos sea siempre un array para evitar el error .map is not a function
+    const safeFeedPhotos = Array.isArray(feedPhotos) ? feedPhotos : [];
 
     const {
         data,
@@ -58,7 +73,7 @@ export default function FacebookStyle({ profileUser, profilePhoto, coverPhoto, f
         reset,
         errors,
     } = useForm({
-        photo: null as File | null,
+        file: null as File | null,
         tipo: 'foto',
         nombre: '',
     });
@@ -69,11 +84,11 @@ export default function FacebookStyle({ profileUser, profilePhoto, coverPhoto, f
             onSuccess: () => {
                 setIsUploadOpen(false);
                 reset();
-                toast.success('Foto subida con éxito');
+                toast.success('Foto publicada con éxito');
             },
             onError: (err) => {
                 console.error(err);
-                toast.error('Error al subir la foto');
+                toast.error('Error al subir la imagen');
             },
         });
     };
@@ -96,331 +111,304 @@ export default function FacebookStyle({ profileUser, profilePhoto, coverPhoto, f
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Perfil de ${profileUser.name}`} />
 
-            <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-950">
-                {/* Portada y Perfil Header */}
-                <div className="relative mx-auto w-full max-w-6xl overflow-hidden rounded-b-xl border-x border-b border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
-                    {/* Cover Photo */}
-                    <div className="group relative h-48 bg-slate-200 md:h-80 dark:bg-slate-800">
+            <div className="flex min-h-screen flex-col bg-[#fff5f5] dark:bg-[#0a0000]">
+                {/* Header Premium con Degradado Rojo */}
+                <div className="relative mx-auto w-full max-w-6xl overflow-hidden rounded-b-[2rem] border-x border-b border-red-100 bg-white shadow-2xl dark:border-red-900/30 dark:bg-[#1a0505]">
+                    {/* Portada Premium */}
+                    <div className="group relative h-56 bg-red-50 md:h-[400px] dark:bg-black">
                         {coverPhoto ? (
-                            <img src={coverPhoto.url} alt="Portada" className="h-full w-full object-cover" />
+                            <img
+                                src={coverPhoto.url}
+                                alt="Portada"
+                                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                            />
                         ) : (
-                            <div className="flex h-full w-full items-center justify-center bg-gradient-to-r from-blue-400 to-blue-600">
-                                <ImageIcon className="h-12 w-12 text-white opacity-50" />
+                            <div className="to-crimson-700 flex h-full w-full items-center justify-center bg-gradient-to-br from-red-600 via-rose-600">
+                                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
+                                <ImageIcon className="h-16 w-16 animate-pulse text-white/40" />
                             </div>
                         )}
 
+                        {/* Overlay Gradiente Portada */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+
                         {isOwnProfile && (
                             <Button
-                                variant="secondary"
+                                variant="outline"
                                 size="sm"
-                                className="absolute right-4 bottom-4 gap-2 bg-white/90 shadow-sm hover:bg-white dark:bg-slate-900/90 dark:hover:bg-slate-900"
+                                className="absolute right-6 bottom-6 gap-2 border-white/30 bg-white/10 text-white backdrop-blur-md transition-all duration-300 hover:scale-105 hover:bg-white/20"
                                 onClick={() => openUploadModal('portada')}
                             >
-                                <Camera className="h-4 w-4" />
-                                <span className="hidden md:inline">Editar foto de portada</span>
+                                <Camera className="h-4 w-4 text-red-400" />
+                                <span className="hidden font-semibold md:inline">Cambiar Portada</span>
                             </Button>
                         )}
                     </div>
 
-                    {/* Profile Info Overlay */}
-                    <div className="px-4 pb-4 md:px-8">
-                        <div className="relative z-10 -mt-12 mb-4 flex flex-col items-center gap-4 md:-mt-8 md:flex-row md:items-end">
-                            {/* Avatar */}
-                            <div className="group relative">
-                                <Avatar className="h-32 w-32 border-4 border-white shadow-md md:h-40 md:w-40 dark:border-slate-900">
+                    {/* Info de Perfil - Estética Overlap */}
+                    <div className="px-6 pb-8 md:px-12">
+                        <div className="relative z-10 -mt-16 mb-6 flex flex-col items-center gap-6 md:-mt-20 md:flex-row md:items-end">
+                            {/* Avatar Esférico con Glow */}
+                            <div className="group relative rounded-full bg-white p-1 shadow-2xl dark:bg-[#1a0505]">
+                                <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-red-600 to-rose-500 opacity-25 blur transition duration-1000 group-hover:opacity-100 group-hover:duration-200"></div>
+                                <Avatar className="relative h-32 w-32 border-4 border-white ring-2 ring-red-500/20 md:h-44 md:w-44 dark:border-[#1a0505]">
                                     <AvatarImage src={profilePhoto?.url} className="object-cover" />
-                                    <AvatarFallback className="bg-slate-100 text-2xl dark:bg-slate-800">{profileUser.name.charAt(0)}</AvatarFallback>
+                                    <AvatarFallback className="bg-gradient-to-br from-red-500 to-rose-600 text-3xl font-bold text-white">
+                                        {profileUser.name.charAt(0)}
+                                    </AvatarFallback>
                                 </Avatar>
                                 {isOwnProfile && (
-                                    <div
-                                        className="absolute right-1 bottom-1 cursor-pointer rounded-full border-2 border-white bg-slate-100 p-2 transition-colors hover:bg-slate-200 md:right-2 md:bottom-2 dark:border-slate-900 dark:bg-slate-800 dark:hover:bg-slate-700"
+                                    <button
+                                        className="group absolute right-2 bottom-2 cursor-pointer rounded-full border-4 border-white bg-red-600 p-2.5 shadow-lg transition-all duration-300 hover:scale-110 hover:bg-red-700 active:scale-95 dark:border-[#1a0505] dark:bg-red-700 dark:hover:bg-red-800"
                                         onClick={() => openUploadModal('perfil')}
                                     >
-                                        <Camera className="h-5 w-5" />
-                                    </div>
+                                        <Camera className="h-5 w-5 text-white" />
+                                    </button>
                                 )}
                             </div>
 
-                            {/* Name and Basic Buttons */}
-                            <div className="flex-1 pt-2 text-center md:text-left">
-                                <h1 className="text-2xl font-bold text-slate-900 md:text-3xl dark:text-slate-50">{profileUser.name}</h1>
-                                <p className="font-medium text-slate-500 dark:text-slate-400">{profileUser.photos.length} Fotos</p>
+                            {/* Nombre y Estadísticas */}
+                            <div className="flex-1 pt-4 text-center md:text-left">
+                                <h1 className="flex items-center justify-center gap-2 text-3xl font-black tracking-tight text-slate-900 md:justify-start md:text-4xl dark:text-white">
+                                    {profileUser.name}
+                                </h1>
                             </div>
 
-                            {/* Action Buttons */}
-                            <div className="flex gap-2 pb-2">
+                            {/* Botones de Acción Estilo Moderno */}
+                            <div className="flex w-full gap-3 pb-2 md:w-auto">
                                 {isOwnProfile ? (
                                     <>
-                                        <Button className="gap-2 bg-blue-600 text-white hover:bg-blue-700" onClick={() => openUploadModal('foto')}>
-                                            <Plus className="h-4 w-4" />
-                                            Añadir a historia
-                                        </Button>
-                                        <Button variant="secondary" className="gap-2">
-                                            <Edit2 className="h-4 w-4" />
-                                            Editar perfil
+                                        <Button
+                                            className="flex-1 gap-2 rounded-xl border-none bg-gradient-to-r from-red-600 to-rose-600 py-6 font-bold text-white shadow-lg shadow-red-500/20 transition-all hover:scale-105 hover:from-red-700 hover:to-rose-700 active:scale-95 md:flex-none"
+                                            onClick={() => openUploadModal('foto')}
+                                        >
+                                            <Plus className="h-5 w-5" />
+                                            Subir Foto
                                         </Button>
                                     </>
                                 ) : (
                                     <>
-                                        <Button className="gap-2 bg-blue-600 text-white hover:bg-blue-700">
-                                            <Plus className="h-4 w-4" />
+                                        <Button className="flex-1 gap-2 rounded-xl bg-red-600 px-8 py-6 font-bold text-white shadow-lg shadow-red-500/20 hover:bg-red-700 md:flex-none">
                                             Seguir
                                         </Button>
-                                        <Button variant="secondary" className="gap-2">
-                                            Enviar mensaje
+                                        <Button
+                                            variant="secondary"
+                                            className="flex-1 gap-2 rounded-xl bg-slate-100 px-8 py-6 font-bold md:flex-none dark:bg-red-950/30"
+                                        >
+                                            Mensaje
                                         </Button>
                                     </>
                                 )}
-                                <Button variant="secondary" size="icon">
-                                    <MoreHorizontal className="h-4 w-4" />
-                                </Button>
                             </div>
                         </div>
 
-                        <Separator className="my-2 bg-slate-200 dark:bg-slate-800" />
+                        <Separator className="my-2 bg-red-100 dark:bg-red-900/20" />
 
-                        {/* Tabs Navigation */}
-                        <div className="flex justify-center md:justify-start">
-                            <Tabs defaultValue="publicaciones" className="w-full">
-                                <TabsList className="h-12 w-full justify-start gap-4 bg-transparent p-0">
+                        {/* Pestañas con animación de línea roja */}
+                        <Tabs defaultValue="publicaciones" className="w-full">
+                            <TabsList className="h-14 w-full justify-start gap-8 border-b border-transparent bg-transparent p-0">
+                                {['publicaciones', 'fotos', 'informacion'].map((tab) => (
                                     <TabsTrigger
-                                        value="publicaciones"
-                                        className="h-full rounded-none border-b-2 border-transparent px-4 font-semibold data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+                                        key={tab}
+                                        value={tab}
+                                        className="h-full rounded-none border-b-2 border-transparent px-2 font-bold text-slate-500 capitalize transition-all duration-300 data-[state=active]:border-red-600 data-[state=active]:bg-transparent data-[state=active]:text-red-600 data-[state=active]:shadow-none dark:text-red-200/40 dark:data-[state=active]:text-red-500"
                                     >
-                                        Publicaciones
+                                        {tab}
                                     </TabsTrigger>
-                                    <TabsTrigger
-                                        value="informacion"
-                                        className="h-full rounded-none border-b-2 border-transparent px-4 font-semibold text-slate-500 data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
-                                    >
-                                        Información
-                                    </TabsTrigger>
-                                    <TabsTrigger
-                                        value="fotos"
-                                        className="h-full rounded-none border-b-2 border-transparent px-4 font-semibold text-slate-500 data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
-                                    >
-                                        Fotos
-                                    </TabsTrigger>
-                                    <TabsTrigger
-                                        value="videos"
-                                        className="h-full rounded-none border-b-2 border-transparent px-4 font-semibold text-slate-500 data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
-                                    >
-                                        Vídeos
-                                    </TabsTrigger>
-                                </TabsList>
-                            </Tabs>
-                        </div>
+                                ))}
+                            </TabsList>
+                        </Tabs>
                     </div>
                 </div>
 
-                {/* Main Content Grid */}
-                <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-4 px-2 py-4 md:px-0 lg:grid-cols-12">
-                    {/* Left Sidebar: About/Info */}
-                    <div className="space-y-4 lg:col-span-5">
-                        <Card className="overflow-hidden border-slate-200 shadow-sm dark:border-slate-800">
-                            <CardHeader className="pb-2">
-                                <CardTitle className="text-xl font-bold">Detalles</CardTitle>
+                {/* Contenido Principal con Diseño de Grilla Limpio */}
+                <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-8 px-4 py-8 md:px-0 lg:grid-cols-12">
+                    {/* Sidebar: Detalles e Información */}
+                    <div className="space-y-6 lg:col-span-4">
+                        <Card className="overflow-hidden rounded-3xl border-none bg-white shadow-xl shadow-red-500/5 dark:bg-[#1a0505]">
+                            <CardHeader className="border-b border-red-50 pb-2 dark:border-red-950/30">
+                                <CardTitle className="text-lg font-black tracking-widest text-red-600 uppercase">Biografía</CardTitle>
                             </CardHeader>
-                            <CardContent className="space-y-4 pt-2">
-                                <div className="flex items-center gap-3 text-slate-600 dark:text-slate-300">
-                                    <Briefcase className="h-5 w-5 text-slate-400" />
-                                    <span>
-                                        Trabaja en <span className="font-semibold text-slate-900 dark:text-slate-100">Miracode Agency</span>
-                                    </span>
+                            <CardContent className="space-y-5 pt-6">
+                                <p className="leading-relaxed font-medium text-slate-600 dark:text-red-100/70">
+                                    Creador de contenido apasionado por la tecnología y el diseño. Explorando el mundo un pixel a la vez. 🚀
+                                </p>
+                                <div className="space-y-4 pt-2">
+                                    <div className="flex items-center gap-4 text-slate-500 dark:text-red-200/50">
+                                        <div className="rounded-lg bg-red-50 p-2 text-red-600 dark:bg-red-950/30">
+                                            <Briefcase className="h-4 w-4" />
+                                        </div>
+                                        <span>
+                                            Influencer en{' '}
+                                            <span className="font-bold text-slate-900 underline decoration-red-500/30 dark:text-white">
+                                                Admus Productions
+                                            </span>
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center gap-4 text-slate-500 dark:text-red-200/50">
+                                        <div className="rounded-lg bg-red-50 p-2 text-red-600 dark:bg-red-950/30">
+                                            <MapPin className="h-4 w-4" />
+                                        </div>
+                                        <span>
+                                            Desde <span className="font-bold text-slate-900 dark:text-white">La Paz, BO</span>
+                                        </span>
+                                    </div>
                                 </div>
-                                <div className="flex items-center gap-3 text-slate-600 dark:text-slate-300">
-                                    <MapPin className="h-5 w-5 text-slate-400" />
-                                    <span>
-                                        Vive en <span className="font-semibold text-slate-900 dark:text-slate-100">Santa Cruz, Bolivia</span>
-                                    </span>
-                                </div>
-                                <div className="flex items-center gap-3 text-slate-600 dark:text-slate-300">
-                                    <Heart className="h-5 w-5 text-slate-400" />
-                                    <span>
-                                        Relación sentimiental con{' '}
-                                        <span className="font-semibold text-slate-900 dark:text-slate-100">Productividad</span>
-                                    </span>
-                                </div>
-                                <div className="flex items-center gap-3 text-slate-600 dark:text-slate-300">
-                                    <Calendar className="h-5 w-5 text-slate-400" />
-                                    <span>
-                                        Se unió en <span className="font-semibold text-slate-900 dark:text-slate-100">Junio de 2025</span>
-                                    </span>
-                                </div>
-
-                                {isOwnProfile && (
-                                    <Button
-                                        variant="secondary"
-                                        className="w-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700"
-                                    >
-                                        Editar detalles
-                                    </Button>
-                                )}
                             </CardContent>
                         </Card>
 
-                        {/* Photos Card (Mini Grid) */}
-                        <Card className="border-slate-200 shadow-sm dark:border-slate-800">
-                            <CardHeader className="flex flex-row items-center justify-between pb-2">
-                                <CardTitle className="text-xl font-bold">Fotos</CardTitle>
-                                <Button variant="ghost" className="text-blue-600 hover:bg-blue-50 hover:text-blue-700">
-                                    Ver todas las fotos
+                        {/* Galería Visual Mini */}
+                        <Card className="overflow-hidden rounded-3xl border-none bg-white shadow-xl shadow-red-500/5 dark:bg-[#1a0505]">
+                            <CardHeader className="flex flex-row items-center justify-between border-b border-red-50 pb-2 dark:border-red-950/30">
+                                <CardTitle className="text-lg font-black tracking-widest text-red-600 uppercase">Fotos Recientes</CardTitle>
+                                <Button variant="ghost" size="sm" className="text-xs font-bold text-red-500 hover:bg-red-50">
+                                    Explorar
                                 </Button>
                             </CardHeader>
-                            <CardContent>
-                                <div className="grid grid-cols-3 gap-1 overflow-hidden rounded-lg border border-slate-100 dark:border-slate-800">
-                                    {profileUser.photos.slice(0, 9).map((photo) => (
-                                        <div key={photo.id} className="group relative aspect-square overflow-hidden bg-slate-100 dark:bg-slate-800">
-                                            <img
-                                                src={photo.url}
-                                                alt={photo.nombre}
-                                                className="h-full w-full object-cover transition-transform group-hover:scale-110"
-                                            />
+                            <CardContent className="p-4">
+                                <div className="grid grid-cols-3 gap-2 overflow-hidden rounded-2xl">
+                                    {safeFeedPhotos.slice(0, 9).map((photo) => (
+                                        <div
+                                            key={photo.id}
+                                            className="group relative aspect-square cursor-pointer overflow-hidden bg-slate-100 dark:bg-black"
+                                        >
+                                            <img src={photo.url} alt={photo.nombre} className="h-full w-full object-cover" />
+                                            <div className="absolute inset-0 bg-red-600/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
                                         </div>
                                     ))}
-                                    {profileUser.photos.length === 0 && (
-                                        <div className="col-span-3 py-8 text-center text-slate-500 italic">No hay fotos aún.</div>
+                                    {safeFeedPhotos.length === 0 && (
+                                        <div className="col-span-3 py-10 text-center font-medium text-red-200/30 italic">Sin fotos aún</div>
                                     )}
                                 </div>
                             </CardContent>
                         </Card>
                     </div>
 
-                    {/* Right Main Feed */}
-                    <div className="space-y-4 lg:col-span-7">
-                        {/* What's on your mind? */}
+                    {/* Feed de Publicaciones - Enfoque Red Limpio */}
+                    <div className="space-y-8 lg:col-span-8">
+                        {/* Composer Premium */}
                         {isOwnProfile && (
-                            <Card className="border-slate-200 shadow-sm dark:border-slate-800">
+                            <Card className="rounded-[2.5rem] border-none bg-white p-4 shadow-2xl shadow-red-500/10 ring-red-500/10 transition-all focus-within:ring-2 dark:bg-[#1a0505]">
                                 <CardContent className="p-4">
-                                    <div className="flex gap-4">
-                                        <Avatar className="h-10 w-10">
-                                            <AvatarImage src={profilePhoto?.url} />
-                                            <AvatarFallback>{profileUser.name.charAt(0)}</AvatarFallback>
-                                        </Avatar>
-                                        <div
-                                            className="flex flex-1 cursor-pointer items-center rounded-full bg-slate-100 px-4 py-2 text-slate-500 transition-colors hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700"
+                                    
+                                    <div className="mt-6 flex justify-around border-t border-red-50 pt-4 dark:border-red-900/10">
+                                        <button
+                                            className="group flex items-center gap-2 rounded-xl px-6 py-2 transition-all hover:bg-rose-50 dark:hover:bg-rose-950/20"
                                             onClick={() => openUploadModal('foto')}
                                         >
-                                            ¿Qué estás pensando, {profileUser.name.split(' ')[0]}?
-                                        </div>
-                                    </div>
-                                    <Separator className="my-3 bg-slate-100 dark:bg-slate-800" />
-                                    <div className="flex justify-between px-2">
-                                        <Button
-                                            variant="ghost"
-                                            className="gap-2 text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
-                                            onClick={() => openUploadModal('foto')}
-                                        >
-                                            <Camera className="h-5 w-5 text-rose-500" />
-                                            <span>Foto/video</span>
-                                        </Button>
-                                        <Button
-                                            variant="ghost"
-                                            className="gap-2 text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
-                                        >
-                                            <UserIcon className="h-5 w-5 text-blue-500" />
-                                            <span>Etiquetar</span>
-                                        </Button>
-                                        <Button
-                                            variant="ghost"
-                                            className="gap-2 text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
-                                        >
-                                            <ImageIcon className="h-5 w-5 text-amber-500" />
-                                            <span>Acontecimiento</span>
-                                        </Button>
+                                            <ImageIcon className="h-6 w-6 text-red-500 transition-transform group-hover:scale-110" />
+                                            <span className="text-sm font-bold text-slate-600 dark:text-red-200/60">Foto</span>
+                                        </button>
                                     </div>
                                 </CardContent>
                             </Card>
                         )}
 
-                        {/* Filter Post Card */}
-                        <Card className="flex items-center justify-between border-slate-200 p-3 shadow-sm dark:border-slate-800">
-                            <h3 className="px-2 text-lg font-bold">Publicaciones</h3>
-                            <div className="flex gap-2">
-                                <Button variant="secondary" size="sm" className="gap-2 bg-slate-100 dark:bg-slate-800">
-                                    Filtros
-                                </Button>
-                                <Button variant="secondary" size="sm" className="gap-2 bg-slate-100 dark:bg-slate-800">
-                                    Administrar
-                                </Button>
-                            </div>
-                        </Card>
-
-                        {/* List of Photos as Posts */}
-                        {feedPhotos.map((photo) => (
+                        {/* Lista de Contenido (Feed) */}
+                        {safeFeedPhotos.map((photo) => (
                             <Card
                                 key={photo.id}
-                                className="animate-in fade-in slide-in-from-bottom-4 overflow-hidden border-slate-200 shadow-sm duration-500 dark:border-slate-800"
+                                className="group animate-in zoom-in-95 overflow-hidden rounded-[2.5rem] border-none bg-white shadow-2xl shadow-black/5 duration-500 dark:bg-[#1a0505]"
                             >
-                                <CardHeader className="flex flex-row items-center gap-3 p-4">
-                                    <Avatar className="h-10 w-10 border border-slate-100 shadow-sm dark:border-slate-800">
+                                <CardHeader className="flex flex-row items-center gap-4 p-6">
+                                    <Avatar className="h-12 w-12 ring-2 ring-red-500/10">
                                         <AvatarImage src={profilePhoto?.url} />
                                         <AvatarFallback>{profileUser.name.charAt(0)}</AvatarFallback>
                                     </Avatar>
                                     <div className="flex-1">
-                                        <p className="font-bold text-slate-900 dark:text-slate-50">{profileUser.name}</p>
-                                        <p className="text-xs text-slate-500">{new Date(photo.created_at).toLocaleDateString()}</p>
+                                        <p className="text-lg leading-tight font-black text-slate-900 dark:text-white">{profileUser.name}</p>
+                                        <p className="text-xs font-bold tracking-tighter text-red-400 uppercase opacity-70">
+                                            {new Date(photo.created_at).toLocaleString('es-ES', { month: 'long', day: 'numeric', year: 'numeric' })}
+                                        </p>
                                     </div>
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
-                                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                                                <MoreHorizontal className="h-4 w-4 text-slate-500" />
+                                            <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full hover:bg-red-50">
+                                                <MoreHorizontal className="h-5 w-5 text-slate-400" />
                                             </Button>
                                         </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end">
+                                        <DropdownMenuContent align="end" className="rounded-2xl border-red-50 shadow-xl">
                                             {isOwnProfile && (
                                                 <DropdownMenuItem
-                                                    className="cursor-pointer gap-2 text-rose-600"
+                                                    className="cursor-pointer gap-2 p-3 font-bold text-red-600"
                                                     onClick={() => handleDelete(photo.id)}
                                                 >
                                                     <Trash2 className="h-4 w-4" />
-                                                    Eliminar foto
+                                                    Eliminar Foto
                                                 </DropdownMenuItem>
                                             )}
-                                            <DropdownMenuItem className="gap-2">Descargar</DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </CardHeader>
                                 <CardContent className="p-0">
-                                    {photo.nombre && <p className="px-4 pb-3 text-slate-700 dark:text-slate-300">{photo.nombre}</p>}
-                                    <div className="flex justify-center border-y border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-900">
-                                        <img src={photo.url} alt={photo.nombre} className="h-auto max-h-[600px] max-w-full object-contain" />
+                                    {photo.nombre && (
+                                        <p className="ml-6 border-l-4 border-red-500 px-8 pb-4 text-lg leading-relaxed font-medium text-slate-700 italic lg:text-xl dark:text-red-50">
+                                            {photo.nombre}
+                                        </p>
+                                    )}
+                                    <div className="flex justify-center border-y border-red-50 bg-black transition-all duration-500 group-hover:brightness-110 dark:border-red-950/20">
+                                        <img src={photo.url} alt={photo.nombre} className="h-auto max-h-[700px] max-w-full object-contain" />
                                     </div>
                                 </CardContent>
-                                <div className="flex justify-between border-t border-slate-100 p-4 dark:border-slate-800">
+                                <div className="flex items-center justify-between bg-red-50/10 p-6 dark:bg-red-950/5">
+                                    <div className="flex -space-x-2">
+                                        {[1, 2, 3].map((i) => (
+                                            <div
+                                                key={i}
+                                                className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-red-500 text-[10px] font-bold text-white dark:border-[#1a0505]"
+                                            >
+                                                {i}k
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="flex gap-6 text-sm font-black tracking-widest text-red-900/40 uppercase dark:text-red-200/20">
+                                        <span>34 Comentarios</span>
+                                        <span>12 compartidos</span>
+                                    </div>
+                                </div>
+                                <div className="flex gap-4 border-t border-red-50 px-6 py-4 dark:border-red-950/10">
                                     <Button
                                         variant="ghost"
-                                        className="flex-1 gap-2 font-semibold text-slate-600 italic hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+                                        className="flex-1 gap-2 rounded-xl font-black text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/30"
                                     >
-                                        👍 Me gusta
+                                        ❤️ Me Encanta
                                     </Button>
                                     <Button
                                         variant="ghost"
-                                        className="flex-1 gap-2 font-semibold text-slate-600 italic hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+                                        className="flex-1 gap-2 rounded-xl font-black text-slate-600 italic hover:bg-slate-50 dark:text-red-200/50 dark:hover:bg-red-950/30"
                                     >
-                                        💬 Comentar
+                                        💬 Opinar
                                     </Button>
                                     <Button
                                         variant="ghost"
-                                        className="flex-1 gap-2 font-semibold text-slate-600 italic hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+                                        className="flex-1 gap-2 rounded-xl font-black text-slate-600 italic hover:bg-slate-50 dark:text-red-200/50 dark:hover:bg-red-950/30"
                                     >
-                                        ➡️ Compartir
+                                        ➡️ Difundir
                                     </Button>
                                 </div>
                             </Card>
                         ))}
 
-                        {feedPhotos.length === 0 && (
-                            <Card className="border-slate-200 p-12 text-center shadow-sm dark:border-slate-800">
-                                <div className="flex flex-col items-center gap-4">
-                                    <ImageIcon className="h-16 w-16 text-slate-200" />
+                        {safeFeedPhotos.length === 0 && (
+                            <Card className="rounded-[3rem] border-none bg-white p-16 text-center shadow-xl dark:bg-[#1a0505]">
+                                <div className="flex flex-col items-center gap-6">
+                                    <div className="flex h-24 w-24 items-center justify-center rounded-full bg-red-50 dark:bg-red-950">
+                                        <Plus className="h-12 w-12 animate-pulse text-red-500" />
+                                    </div>
                                     <div>
-                                        <h3 className="text-xl font-bold text-slate-400">Sin publicaciones</h3>
-                                        <p className="text-slate-500">Comienza compartiendo una foto con el mundo.</p>
+                                        <h3 className="text-2xl font-black tracking-tighter text-slate-900 uppercase dark:text-white">
+                                            Sin fotos aún
+                                        </h3>
+                                        <p className="mt-2 text-slate-400 italic dark:text-red-200/30">
+                                            Sé el primero en darle vida a tu nuevo perfil premium.
+                                        </p>
                                     </div>
                                     {isOwnProfile && (
-                                        <Button className="bg-blue-600" onClick={() => openUploadModal('foto')}>
-                                            Subir primera foto
+                                        <Button
+                                            className="rounded-2xl bg-red-600 px-10 py-6 font-bold text-white shadow-xl shadow-red-500/30 transition-all hover:scale-105 hover:bg-red-700"
+                                            onClick={() => openUploadModal('foto')}
+                                        >
+                                            Empezar Ahora
                                         </Button>
                                     )}
                                 </div>
@@ -430,67 +418,58 @@ export default function FacebookStyle({ profileUser, profilePhoto, coverPhoto, f
                 </div>
             </div>
 
-            {/* Upload Modal */}
+            {/* Modal de Subida Universal */}
             <Dialog open={isUploadOpen} onOpenChange={setIsUploadOpen}>
-                <DialogContent className="border-slate-200 bg-white sm:max-w-md dark:border-slate-800 dark:bg-slate-900">
+                <DialogContent className="rounded-[3rem] border-none bg-white p-8 shadow-2xl sm:max-w-lg dark:bg-[#1a0505]">
                     <DialogHeader>
-                        <DialogTitle className="border-b pb-4 text-center text-xl font-bold">
-                            {uploadType === 'portada'
-                                ? 'Actualizar foto de portada'
-                                : uploadType === 'perfil'
-                                  ? 'Actualizar foto de perfil'
-                                  : 'Crear publicación'}
+                        <DialogTitle className="border-b border-red-50 pb-6 text-center text-2xl font-black tracking-widest text-red-600 uppercase">
+                            {uploadType === 'portada' ? 'Cambiar Portada' : uploadType === 'perfil' ? 'Cambiar Perfil' : 'Nueva Foto'}
                         </DialogTitle>
                     </DialogHeader>
                     <form onSubmit={handleUpload}>
-                        <div className="space-y-4 py-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="photo" className="text-sm font-semibold">
+                        <div className="space-y-6 py-6">
+                            <div className="space-y-3">
+                                <Label htmlFor="file" className="text-sm font-black tracking-widest text-slate-900 uppercase dark:text-white">
                                     Seleccionar Imagen
                                 </Label>
-                                <Input
-                                    id="photo"
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={(e) => setData('photo', e.target.files?.[0] || null)}
-                                    className="cursor-pointer file:mr-4 file:rounded-full file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100"
-                                    required
-                                />
-                                {errors.photo && <p className="text-sm font-medium text-rose-500">{errors.photo}</p>}
+                                <div className="group relative">
+                                    <Input
+                                        id="file"
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={(e) => setData('file', e.target.files?.[0] || null)}
+                                        className="flex h-24 cursor-pointer items-center justify-center rounded-3xl border-2 border-dashed border-red-200 bg-red-50 text-center font-bold text-red-600 transition-all file:hidden hover:border-red-500 dark:border-red-900/50 dark:bg-red-950/30"
+                                    />
+                                    {!data.file && (
+                                        <div className="pointer-events-none absolute inset-0 flex items-center justify-center font-bold text-red-400 italic">
+                                            Presiona aquí para elegir una foto
+                                        </div>
+                                    )}
+                                </div>
+                                {errors.file && <p className="mt-2 text-center text-sm font-bold text-red-600">{errors.file}</p>}
                             </div>
 
-                            {uploadType === 'foto' && (
-                                <div className="space-y-2">
-                                    <Label htmlFor="nombre" className="text-sm font-semibold">
-                                        Descripción (opcional)
-                                    </Label>
-                                    <Input
-                                        id="nombre"
-                                        value={data.nombre}
-                                        onChange={(e) => setData('nombre', e.target.value)}
-                                        placeholder="Escribe algo sobre esta foto..."
-                                        className="bg-slate-50 dark:bg-slate-800"
-                                    />
-                                </div>
-                            )}
-
-                            {data.photo && (
-                                <div className="mt-4 aspect-video overflow-hidden rounded-lg border border-slate-200 dark:border-slate-800">
-                                    <img src={URL.createObjectURL(data.photo)} alt="Vista previa" className="h-full w-full object-cover" />
+                            {data.file && (
+                                <div className="mt-4 max-h-48 overflow-hidden rounded-[2rem] border-4 border-red-50 shadow-inner">
+                                    <img src={URL.createObjectURL(data.file)} alt="Preview" className="h-full w-full object-cover" />
                                 </div>
                             )}
                         </div>
-                        <DialogFooter className="flex-col gap-2 sm:flex-row">
+                        <DialogFooter className="flex gap-4 border-t border-red-50 pt-4 dark:border-red-900/10">
                             <Button
                                 type="button"
-                                variant="secondary"
+                                variant="outline"
                                 onClick={() => setIsUploadOpen(false)}
-                                className="bg-slate-100 dark:bg-slate-800"
+                                className="flex-1 rounded-2xl border-red-100 py-8 font-bold text-slate-400"
                             >
                                 Cancelar
                             </Button>
-                            <Button type="submit" className="flex-1 bg-blue-600 text-white hover:bg-blue-700" disabled={processing}>
-                                {processing ? 'Subiendo...' : 'Publicar'}
+                            <Button
+                                type="submit"
+                                className="flex-1 rounded-2xl bg-gradient-to-r from-red-600 to-rose-600 py-8 font-black tracking-tighter text-white uppercase shadow-xl shadow-red-500/40 transition-all hover:scale-105"
+                                disabled={processing}
+                            >
+                                {processing ? 'Subiendo...' : 'Publicar Foto'}
                             </Button>
                         </DialogFooter>
                     </form>

@@ -31,9 +31,10 @@ class FacebookProfileController extends Controller
         });
 
         // Agrupar fotos por tipo para facilitar el uso en el frontend
+        // Usamos .values() para asegurar que Laravel devuelva un array [0,1,2...] y no un objeto {5:..., 8:...}
         $profilePhoto = $user->photos->where('tipo', 'perfil')->first();
         $coverPhoto = $user->photos->where('tipo', 'portada')->first();
-        $feedPhotos = $user->photos->where('tipo', 'foto');
+        $feedPhotos = $user->photos->where('tipo', 'foto')->values();
 
         return Inertia::render('Profile/FacebookStyle', [
             'profileUser' => $user,
@@ -50,34 +51,29 @@ class FacebookProfileController extends Controller
     public function storePhoto(Request $request)
     {
         $request->validate([
-            'photo' => 'required|image|max:5120', // Máx 5MB
+            'file' => 'required|image|max:10240', // Máx 10MB para fotos
             'tipo' => 'required|in:foto,perfil,portada',
             'nombre' => 'nullable|string|max:255',
         ]);
 
-        /** @var \App\Models\User $user */
         $user = Auth::user();
+        /** @var \App\Models\User $user */
 
-        // Si es perfil o portada, desactivar la anterior (o borrarla si prefieres)
+        if ($request->hasFile('file')) {
+            $path = $request->file('file')->store('user_photos', 'public');
 
-        if (in_array($request->tipo, ['perfil', 'portada'])) {
-            // Podríamos marcar las anteriores como 'foto' normal o dejarlas.
-            // Para simplicidad en este ejemplo, las dejamos pero el controlador 'show' rescatará la última.
-        }
-
-        if ($request->hasFile('photo')) {
-            $path = $request->file('photo')->store('user_photos', 'public');
-
-            $photo = Photo::create([
+            $media = Photo::create([
                 'path' => $path,
                 'nombre' => $request->nombre,
                 'tipo' => $request->tipo,
             ]);
 
-            $user->photos()->attach($photo->id);
+            $user->photos()->attach($media->id);
+
+            return back()->with('success', 'Foto subida correctamente.');
         }
 
-        return back()->with('success', 'Foto subida correctamente.');
+        return back()->withErrors(['file' => 'Debe seleccionar una imagen.']);
     }
 
     /**
@@ -104,7 +100,6 @@ class FacebookProfileController extends Controller
         /** @var \App\Models\User $user */
         $user = Auth::user();
         if (!$user->photos()->where('photo_id', $photo->id)->exists()) {
-
             abort(403);
         }
 

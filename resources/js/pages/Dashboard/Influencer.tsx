@@ -64,6 +64,27 @@ interface DashboardProps extends PageProps {
     daysWithoutAvailability: string[];
 }
 
+// Función para traducir días de la semana de inglés a español
+const translateDayToSpanish = (day: string): string => {
+    const daysMap: { [key: string]: string } = {
+        'Monday': 'Lunes',
+        'Tuesday': 'Martes',
+        'Wednesday': 'Miércoles',
+        'Thursday': 'Jueves',
+        'Friday': 'Viernes',
+        'Saturday': 'Sábado',
+        'Sunday': 'Domingo',
+        'monday': 'Lunes',
+        'tuesday': 'Martes',
+        'wednesday': 'Miércoles',
+        'thursday': 'Jueves',
+        'friday': 'Viernes',
+        'saturday': 'Sábado',
+        'sunday': 'Domingo',
+    };
+    return daysMap[day] || day;
+};
+
 export default function InfluencerDashboard({
     auth,
     workingWeeks,
@@ -198,7 +219,7 @@ export default function InfluencerDashboard({
                             value={nextBooking ? nextBooking.company_name : 'N/A'}
                             icon={<Calendar className="h-6 w-6" />}
                             color="bg-red-600"
-                            desc={nextBooking ? `${nextBooking.day_of_week} • ${nextBooking.start_time}` : 'Sin eventos próximos'}
+                            desc={nextBooking ? `${translateDayToSpanish(nextBooking.day_of_week)} • ${nextBooking.start_time}` : 'Sin eventos próximos'}
                             isText
                         />
                         <MetricCard
@@ -279,7 +300,7 @@ export default function InfluencerDashboard({
                                         >
                                             <div className="space-y-0.5">
                                                 <p className="text-sm leading-none font-black text-slate-900 uppercase dark:text-white">
-                                                    {av.day_of_week}
+                                                    {translateDayToSpanish(av.day_of_week)}
                                                 </p>
                                                 <p className="text-[10px] font-bold tracking-widest text-amber-600 uppercase">{av.turno}</p>
                                             </div>

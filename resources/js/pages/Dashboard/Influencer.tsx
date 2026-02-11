@@ -1,26 +1,17 @@
-//import { PageProps } from '@/types';
+'use client';
+
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
+import type { PageProps } from '@/types';
 import { Head } from '@inertiajs/react';
-import {
-    AccessTime,
-    ArrowDownward, // Nuevo icono para indicar desplazamiento
-    BarChart,
-    Block,
-    Business,
-    CalendarMonth,
-    EventNote,
-    HourglassEmpty,
-    PhotoCamera,
-    PlaylistAddCheck,
-    TrendingUp,
-    WavingHand,
-} from '@mui/icons-material';
-import { Box, Button, Grid, IconButton, Paper, Typography, useTheme } from '@mui/material';
-import dayjs from 'dayjs'; // Importamos dayjs para formateo de fechas
 import { AnimatePresence, motion } from 'framer-motion';
+import { Activity, BarChart3, Calendar, Clock, HandMetal, MapPin, Sparkles, Target, TrendingUp } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
-// Definición de interfaces (mantienen las mismas)
+// Interfaces
 interface Week {
     id: number;
     name: string;
@@ -73,27 +64,6 @@ interface DashboardProps extends PageProps {
     daysWithoutAvailability: string[];
 }
 
-// Variantes para la animación de la bienvenida
-const welcomeVariants = {
-    hidden: { opacity: 0, y: -50 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: 'easeOut' } },
-    exit: { opacity: 0, y: -50, transition: { duration: 0.5, ease: 'easeIn' } },
-};
-
-// Variantes para las cards
-const cardVariants = {
-    hidden: { opacity: 0, scale: 0.9 },
-    visible: (i: number) => ({
-        opacity: 1,
-        scale: 1,
-        transition: {
-            delay: i * 0.1 + 0.5, // Retraso incremental, comenzando después de la bienvenida
-            duration: 0.6,
-            ease: 'easeOut',
-        },
-    }),
-};
-
 export default function InfluencerDashboard({
     auth,
     workingWeeks,
@@ -109,26 +79,15 @@ export default function InfluencerDashboard({
     totalPhotos,
     daysWithoutAvailability,
 }: DashboardProps) {
-    const theme = useTheme(); // Para acceder a los colores del tema de MUI
     const [showWelcome, setShowWelcome] = useState(true);
-    const contentRef = useRef<HTMLDivElement>(null); // Referencia al contenido principal
+    const contentRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        // Opción 1: Desvanecer la bienvenida después de un tiempo
-        const timer = setTimeout(() => {
-            setShowWelcome(false);
-        }, 3000); // Muestra la bienvenida por 3 segundos
-
-        // Opción 2: Ocultar la bienvenida al hacer scroll
+        const timer = setTimeout(() => setShowWelcome(false), 4000);
         const handleScroll = () => {
-            if (window.scrollY > 50) {
-                // Si el usuario se desplaza más de 50px
-                setShowWelcome(false);
-            }
+            if (window.scrollY > 100) setShowWelcome(false);
         };
-
         window.addEventListener('scroll', handleScroll);
-
         return () => {
             clearTimeout(timer);
             window.removeEventListener('scroll', handleScroll);
@@ -136,504 +95,243 @@ export default function InfluencerDashboard({
     }, []);
 
     const scrollToContent = () => {
-        if (contentRef.current) {
-            setShowWelcome(false); // Ocultar bienvenida al hacer clic en el botón
-            contentRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+        setShowWelcome(false);
+        contentRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
-    const breadcrumbs = [
-        { label: 'Inicio', href: '/' },
-        { label: 'Panel de Control', href: '/dashboard' },
-    ];
+    const breadcrumbs = [{ title: 'Dashboard', href: '/dashboard' }];
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Panel de Control" />
+            <Head title="Influencer Dashboard | Admus Productions" />
 
             <AnimatePresence>
                 {showWelcome && (
                     <motion.div
-                        key="welcome-section"
-                        initial="hidden"
-                        animate="visible"
-                        exit="exit"
-                        variants={welcomeVariants}
-                        style={{
-                            minHeight: 'calc(100vh - 64px)', // Resta la altura del header de AppLayout si lo tiene
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            textAlign: 'center',
-                            padding: theme.spacing(4),
-                            background: `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.secondary.main} 90%)`,
-                            color: theme.palette.common.white,
-                            position: 'relative',
-                            overflow: 'hidden',
-                        }}
+                        className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-slate-950"
+                        initial={{ opacity: 1 }}
+                        exit={{ opacity: 0, scale: 1.1, filter: 'blur(20px)' }}
+                        transition={{ duration: 0.8, ease: 'easeInOut' }}
                     >
-                        <motion.div
-                            initial={{ scale: 0.8 }}
-                            animate={{ scale: 1 }}
-                            transition={{ duration: 1, repeat: Infinity, repeatType: 'mirror' }}
-                            style={{
-                                position: 'absolute',
-                                top: 0,
-                                left: 0,
-                                right: 0,
-                                bottom: 0,
-                                background: 'rgba(255,255,255,0.1)',
-                                filter: 'blur(50px)',
-                                zIndex: 0,
-                            }}
-                        />
-                        <Box sx={{ zIndex: 1 }}>
+                        {/* Background VFX */}
+                        <div className="absolute inset-0 opacity-20">
+                            <div className="absolute top-1/4 left-1/4 h-96 w-96 animate-pulse rounded-full bg-red-600 blur-[120px]" />
+                            <div className="absolute right-1/4 bottom-1/4 h-96 w-96 animate-pulse rounded-full bg-indigo-600 blur-[120px] delay-700" />
+                        </div>
+
+                        <div className="relative z-10 space-y-8 px-6 text-center">
                             <motion.div
-                                animate={{ rotate: [0, 14, -8, 14, -4, 10, 0] }}
-                                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                                animate={{ rotate: [0, 15, -10, 15, 0] }}
+                                transition={{ duration: 2, repeat: Infinity }}
+                                className="inline-block"
                             >
-                                <WavingHand sx={{ fontSize: 120, mb: 2 }} />
+                                <HandMetal className="h-24 w-24 text-red-600 md:h-32 md:w-32" />
                             </motion.div>
-                            <Typography variant="h3" component="h1" gutterBottom>
-                                ¡Hola, {auth.user.name}!
-                            </Typography>
-                            <Typography variant="h5" component="p" sx={{ mb: 4 }}>
-                                Bienvenido a tu centro de gestión de influencer.
-                            </Typography>
-                            <Typography variant="h6" component="p" sx={{ mb: 6 }}>
-                                Aquí tienes un resumen rápido de tu actividad.
-                            </Typography>
-                            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.5, duration: 0.8 }}>
-                                <IconButton
-                                    color="inherit"
+                            <motion.h1
+                                className="font-orbitron text-5xl font-black tracking-tighter text-white uppercase md:text-8xl"
+                                initial={{ y: 20, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                transition={{ delay: 0.3 }}
+                            >
+                                HOLA, {auth.user.name.split(' ')[0]}
+                            </motion.h1>
+                            <motion.p
+                                className="text-lg font-bold tracking-[0.3em] text-slate-400 uppercase"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 0.6 }}
+                            >
+                                PREPARANDO TU PERFORMANCE CENTER
+                            </motion.p>
+
+                            <motion.div className="pt-10" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }}>
+                                <Button
                                     onClick={scrollToContent}
-                                    sx={{
-                                        border: `2px solid ${theme.palette.common.white}`,
-                                        p: 1,
-                                        '&:hover': {
-                                            backgroundColor: 'rgba(255,255,255,0.1)',
-                                        },
-                                    }}
+                                    variant="outline"
+                                    className="rounded-full border-2 border-white/20 px-8 py-6 text-white transition-all duration-300 hover:bg-white hover:text-black"
                                 >
-                                    <ArrowDownward sx={{ fontSize: 32 }} />
-                                </IconButton>
-                                <Typography variant="body2" sx={{ mt: 1 }}>
-                                    Desplázate para ver tus datos
-                                </Typography>
+                                    ENTRAR AL PANEL
+                                </Button>
                             </motion.div>
-                        </Box>
+                        </div>
                     </motion.div>
                 )}
             </AnimatePresence>
 
-            <Box ref={contentRef} sx={{ p: 4, pt: showWelcome ? 0 : 4, opacity: showWelcome ? 0 : 1, transition: 'opacity 0.5s ease-in-out' }}>
-                <Grid container spacing={4}>
-                    {/* Card 1: Semanas Trabajando */}
-                    <Grid item xs={12} sm={6} md={3}>
-                        <motion.div initial="hidden" animate="visible" custom={0} variants={cardVariants}>
-                            <Paper
-                                elevation={3}
-                                sx={{
-                                    p: 3,
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    minHeight: 200,
-                                    justifyContent: 'center',
-                                }}
-                            >
-                                <CalendarMonth color="primary" sx={{ fontSize: 48, mb: 2 }} />
-                                <Typography variant="h6" component="h3" gutterBottom align="center">
-                                    Semanas en Curso
-                                </Typography>
-                                {workingWeeks.length > 0 ? (
-                                    <ul style={{ listStyleType: 'none', padding: 0, textAlign: 'center' }}>
-                                        {workingWeeks.map((week) => (
-                                            <li key={week.id}>
-                                                <Typography variant="body2">
-                                                    <strong>{week.name}</strong>
-                                                    <br />
-                                                    {dayjs(week.start_date).format('DD MMM YYYY')} - {dayjs(week.end_date).format('DD MMM YYYY')}
-                                                </Typography>
-                                            </li>
+            <div className="min-h-screen bg-slate-50 p-6 md:p-10 dark:bg-slate-950" ref={contentRef}>
+                <div className="mx-auto max-w-7xl space-y-10">
+                    {/* Hero Profile Section */}
+                    <div className="relative overflow-hidden rounded-[3rem] border border-slate-800 bg-slate-900 p-8 text-white shadow-2xl md:p-14">
+                        <div className="relative z-10 flex flex-col items-center gap-10 md:flex-row">
+                            <div className="relative">
+                                <Avatar className="h-32 w-32 border-4 border-white/10 shadow-2xl md:h-44 md:w-44">
+                                    <AvatarImage src={auth.user.profile_photo_path || ''} className="object-cover" />
+                                    <AvatarFallback className="bg-slate-800 text-4xl font-black uppercase">{auth.user.name.charAt(0)}</AvatarFallback>
+                                </Avatar>
+                                <div className="absolute -right-2 -bottom-2 rounded-full bg-red-600 p-3 shadow-lg ring-4 ring-slate-900 transition-transform hover:scale-110">
+                                    <Sparkles className="h-6 w-6 text-white" />
+                                </div>
+                            </div>
+
+                            <div className="flex-grow space-y-4 text-center md:text-left">
+                                <div className="space-y-1">
+                                    <h1 className="font-orbitron text-4xl font-black tracking-tighter uppercase md:text-6xl">{auth.user.name}</h1>
+                                    <p className="text-xl font-bold tracking-widest text-red-500 uppercase">INFLUENCER</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="absolute top-0 right-0 h-full w-1/3 bg-gradient-to-l from-red-600/10 to-transparent blur-3xl" />
+                    </div>
+
+                    {/* Stats Grid */}
+                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                        <MetricCard
+                            label="PROMEDIO SEMANAL"
+                            value={averageDaysPerWeek}
+                            icon={<Activity className="h-6 w-6" />}
+                            color="bg-indigo-600"
+                            desc="Días de impacto"
+                        />
+                        <MetricCard
+                            label="PROXIMA RESERVA"
+                            value={nextBooking ? nextBooking.company_name : 'N/A'}
+                            icon={<Calendar className="h-6 w-6" />}
+                            color="bg-red-600"
+                            desc={nextBooking ? `${nextBooking.day_of_week} • ${nextBooking.start_time}` : 'Sin eventos próximos'}
+                            isText
+                        />
+                        <MetricCard
+                            label="HORAS DISPONIBLES"
+                            value={totalAvailabilityHours}
+                            icon={<Clock className="h-6 w-6" />}
+                            color="bg-amber-500"
+                            desc="Capacidad mensual"
+                        />
+                        <MetricCard
+                            label="ULTIMA MARCA"
+                            value={lastWorkedCompany || 'N/A'}
+                            icon={<MapPin className="h-6 w-6" />}
+                            color="bg-emerald-600"
+                            desc="Colaboración reciente"
+                            isText
+                        />
+                    </div>
+
+                    {/* Content Sections */}
+                    <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+                        {/* Weekly Activity */}
+                        <Card className="overflow-hidden rounded-[3rem] border-0 bg-white shadow-xl lg:col-span-2 dark:bg-slate-900/50">
+                            <CardHeader className="p-8 pb-0">
+                                <CardTitle className="flex items-center gap-3 text-2xl font-black tracking-tight uppercase">
+                                    <BarChart3 className="h-7 w-7 text-indigo-600" />
+                                    Performance por Semana
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="p-8">
+                                <div className="space-y-6">
+                                    {daysWorkedByWeek.map((data, idx) => (
+                                        <div
+                                            key={idx}
+                                            className="group flex items-center justify-between rounded-2xl bg-slate-50 p-4 transition-colors hover:bg-slate-100 dark:bg-slate-800/50 dark:hover:bg-slate-800"
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900">
+                                                    <Calendar className="h-6 w-6 text-slate-400 transition-colors group-hover:text-indigo-600" />
+                                                </div>
+                                                <div>
+                                                    <p className="mb-1 leading-none font-black tracking-tight text-slate-900 uppercase dark:text-white">
+                                                        {data.week_name}
+                                                    </p>
+                                                    <p className="text-xs font-bold tracking-widest text-slate-400 uppercase">Actividad total</p>
+                                                </div>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="text-2xl leading-none font-black text-indigo-600">{data.total_days_worked}</p>
+                                                <p className="text-[10px] font-bold tracking-tighter text-slate-400 uppercase">Días</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {daysWorkedByWeek.length === 0 && (
+                                        <div className="flex flex-col items-center justify-center py-20 font-medium text-slate-400 italic">
+                                            <TrendingUp className="mb-4 h-12 w-12 opacity-20" />
+                                            Sin registros históricos aún.
+                                        </div>
+                                    )}
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        {/* Booking & Availability Sidebar */}
+                        <div className="space-y-8">
+                            <Card className="rounded-[3rem] border-0 bg-white shadow-xl dark:bg-slate-900/50">
+                                <CardHeader className="p-8 pb-4">
+                                    <CardTitle className="flex items-center gap-2 text-xl font-black uppercase">
+                                        <Clock className="h-5 w-5 text-amber-500" />
+                                        Disponibilidad
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-4 px-8 pb-8">
+                                    {availabilities.slice(0, 4).map((av, idx) => (
+                                        <div
+                                            key={idx}
+                                            className="flex items-center justify-between rounded-2xl border border-amber-500/10 bg-amber-500/5 p-4"
+                                        >
+                                            <div className="space-y-0.5">
+                                                <p className="text-sm leading-none font-black text-slate-900 uppercase dark:text-white">
+                                                    {av.day_of_week}
+                                                </p>
+                                                <p className="text-[10px] font-bold tracking-widest text-amber-600 uppercase">{av.turno}</p>
+                                            </div>
+                                            <p className="text-xs font-black text-slate-700 dark:text-slate-300">
+                                                {av.start_time} - {av.end_time}
+                                            </p>
+                                        </div>
+                                    ))}
+                                    <Button variant="outline" className="w-full rounded-2xl py-6 font-black tracking-widest uppercase">
+                                        GESTIONAR HORARIO
+                                    </Button>
+                                </CardContent>
+                            </Card>
+
+                            <Card className="relative overflow-hidden rounded-[3rem] border-0 bg-red-600 p-8 text-white shadow-xl shadow-red-600/20">
+                                <div className="relative z-10 space-y-4">
+                                    <Target className="h-10 w-10 text-white/40" />
+                                    <h3 className="text-2xl leading-tight font-black uppercase">STATUS DE RESERVAS</h3>
+                                    <div className="space-y-3">
+                                        {Object.entries(bookingStatusCounts).map(([status, count], i) => (
+                                            <div key={i} className="flex items-center justify-between border-b border-white/20 pb-2">
+                                                <span className="text-xs font-black tracking-widest uppercase opacity-80">{status}</span>
+                                                <span className="text-xl font-black">{count}</span>
+                                            </div>
                                         ))}
-                                    </ul>
-                                ) : (
-                                    <Typography variant="body2" color="text.secondary" align="center">
-                                        No tienes semanas asignadas.
-                                    </Typography>
-                                )}
-                            </Paper>
-                        </motion.div>
-                    </Grid>
-
-                    {/* Card 2: Días Trabajados por Semana */}
-                    <Grid item xs={12} sm={6} md={3}>
-                        <motion.div initial="hidden" animate="visible" custom={1} variants={cardVariants}>
-                            <Paper
-                                elevation={3}
-                                sx={{
-                                    p: 3,
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    minHeight: 200,
-                                    justifyContent: 'center',
-                                }}
-                            >
-                                <BarChart color="secondary" sx={{ fontSize: 48, mb: 2 }} />
-                                <Typography variant="h6" component="h3" gutterBottom align="center">
-                                    Días Trabajados por Semana
-                                </Typography>
-                                {daysWorkedByWeek.length > 0 ? (
-                                    <ul style={{ listStyleType: 'none', padding: 0, textAlign: 'center' }}>
-                                        {daysWorkedByWeek.map((data, index) => (
-                                            <li key={index}>
-                                                <Typography variant="body2">
-                                                    <strong>{data.week_name}</strong>: {data.total_days_worked} día(s)
-                                                </Typography>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                ) : (
-                                    <Typography variant="body2" color="text.secondary" align="center">
-                                        No hay registros de días trabajados.
-                                    </Typography>
-                                )}
-                            </Paper>
-                        </motion.div>
-                    </Grid>
-
-                    {/* Card 3: Empresas Colaboradoras */}
-                    <Grid item xs={12} sm={6} md={3}>
-                        <motion.div initial="hidden" animate="visible" custom={2} variants={cardVariants}>
-                            <Paper
-                                elevation={3}
-                                sx={{
-                                    p: 3,
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    minHeight: 200,
-                                    justifyContent: 'center',
-                                }}
-                            >
-                                <Business color="error" sx={{ fontSize: 48, mb: 2 }} />
-                                <Typography variant="h6" component="h3" gutterBottom align="center">
-                                    Empresas Colaboradoras
-                                </Typography>
-                                {workedCompanies.length > 0 ? (
-                                    <ul style={{ listStyleType: 'none', padding: 0, textAlign: 'center' }}>
-                                        {workedCompanies.map((company) => (
-                                            <li key={company.id}>
-                                                <Typography variant="body2">{company.name}</Typography>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                ) : (
-                                    <Typography variant="body2" color="text.secondary" align="center">
-                                        Aún no has colaborado con ninguna empresa.
-                                    </Typography>
-                                )}
-                            </Paper>
-                        </motion.div>
-                    </Grid>
-
-                    {/* Card 4: Tu Disponibilidad Registrada */}
-                    <Grid item xs={12} sm={6} md={3}>
-                        <motion.div initial="hidden" animate="visible" custom={3} variants={cardVariants}>
-                            <Paper
-                                elevation={3}
-                                sx={{
-                                    p: 3,
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    minHeight: 200,
-                                    justifyContent: 'center',
-                                }}
-                            >
-                                <AccessTime color="warning" sx={{ fontSize: 48, mb: 2 }} />
-                                <Typography variant="h6" component="h3" gutterBottom align="center">
-                                    Tu Disponibilidad
-                                </Typography>
-                                {availabilities.length > 0 ? (
-                                    <ul style={{ listStyleType: 'none', padding: 0, textAlign: 'center' }}>
-                                        {availabilities.slice(0, 3).map((availability) => (
-                                            <li key={availability.id}>
-                                                <Typography variant="body2">
-                                                    <strong>{availability.day_of_week}</strong>: {availability.start_time} - {availability.end_time}
-                                                </Typography>
-                                            </li>
-                                        ))}
-                                        {availabilities.length > 3 && (
-                                            <Typography variant="body2" color="text.secondary">
-                                                ...y {availabilities.length - 3} más
-                                            </Typography>
-                                        )}
-                                    </ul>
-                                ) : (
-                                    <Typography variant="body2" color="text.secondary" align="center">
-                                        No has registrado tu disponibilidad.
-                                    </Typography>
-                                )}
-                                <Button variant="contained" size="small" sx={{ mt: 2 }}>
-                                    Gestionar
-                                </Button>
-                            </Paper>
-                        </motion.div>
-                    </Grid>
-
-                    {/* Card 5: Total de Reservas */}
-                    <Grid item xs={12} sm={6} md={3}>
-                        <motion.div initial="hidden" animate="visible" custom={4} variants={cardVariants}>
-                            <Paper
-                                elevation={3}
-                                sx={{
-                                    p: 3,
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    minHeight: 200,
-                                    justifyContent: 'center',
-                                }}
-                            >
-                                <PlaylistAddCheck color="info" sx={{ fontSize: 48, mb: 2 }} />
-                                <Typography variant="h6" component="h3" gutterBottom align="center">
-                                    Total de Reservas
-                                </Typography>
-                                <Typography variant="h4" component="p" color="text.primary" align="center">
-                                    {totalBookings}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary" align="center">
-                                    Reservas en total.
-                                </Typography>
-                            </Paper>
-                        </motion.div>
-                    </Grid>
-
-                    {/* Card 6: Desglose de Reservas por Estado */}
-                    <Grid item xs={12} sm={6} md={3}>
-                        <motion.div initial="hidden" animate="visible" custom={5} variants={cardVariants}>
-                            <Paper
-                                elevation={3}
-                                sx={{
-                                    p: 3,
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    minHeight: 200,
-                                    justifyContent: 'center',
-                                }}
-                            >
-                                <HourglassEmpty color="action" sx={{ fontSize: 48, mb: 2 }} />
-                                <Typography variant="h6" component="h3" gutterBottom align="center">
-                                    Reservas por Estado
-                                </Typography>
-                                {Object.keys(bookingStatusCounts).length > 0 ? (
-                                    <ul style={{ listStyleType: 'none', padding: 0, textAlign: 'center' }}>
-                                        {Object.entries(bookingStatusCounts).map(([status, count]) => (
-                                            <li key={status}>
-                                                <Typography variant="body2">
-                                                    <strong>{status.charAt(0).toUpperCase() + status.slice(1)}</strong>: {count}
-                                                </Typography>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                ) : (
-                                    <Typography variant="body2" color="text.secondary" align="center">
-                                        No hay reservas registradas.
-                                    </Typography>
-                                )}
-                            </Paper>
-                        </motion.div>
-                    </Grid>
-
-                    {/* Card 7: Total de Horas de Disponibilidad */}
-                    <Grid item xs={12} sm={6} md={3}>
-                        <motion.div initial="hidden" animate="visible" custom={6} variants={cardVariants}>
-                            <Paper
-                                elevation={3}
-                                sx={{
-                                    p: 3,
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    minHeight: 200,
-                                    justifyContent: 'center',
-                                }}
-                            >
-                                <AccessTime color="success" sx={{ fontSize: 48, mb: 2 }} />
-                                <Typography variant="h6" component="h3" gutterBottom align="center">
-                                    Horas Disponibles
-                                </Typography>
-                                <Typography variant="h4" component="p" color="text.primary" align="center">
-                                    {totalAvailabilityHours}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary" align="center">
-                                    Horas marcadas como disponibles.
-                                </Typography>
-                            </Paper>
-                        </motion.div>
-                    </Grid>
-
-                    {/* Card 8: Próxima Reserva */}
-                    <Grid item xs={12} sm={6} md={3}>
-                        <motion.div initial="hidden" animate="visible" custom={7} variants={cardVariants}>
-                            <Paper
-                                elevation={3}
-                                sx={{
-                                    p: 3,
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    minHeight: 200,
-                                    justifyContent: 'center',
-                                }}
-                            >
-                                <EventNote color="primary" sx={{ fontSize: 48, mb: 2 }} />
-                                <Typography variant="h6" component="h3" gutterBottom align="center">
-                                    Próxima Reserva
-                                </Typography>
-                                {nextBooking ? (
-                                    <>
-                                        <Typography variant="body1" align="center" fontWeight="bold">
-                                            {nextBooking.company_name}
-                                        </Typography>
-                                        <Typography variant="body2" color="text.secondary" align="center">
-                                            {nextBooking.day_of_week} | {nextBooking.start_time}
-                                        </Typography>
-                                    </>
-                                ) : (
-                                    <Typography variant="body2" color="text.secondary" align="center">
-                                        No tienes próximas reservas.
-                                    </Typography>
-                                )}
-                            </Paper>
-                        </motion.div>
-                    </Grid>
-
-                    {/* Card 9: Última Empresa Trabajada */}
-                    <Grid item xs={12} sm={6} md={3}>
-                        <motion.div initial="hidden" animate="visible" custom={8} variants={cardVariants}>
-                            <Paper
-                                elevation={3}
-                                sx={{
-                                    p: 3,
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    minHeight: 200,
-                                    justifyContent: 'center',
-                                }}
-                            >
-                                <Business color="info" sx={{ fontSize: 48, mb: 2 }} />
-                                <Typography variant="h6" component="h3" gutterBottom align="center">
-                                    Última Empresa
-                                </Typography>
-                                <Typography variant="h5" component="p" color="text.primary" align="center">
-                                    {lastWorkedCompany}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary" align="center">
-                                    Con la que colaboraste recientemente.
-                                </Typography>
-                            </Paper>
-                        </motion.div>
-                    </Grid>
-
-                    {/* Card 10: Promedio de Días de Trabajo por Semana */}
-                    <Grid item xs={12} sm={6} md={3}>
-                        <motion.div initial="hidden" animate="visible" custom={9} variants={cardVariants}>
-                            <Paper
-                                elevation={3}
-                                sx={{
-                                    p: 3,
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    minHeight: 200,
-                                    justifyContent: 'center',
-                                }}
-                            >
-                                <TrendingUp color="secondary" sx={{ fontSize: 48, mb: 2 }} />
-                                <Typography variant="h6" component="h3" gutterBottom align="center">
-                                    Promedio Días/Semana
-                                </Typography>
-                                <Typography variant="h4" component="p" color="text.primary" align="center">
-                                    {averageDaysPerWeek}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary" align="center">
-                                    Días de trabajo por semana.
-                                </Typography>
-                            </Paper>
-                        </motion.div>
-                    </Grid>
-
-                    {/* Card 11: Cantidad de Fotos Subidas */}
-                    <Grid item xs={12} sm={6} md={3}>
-                        <motion.div initial="hidden" animate="visible" custom={10} variants={cardVariants}>
-                            <Paper
-                                elevation={3}
-                                sx={{
-                                    p: 3,
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    minHeight: 200,
-                                    justifyContent: 'center',
-                                }}
-                            >
-                                <PhotoCamera color="action" sx={{ fontSize: 48, mb: 2 }} />
-                                <Typography variant="h6" component="h3" gutterBottom align="center">
-                                    Tus Fotos
-                                </Typography>
-                                <Typography variant="h4" component="p" color="text.primary" align="center">
-                                    {totalPhotos}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary" align="center">
-                                    Fotos subidas a tu perfil.
-                                </Typography>
-                            </Paper>
-                        </motion.div>
-                    </Grid>
-
-                    {/* Card 12: Días sin Disponibilidad */}
-                    <Grid item xs={12} sm={6} md={3}>
-                        <motion.div initial="hidden" animate="visible" custom={11} variants={cardVariants}>
-                            <Paper
-                                elevation={3}
-                                sx={{
-                                    p: 3,
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    minHeight: 200,
-                                    justifyContent: 'center',
-                                }}
-                            >
-                                <Block color="error" sx={{ fontSize: 48, mb: 2 }} />
-                                <Typography variant="h6" component="h3" gutterBottom align="center">
-                                    Días Sin Disponibilidad
-                                </Typography>
-                                {daysWithoutAvailability.length > 0 ? (
-                                    <ul style={{ listStyleType: 'none', padding: 0, textAlign: 'center' }}>
-                                        {daysWithoutAvailability.map((day, index) => (
-                                            <li key={index}>
-                                                <Typography variant="body2">{day.charAt(0).toUpperCase() + day.slice(1)}</Typography>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                ) : (
-                                    <Typography variant="body2" color="text.secondary" align="center">
-                                        ¡Has registrado disponibilidad para todos los días!
-                                    </Typography>
-                                )}
-                            </Paper>
-                        </motion.div>
-                    </Grid>
-                </Grid>
-            </Box>
+                                    </div>
+                                </div>
+                                <div className="absolute -right-10 -bottom-10 h-40 w-40 rounded-full bg-white/10 blur-3xl" />
+                            </Card>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </AppLayout>
+    );
+}
+
+function MetricCard({ label, value, icon, color, desc, isText }: any) {
+    return (
+        <Card className="group overflow-hidden border-0 shadow-lg transition-all hover:translate-y-[-6px] hover:shadow-2xl">
+            <CardContent className="flex items-center gap-5 p-6 md:p-8">
+                <div
+                    className={`flex h-16 w-16 items-center justify-center rounded-[1.5rem] text-white shadow-xl ${color} transition-transform group-hover:scale-110`}
+                >
+                    {icon}
+                </div>
+                <div>
+                    <p className="mb-1 text-[10px] leading-none font-black tracking-[0.2em] text-slate-400 uppercase">{label}</p>
+                    <p className={`leading-none font-black text-slate-900 dark:text-white ${isText ? 'text-xl' : 'text-4xl'}`}>{value}</p>
+                    <p className="mt-2 text-[10px] leading-none font-bold tracking-tighter text-slate-400 uppercase opacity-80">{desc}</p>
+                </div>
+            </CardContent>
+        </Card>
     );
 }

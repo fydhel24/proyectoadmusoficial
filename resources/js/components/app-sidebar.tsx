@@ -19,46 +19,53 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarSeparator,
 } from '@/components/ui/sidebar';
+
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 
 // 3. Componentes personalizados
 import { NavUser } from '@/components/nav-user';
 import AppLogo from './app-logo';
-import { InfluencerHistorySidebarItem } from './influencer-history';
 
 // 4. Tipos
 import type { NavItem } from '@/types';
 
-// 5. Iconos
-import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
-import BusinessIcon from '@mui/icons-material/Business';
-import CalendarViewWeekIcon from '@mui/icons-material/CalendarViewWeek';
-import CategoryIcon from '@mui/icons-material/Category';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import EmojiPeopleIcon from '@mui/icons-material/EmojiPeople';
-import EventNoteIcon from '@mui/icons-material/EventNote';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import GroupIcon from '@mui/icons-material/Group';
-import PeopleIcon from '@mui/icons-material/Groups';
-import ListAltIcon from '@mui/icons-material/ListAlt';
-import PendingActionsIcon from '@mui/icons-material/PendingActions';
-import PersonIcon from '@mui/icons-material/Person';
-import PublishedWithChangesIcon from '@mui/icons-material/PublishedWithChanges';
-import RateReviewIcon from '@mui/icons-material/RateReview';
-import WorkIcon from '@mui/icons-material/Work';
-
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'; // Para "Pagos del ANUALES"
-import LinkIcon from '@mui/icons-material/Link'; // Para "+ Link de Compañias"
-import MonetizationOnIcon from '@mui/icons-material/MonetizationOn'; // Para "Pagos del MES"
-import StoreIcon from '@mui/icons-material/Store'; // Para "Companies"
-
-import AccessTimeIcon from '@mui/icons-material/AccessTime'; // Para "Semana Influencer"
-import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest'; // Para "Personal"
-import TableChartIcon from '@mui/icons-material/TableChart'; // Para "Semana"
-
-import PermIdentityIcon from '@mui/icons-material/PermIdentity'; // Para "Mi perfil"
-import TodayIcon from '@mui/icons-material/Today';
+// 5. Iconos Lucide
+import {
+    LayoutDashboard,
+    Gift,
+    History,
+    Users,
+    ShieldCheck,
+    Settings,
+    Briefcase,
+    Building2,
+    Tags,
+    Link2,
+    Banknote,
+    CalendarCheck,
+    Video,
+    FileText,
+    UserCheck,
+    User,
+    CalendarRange,
+    CalendarDays,
+    CheckSquare,
+    ClipboardList,
+    ClipboardCheck,
+    ListTodo,
+    Flame,
+    ChevronDown,
+    ChevronUp,
+    Store,
+    Clock,
+    UserCircle
+} from 'lucide-react';
 
 // 6. Props que trae Inertia
 type PageProps = {
@@ -77,83 +84,90 @@ type MenuSection = {
     isCollapsible?: boolean;
 };
 
-// 8. NavMain: mantiene sección activa abierta y aplica degradado rojo con texto blanco
+// 8. NavMain: modern collapsible section with Lucide and refined styles
 function NavMain({ sections, currentPath }: { sections: MenuSection[]; currentPath: string }) {
-    const activeSectionKey =
-        sections
-            .find((sec) => sec.items?.some((item) => item.href === currentPath))
-            ?.title.toLowerCase()
-            .replace(/\s+/g, '') ?? '';
-
-    const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
-        [activeSectionKey]: true,
-    });
-
-    useEffect(() => {
-        setExpandedSections({ [activeSectionKey]: true });
-    }, [activeSectionKey]);
-
-    const toggleSection = (key: string) => {
-        setExpandedSections((prev) => ({ ...prev, [key]: !prev[key] }));
-    };
-
     return (
-        <>
+        <SidebarMenu>
             {sections.map((section) => {
                 const key = section.title.toLowerCase().replace(/\s+/g, '');
-                const isExpanded = !!expandedSections[key];
-                const isActiveSection = key === activeSectionKey;
+                const hasActiveItem = section.items?.some((item) => item.href === currentPath);
+
+                if (!section.isCollapsible) {
+                    return (
+                        <SidebarGroup key={key} className="py-0">
+                            <SidebarGroupLabel className="text-gray-400 px-2 py-4">
+                                {section.title}
+                            </SidebarGroupLabel>
+                            <SidebarMenu>
+                                {section.items.map((item) => {
+                                    const Icon = item.icon as React.ElementType;
+                                    return (
+                                        <SidebarMenuItem key={item.href}>
+                                            <SidebarMenuButton
+                                                asChild
+                                                isActive={item.href === currentPath}
+                                                tooltip={item.title}
+                                            >
+                                                <Link href={item.href} className="flex items-center gap-2">
+                                                    <Icon className="h-4 w-4" />
+                                                    <span>{item.title}</span>
+                                                </Link>
+                                            </SidebarMenuButton>
+                                        </SidebarMenuItem>
+                                    );
+                                })}
+                            </SidebarMenu>
+                        </SidebarGroup>
+                    );
+                }
 
                 return (
-                    <SidebarGroup key={key}>
-                        <SidebarGroupLabel
-                            onClick={section.isCollapsible ? () => toggleSection(key) : undefined}
-                            className={
-                                `flex cursor-pointer items-center justify-between rounded-md px-3 py-2 transition-colors duration-200 ` +
-                                `${section.isCollapsible ? 'hover:bg-red-500' : ''} ` +
-                                `${isActiveSection ? 'bg-gradient-to-r from-red-500 to-red-600 text-white' : 'bg-transparent text-white'}`
-                            }
-                        >
-                            <div className="flex items-center gap-2">
-                                <section.icon className="h-5 w-5 text-white" />
-                                <span className="font-medium">{section.title}</span>
-                            </div>
-                            {section.isCollapsible &&
-                                (isExpanded ? <ExpandLessIcon className="h-5 w-5 text-white" /> : <ExpandMoreIcon className="h-5 w-5 text-white" />)}
-                        </SidebarGroupLabel>
-
-                        {(!section.isCollapsible || isExpanded) && (
-                            <SidebarGroupContent className="transition-all duration-200">
-                                <SidebarMenu>
-                                    {section.items?.map((item) => {
-                                        const isActiveItem = item.href === currentPath;
-                                        return (
-                                            <SidebarMenuItem key={item.href}>
-                                                <SidebarMenuButton asChild>
-                                                    <Link
-                                                        href={item.href}
-                                                        prefetch
-                                                        className={
-                                                            `flex items-center gap-2 rounded-md px-4 py-2 transition-colors duration-150 ` +
-                                                            `${isActiveItem ? 'bg-gradient-to-r from-red-400 to-red-500 text-white' : 'text-white hover:bg-red-50 hover:text-gray-800'}`
-                                                        }
+                    <Collapsible
+                        key={key}
+                        asChild
+                        defaultOpen={hasActiveItem}
+                        className="group/collapsible"
+                    >
+                        <SidebarGroup className="py-0">
+                            <SidebarMenuItem>
+                                <CollapsibleTrigger asChild>
+                                    <SidebarMenuButton tooltip={section.title}>
+                                        <section.icon className="h-4 w-4" />
+                                        <span className="font-medium">{section.title}</span>
+                                        <ChevronDown className="ml-auto h-4 w-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-180" />
+                                    </SidebarMenuButton>
+                                </CollapsibleTrigger>
+                                <CollapsibleContent>
+                                    <SidebarMenuSub className="mr-0 border-l border-sidebar-border ml-4">
+                                        {section.items.map((item) => {
+                                            const Icon = item.icon as React.ElementType;
+                                            return (
+                                                <SidebarMenuSubItem key={item.href}>
+                                                    <SidebarMenuSubButton
+                                                        asChild
+                                                        isActive={item.href === currentPath}
                                                     >
-                                                        <item.icon className="h-4 w-4 text-white" />
-                                                        <span>{item.title}</span>
-                                                    </Link>
-                                                </SidebarMenuButton>
-                                            </SidebarMenuItem>
-                                        );
-                                    })}
-                                </SidebarMenu>
-                            </SidebarGroupContent>
-                        )}
-                    </SidebarGroup>
+                                                        <Link href={item.href} className="flex items-center gap-2">
+                                                            <Icon className="h-4 w-4" />
+                                                            <span>{item.title}</span>
+                                                        </Link>
+                                                    </SidebarMenuSubButton>
+                                                </SidebarMenuSubItem>
+                                            );
+                                        })}
+                                    </SidebarMenuSub>
+                                </CollapsibleContent>
+                            </SidebarMenuItem>
+                        </SidebarGroup>
+                    </Collapsible>
                 );
             })}
-        </>
+        </SidebarMenu>
     );
 }
+
+// Helper to keep SidebarMenuSub working
+import { SidebarMenuSub, SidebarMenuSubItem, SidebarMenuSubButton } from '@/components/ui/sidebar';
 
 // 9. Componente principal AppSidebar
 export function AppSidebar() {
@@ -190,92 +204,90 @@ export function AppSidebar() {
         menuSections.push(
             {
                 title: 'Gestion de Personal',
-                icon: PeopleIcon,
+                icon: Users,
                 items: [
-                    { title: 'Usuarios', href: '/users', icon: PersonIcon },
-                    { title: 'Roles', href: '/roles', icon: AdminPanelSettingsIcon },
-                    { title: 'Gestion de tipos', href: '/tipos', icon: SettingsSuggestIcon }, // CAMBIADO
-                    { title: 'Postulaciones de Trabajo', href: '/admin/job-applications', icon: WorkIcon },
+                    { title: 'Usuarios', href: '/users', icon: User },
+                    { title: 'Roles', href: '/roles', icon: ShieldCheck },
+                    { title: 'Gestion de tipos', href: '/tipos', icon: Settings },
+                    { title: 'Postulaciones de Trabajo', href: '/admin/job-applications', icon: Briefcase },
                 ],
                 isCollapsible: true,
             },
             {
                 title: 'Gestion de Empresas',
-                icon: BusinessIcon,
+                icon: Building2,
                 items: [
-                    { title: 'Empresas', href: '/companies', icon: StoreIcon }, // CAMBIADO
-                    { title: 'Categorias', href: '/categories', icon: CategoryIcon },
-                    { title: 'Link de Empresas', href: '/company-links', icon: LinkIcon }, // CAMBIADO
-                    { title: 'Pagos del MES', href: '/pagos-del-mes', icon: MonetizationOnIcon }, // CAMBIADO
-                    { title: 'Pagos del ANUALES', href: '/reportes/pagos-por-anio', icon: CalendarMonthIcon },
-                    { title: 'Videos Empresas', href: '/videos', icon: BusinessIcon },
-                    { title: 'Videos MES Empresas', href: '/videosmes', icon: BusinessIcon },
-                    { title: 'Informes', href: '/informes', icon: BusinessIcon },
+                    { title: 'Empresas', href: '/companies', icon: Store },
+                    { title: 'Categorias', href: '/categories', icon: Tags },
+                    { title: 'Link de Empresas', href: '/company-links', icon: Link2 },
+                    { title: 'Pagos del MES', href: '/pagos-del-mes', icon: Banknote },
+                    { title: 'Pagos del ANUALES', href: '/reportes/pagos-por-anio', icon: CalendarDays },
+                    { title: 'Videos Empresas', href: '/videos', icon: Video },
+                    { title: 'Videos MES Empresas', href: '/videosmes', icon: Video },
+                    { title: 'Informes', href: '/informes', icon: FileText },
                 ],
                 isCollapsible: true,
             },
             {
                 title: 'Gestion de Influencers',
-                icon: EmojiPeopleIcon,
+                icon: UserCheck,
                 items: [
-                    { title: 'Semana Influencer', href: '/semanainfluencer', icon: AccessTimeIcon },
-                    { title: 'Semana Pasante', href: '/semana-pasantes', icon: AccessTimeIcon },
-                    { title: 'Administrar Influencers', href: '/infuencersdatos', icon: EmojiPeopleIcon },
-                    { title: 'Influencers', href: '/influencers', icon: GroupIcon },
-                    { title: 'Historial de Semanas', href: '/weeks', icon: CalendarViewWeekIcon },
-                    { title: 'Ver Calendario', href: '/bookings', icon: EventNoteIcon },
+                    { title: 'Semana Influencer', href: '/semanainfluencer', icon: Clock },
+                    { title: 'Semana Pasante', href: '/semana-pasantes', icon: Clock },
+                    { title: 'Administrar Influencers', href: '/infuencersdatos', icon: UserCheck },
+                    { title: 'Influencers', href: '/influencers', icon: Users },
+                    { title: 'Historial de Semanas', href: '/weeks', icon: CalendarRange },
+                    { title: 'Ver Calendario', href: '/bookings', icon: CalendarCheck },
                 ],
                 isCollapsible: true,
             },
             {
                 title: 'Gestion de Pasantes',
-                icon: WorkIcon,
+                icon: Briefcase,
                 items: [
-                    { title: 'Tareas de Hoy', href: '/tareas/hoy', icon: TodayIcon }, // CAMBIADO
-                    { title: 'Tareas en revicion', href: '/tareas/revicion', icon: PendingActionsIcon },
-                    { title: 'Semana Tareas', href: '/semana', icon: TableChartIcon }, // CAMBIADO
-                    { title: 'Reporte de tareas', href: '/reportetareas', icon: TableChartIcon }, // CAMBIADO
-                    { title: 'Agenda Mensual', href: '/mes', icon: TableChartIcon }, // CAMBIADO
+                    { title: 'Tareas de Hoy', href: '/tareas/hoy', icon: CalendarCheck },
+                    { title: 'Tareas en revicion', href: '/tareas/revicion', icon: ClipboardCheck },
+                    { title: 'Semana Tareas', href: '/semana', icon: CalendarRange },
+                    { title: 'Reporte de tareas', href: '/reportetareas', icon: FileText },
+                    { title: 'Agenda Mensual', href: '/mes', icon: CalendarRange },
                 ],
                 isCollapsible: true,
             },
             {
                 title: 'Gestión de Marketing',
-                icon: WorkIcon, // Podrías cambiarlo también a "CampaignIcon" para darle un toque más de marketing
+                icon: Flame,
                 items: [
-                    { title: 'Lista de Empresas', href: '/planes-empresas', icon: BusinessIcon }, // Empresas
-                    { title: 'Todas las Tareas', href: '/seguimiento-tareas-todos', icon: ListAltIcon }, // Lista
-                    { title: 'Pendientes Mes', href: '/seguimiento-tareas-pendientes', icon: EventNoteIcon }, // Calendario/mes
-                    { title: 'Pendientes de Hoy', href: '/seguimiento-tareas-pendienteshoy', icon: TodayIcon }, // Hoy
-                    { title: 'Pendientes Producción Hoy', href: '/seguimiento-tareas-pendienteshoyproduccion', icon: EmojiPeopleIcon }, // Producción
-                    { title: 'Pendientes Edición Hoy', href: '/seguimiento-tareas-pendienteshoyedicion', icon: AdminPanelSettingsIcon }, // Edición
-                    { title: 'En Revisión', href: '/seguimiento-tareas-pendienteshoyrevision', icon: RateReviewIcon }, // Revisión
-                    { title: 'Publicados', href: '/seguimiento-tareas-publicados', icon: PublishedWithChangesIcon }, // Publicados
+                    { title: 'Lista de Empresas', href: '/planes-empresas', icon: Building2 },
+                    { title: 'Todas las Tareas', href: '/seguimiento-tareas-todos', icon: ListTodo },
+                    { title: 'Pendientes Mes', href: '/seguimiento-tareas-pendientes', icon: CalendarRange },
+                    { title: 'Pendientes de Hoy', href: '/seguimiento-tareas-pendienteshoy', icon: CalendarCheck },
+                    { title: 'Pendientes Producción Hoy', href: '/seguimiento-tareas-pendienteshoyproduccion', icon: Video },
+                    { title: 'Pendientes Edición Hoy', href: '/seguimiento-tareas-pendienteshoyedicion', icon: Settings },
+                    { title: 'En Revisión', href: '/seguimiento-tareas-pendienteshoyrevision', icon: ClipboardCheck },
+                    { title: 'Publicados', href: '/seguimiento-tareas-publicados', icon: FileText },
                 ],
                 isCollapsible: true,
             },
             {
                 title: 'Gestion de Vendedores',
-                icon: WorkIcon,
+                icon: Briefcase,
                 items: [
-                    { title: 'Reportes Empresas general', href: '/reportesgeneral', icon: StoreIcon }, // admin
-                    { title: 'Seguimiento Empresas', href: '/seguimiento-empresa', icon: StoreIcon }, // admin
-                    { title: 'Seguimiento Historial', href: '/seguimiento-historial', icon: StoreIcon }, // admin
-                    { title: 'Reportes Empresas', href: '/reporte-empresa-vendedor', icon: RateReviewIcon }, // admin
-                    { title: 'Canjes Pendientes', href: '/canjes/pendientes', icon: TodayIcon }, // admin
-                    { title: 'Premios', href: '/premios', icon: PendingActionsIcon },
-                    { title: 'Paquetes', href: '/paquetes', icon: TableChartIcon }, // CAMBIADO
-                    /* { title: 'Seguimiento Empresas Vendedor', href: '/seguimiento-empresa-vendedor', icon: StoreIcon }, // vendedor
-                    { title: 'Canjes Pendientes', href: '/canjes', icon: TodayIcon }, // vendedor */
+                    { title: 'Reportes Empresas general', href: '/reportesgeneral', icon: Building2 },
+                    { title: 'Seguimiento Empresas', href: '/seguimiento-empresa', icon: Building2 },
+                    { title: 'Seguimiento Historial', href: '/seguimiento-historial', icon: History },
+                    { title: 'Reportes Empresas', href: '/reporte-empresa-vendedor', icon: FileText },
+                    { title: 'Canjes Pendientes', href: '/canjes/pendientes', icon: CalendarCheck },
+                    { title: 'Premios', href: '/premios', icon: Gift },
+                    { title: 'Paquetes', href: '/paquetes', icon: Tags },
                 ],
                 isCollapsible: true,
             },
             {
                 title: 'Gestion regalos',
-                icon: WorkIcon,
+                icon: Gift,
                 items: [
-                    { title: 'Administrar regalos', href: '/regalo', icon: StoreIcon }, // admin
-                    { title: 'Navidad Admus', href: '/regaloview', icon: StoreIcon }, // admin
+                    { title: 'Administrar regalos', href: '/regalo', icon: Settings },
+                    { title: 'Navidad Admus', href: '/regaloview', icon: Flame },
                 ],
                 isCollapsible: true,
             },
@@ -284,11 +296,11 @@ export function AppSidebar() {
         if (isInfluencer) {
             menuSections.push({
                 title: 'Influencer',
-                icon: EmojiPeopleIcon,
+                icon: UserCheck,
                 items: [
-                    { title: 'Influencers', href: '/influencers', icon: GroupIcon },
-                    { title: 'Ver Calendario', href: '/bookings', icon: EventNoteIcon },
-                    { title: 'Mi perfil2', href: '/perfil-influencer', icon: PermIdentityIcon },
+                    { title: 'Influencers', href: '/influencers', icon: Users },
+                    { title: 'Ver Calendario', href: '/bookings', icon: CalendarCheck },
+                    { title: 'Mi perfil', href: '/perfil-influencer', icon: UserCircle },
                 ],
                 isCollapsible: false,
             });
@@ -296,15 +308,13 @@ export function AppSidebar() {
         if (isPasante) {
             menuSections.push({
                 title: 'Pasante',
-                icon: WorkIcon,
+                icon: Briefcase,
                 items: [
-                    { title: 'Mis Tareas de HOY', href: '/tareas-personales', icon: TodayIcon },
-                    { title: 'Tareas Pendientes', href: '/pasante/mistareas/pendientes', icon: PendingActionsIcon },
-                    { title: 'Tareas Para Corregir', href: '/pasante/mistareas/encorregir', icon: RateReviewIcon },
-                    { title: 'Todas mis tareas', href: '/pasante/mistareas/todos', icon: ListAltIcon },
-                    { title: 'Tareas Realizadas', href: '/pasante/mistareas/enrevicion', icon: RateReviewIcon },
-                    //{ title: 'Tareas Publicadas', href: '/pasante/mistareas/publicadas', icon: PublishedWithChangesIcon },
-                    //{ title: 'Mi Horario', href: '/mi-horario', icon: AccessTimeIcon },
+                    { title: 'Mis Tareas de HOY', href: '/tareas-personales', icon: CalendarDays },
+                    { title: 'Tareas Pendientes', href: '/pasante/mistareas/pendientes', icon: Clock },
+                    { title: 'Tareas Para Corregir', href: '/pasante/mistareas/encorregir', icon: ClipboardList },
+                    { title: 'Todas mis tareas', href: '/pasante/mistareas/todos', icon: ListTodo },
+                    { title: 'Tareas Realizadas', href: '/pasante/mistareas/enrevicion', icon: ClipboardCheck },
                 ],
                 isCollapsible: true,
             });
@@ -312,16 +322,10 @@ export function AppSidebar() {
         if (isCamarografo) {
             menuSections.push({
                 title: 'Camarografo',
-                icon: WorkIcon,
+                icon: Video,
                 items: [
-                    { title: 'Grabaciones de HOY', href: '/camarografo/tareas-hoy', icon: TodayIcon },
-                    { title: 'Grabaciones Semana ', href: '/tareas-camarografo', icon: TodayIcon },
-
-                    /* { title: 'Tareas Pendientes', href: '/pasante/mistareas/pendientes', icon: PendingActionsIcon },
-                    { title: 'Todas mis tareas', href: '/pasante/mistareas/todos', icon: ListAltIcon },
-                    { title: 'Tareas Realizadas', href: '/pasante/mistareas/enrevicion', icon: RateReviewIcon }, */
-                    //{ title: 'Tareas Publicadas', href: '/pasante/mistareas/publicadas', icon: PublishedWithChangesIcon },
-                    //{ title: 'Mi Horario', href: '/mi-horario', icon: AccessTimeIcon },
+                    { title: 'Grabaciones de HOY', href: '/camarografo/tareas-hoy', icon: CalendarCheck },
+                    { title: 'Grabaciones Semana ', href: '/tareas-camarografo', icon: CalendarRange },
                 ],
                 isCollapsible: true,
             });
@@ -329,12 +333,10 @@ export function AppSidebar() {
         if (isEditor) {
             menuSections.push({
                 title: 'Panel Editor',
-                icon: WorkIcon,
+                icon: Video,
                 items: [
-                    { title: 'Edicion de Hoy', href: '/editor/tareas-hoy', icon: TodayIcon },
-                    { title: 'Edicion de Semana ', href: '/tareas-editor', icon: TodayIcon },
-                    //{ title: 'Tareas Realizadas HOY', href: '/tareas-personales', icon: TodayIcon },
-                    //{ title: 'Todas mis tareas', href: '/pasante/mistareas/todos', icon: ListAltIcon },
+                    { title: 'Edicion de Hoy', href: '/editor/tareas-hoy', icon: CalendarCheck },
+                    { title: 'Edicion de Semana ', href: '/tareas-editor', icon: CalendarRange },
                 ],
                 isCollapsible: true,
             });
@@ -342,10 +344,10 @@ export function AppSidebar() {
         if (isVendedor) {
             menuSections.push({
                 title: 'Ejecutivo de Ventas',
-                icon: WorkIcon,
+                icon: Briefcase,
                 items: [
-                    { title: 'Seguimiento Empresas', href: '/seguimiento-empresa-vendedor', icon: StoreIcon }, // vendedor
-                    { title: 'Canjes Pendientes', href: '/canjes', icon: TodayIcon }, // vendedor
+                    { title: 'Seguimiento Empresas', href: '/seguimiento-empresa-vendedor', icon: Building2 },
+                    { title: 'Canjes Pendientes', href: '/canjes', icon: Clock },
                 ],
                 isCollapsible: false,
             });
@@ -355,41 +357,32 @@ export function AppSidebar() {
             menuSections.push(
                 {
                     title: 'Encargado de marketing',
-                    icon: WorkIcon,
+                    icon: Flame,
                     items: [
-                        { title: 'Crear Empresas', href: '/companiasmark', icon: StoreIcon }, // CAMBIADO
-                        { title: 'Lista de Empresas', href: '/planes-empresas', icon: BusinessIcon }, // Empresas
-                        { title: 'Todas las Tareas', href: '/seguimiento-tareas-todos', icon: ListAltIcon }, // Lista
-                        { title: 'Pendientes Mes', href: '/seguimiento-tareas-pendientes', icon: EventNoteIcon }, // Calendario/mes
-                        { title: 'Pendientes de Hoy', href: '/seguimiento-tareas-pendienteshoy', icon: TodayIcon }, // Hoy
-                        { title: 'Pendientes Producción Hoy', href: '/seguimiento-tareas-pendienteshoyproduccion', icon: EmojiPeopleIcon }, // Producción
-                        { title: 'Pendientes Edición Hoy', href: '/seguimiento-tareas-pendienteshoyedicion', icon: AdminPanelSettingsIcon }, // Edición
-                        { title: 'En Revisión', href: '/seguimiento-tareas-pendienteshoyrevision', icon: RateReviewIcon }, // Revisión
-                        { title: 'Publicados', href: '/seguimiento-tareas-publicados', icon: PublishedWithChangesIcon }, // Publicados
-                        { title: 'Informes', href: '/informes', icon: BusinessIcon },
+                        { title: 'Crear Empresas', href: '/companiasmark', icon: Store },
+                        { title: 'Lista de Empresas', href: '/planes-empresas', icon: Building2 },
+                        { title: 'Todas las Tareas', href: '/seguimiento-tareas-todos', icon: ListTodo },
+                        { title: 'Pendientes Mes', href: '/seguimiento-tareas-pendientes', icon: CalendarRange },
+                        { title: 'Pendientes de Hoy', href: '/seguimiento-tareas-pendienteshoy', icon: CalendarCheck },
+                        { title: 'Pendientes Producción Hoy', href: '/seguimiento-tareas-pendienteshoyproduccion', icon: Video },
+                        { title: 'Pendientes Edición Hoy', href: '/seguimiento-tareas-pendienteshoyedicion', icon: Settings },
+                        { title: 'En Revisión', href: '/seguimiento-tareas-pendienteshoyrevision', icon: ClipboardCheck },
+                        { title: 'Publicados', href: '/seguimiento-tareas-publicados', icon: FileText },
+                        { title: 'Informes', href: '/informes', icon: FileText },
                     ],
                     isCollapsible: true,
                 },
-                /* {
-                    title: 'Mis tareas',
-                    icon: ListAltIcon,
-                    items: [
-                        { title: 'Mis Tareas de HOY', href: '/tareas-personales', icon: TodayIcon },
-                        { title: 'Todas mis tareas', href: '/pasante/mistareas/todos', icon: ListAltIcon },
-                    ],
-                    isCollapsible: true,
-                }, */
             );
         }
 
         if (isEmpresa) {
             menuSections.push({
                 title: 'Empresa',
-                icon: BusinessIcon,
+                icon: Building2,
                 items: [
-                    { title: 'Videos Empresas', href: '/videos', icon: BusinessIcon },
-                    { title: 'Videos MES Empresas', href: '/videosmes', icon: BusinessIcon },
-                    { title: 'Realizar Pagos', href: '/pagos', icon: BusinessIcon },
+                    { title: 'Videos Empresas', href: '/videos', icon: Video },
+                    { title: 'Videos MES Empresas', href: '/videosmes', icon: Video },
+                    { title: 'Realizar Pagos', href: '/pagos', icon: Banknote },
                 ],
                 isCollapsible: false,
             });
@@ -397,12 +390,12 @@ export function AppSidebar() {
         if (isjefeventas) {
             menuSections.push({
                 title: 'Gestion de Vendedores',
-                icon: WorkIcon,
+                icon: Briefcase,
                 items: [
-                    { title: 'Reportes Empresas', href: '/reportes', icon: BusinessIcon },
-                    { title: 'Seguimiento Empresas', href: '/seguimiento-empresa', icon: EmojiPeopleIcon },
-                    { title: 'Seguimiento Historial', href: '/seguimiento-historial', icon: StoreIcon },
-                    { title: 'Canjes Pendientes', href: '/canjes/pendientes', icon: TodayIcon },
+                    { title: 'Reportes Empresas', href: '/reportes', icon: FileText },
+                    { title: 'Seguimiento Empresas', href: '/seguimiento-empresa', icon: UserCheck },
+                    { title: 'Seguimiento Historial', href: '/seguimiento-historial', icon: History },
+                    { title: 'Canjes Pendientes', href: '/canjes/pendientes', icon: Clock },
                 ],
                 isCollapsible: true,
             });
@@ -410,9 +403,9 @@ export function AppSidebar() {
         if (IsInvitado) {
             menuSections.push({
                 title: 'Invitado',
-                icon: PeopleIcon,
+                icon: Users,
                 items: [
-                    { title: 'Regalo secreto', href: '/regaloview', icon: BusinessIcon },
+                    { title: 'Regalo secreto', href: '/regaloview', icon: Gift },
                 ],
                 isCollapsible: false,
             });
@@ -420,9 +413,8 @@ export function AppSidebar() {
     }
 
     return (
-        <Sidebar collapsible="icon" variant="inset" className="bg-opacity-95 bg-gradient-to-b from-gray-700 via-gray-800 to-gray-800">
-            {/* Header */}
-            <SidebarHeader className="bg-opacity-95 bg-gradient-to-b from-gray-700 via-gray-700 to-gray-700">
+        <Sidebar collapsible="icon" variant="inset">
+            <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
@@ -434,81 +426,59 @@ export function AppSidebar() {
                 </SidebarMenu>
             </SidebarHeader>
 
-            {/* Contenido */}
-            <SidebarContent className="bg-opacity-95 bg-gradient-to-b from-gray-700 via-gray-700 to-gray-800">
-                {/* Panel Principal sin carpeta */}
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton asChild>
-                            <Link
-                                href="/dashboard"
-                                prefetch
-                                className={
-                                    `flex items-center gap-2 rounded-md px-4 py-2 transition-colors duration-150 ` +
-                                    `${currentPath === '/dashboard' ? 'bg-gradient-to-r from-red-500 to-red-600 text-white' : 'text-white hover:bg-red-50 hover:text-gray-800'}`
-                                }
-                            >
-                                <DashboardIcon className="h-5 w-5 text-white" />
-                                <span className="font-medium">Panel Principal</span>
-                            </Link>
-                        </SidebarMenuButton>
-                        <SidebarMenuButton asChild>
-                            <Link
-                                href="/regaloview"
-                                prefetch
-                                className={
-                                    `flex items-center gap-2 rounded-md px-4 py-2 transition-colors duration-150 ` +
-                                    `${currentPath === '/dashboard' ? 'bg-gradient-to-r from-red-500 to-red-600 text-white' : 'text-white hover:bg-red-50 hover:text-gray-800'}`
-                                }
-                            >
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-white">
-                                    <path d="M5.7 21a2 2 0 0 1-3.5-2l8.6-14a6 6 0 0 1 10.4 6 2 2 0 1 1-3.464-2 2 2 0 1 0-3.464-2Z" />
-                                    <path d="M17.75 7 15 2.1" />
-                                    <path d="M10.9 4.8 13 9" />
-                                    <path d="m7.9 9.7 2 4.4" />
-                                    <path d="M4.9 14.7 7 18.9" />
-                                </svg>
-                                <span className="font-medium">Navidad Admus</span>
-                            </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                </SidebarMenu>
-
-                {/* Regalo button for admin */}
-                {isAdmin && (
+            <SidebarContent>
+                <SidebarGroup>
                     <SidebarMenu>
                         <SidebarMenuItem>
+                            <SidebarMenuButton
+                                asChild
+                                isActive={currentPath === '/dashboard'}
+                                tooltip="Panel Principal"
+                            >
+                                <Link href="/dashboard" prefetch>
+                                    <LayoutDashboard className="h-5 w-5" />
+                                    <span>Panel Principal</span>
+                                </Link>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
 
-
+                        <SidebarMenuItem>
+                            <SidebarMenuButton
+                                asChild
+                                isActive={currentPath === '/regaloview'}
+                                tooltip="Navidad Admus"
+                            >
+                                <Link href="/regaloview" prefetch>
+                                    <Flame className="h-5 w-5" />
+                                    <span>Navidad Admus</span>
+                                </Link>
+                            </SidebarMenuButton>
                         </SidebarMenuItem>
                     </SidebarMenu>
-                )}
+                </SidebarGroup>
 
-                {/* Otras secciones */}
+                <SidebarSeparator className="mx-0" />
+
                 {isAdmin && (
                     <SidebarGroup>
                         <SidebarGroupLabel className="text-gray-400">Consultas Rápidas</SidebarGroupLabel>
-                        <SidebarGroupContent>
-                            <SidebarMenu>
-                                <SidebarMenuItem>
-                                    <SidebarMenuButton asChild>
-                                        <Link href="/admin/influencer-history" className="flex items-center gap-2 text-white hover:bg-red-50 hover:text-gray-800">
-                                            <CalendarMonthIcon className="h-4 w-4" />
-                                            <span>Historial Influencers</span>
-                                        </Link>
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                            </SidebarMenu>
-                        </SidebarGroupContent>
+                        <SidebarMenu>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild tooltip="Historial Influencers">
+                                    <Link href="/admin/influencer-history">
+                                        <History className="h-4 w-4" />
+                                        <span>Historial Influencers</span>
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                        </SidebarMenu>
                     </SidebarGroup>
                 )}
+
                 <NavMain sections={menuSections} currentPath={currentPath} />
             </SidebarContent>
 
-            {/* Footer */}
-            <SidebarFooter className="bg-opacity-95 bg-gradient-to-b from-gray-800 via-gray-800 to-gray-800">
-                <NavUser />
-            </SidebarFooter>
+            <SidebarFooter />
         </Sidebar>
     );
 }

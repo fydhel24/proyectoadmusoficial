@@ -201,7 +201,7 @@ export default function UsersPermissions() {
                         }}
                     />
                     <Button variant="contained" color="primary" sx={{ ml: 2 }} onClick={openCreateModal} startIcon={<EditIcon />}>
-                        Nuevo Usuarioooooo
+                        Nuevo Usuario
                     </Button>
                 </Box>
 

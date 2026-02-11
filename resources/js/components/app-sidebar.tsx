@@ -28,7 +28,8 @@ import {
     CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 
-// 3. Componentes personalizados
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { NavUser } from '@/components/nav-user';
 import AppLogo from './app-logo';
 
@@ -94,8 +95,8 @@ function NavMain({ sections, currentPath }: { sections: MenuSection[]; currentPa
 
                 if (!section.isCollapsible) {
                     return (
-                        <SidebarGroup key={key} className="py-0">
-                            <SidebarGroupLabel className="text-gray-400 px-2 py-4">
+                        <SidebarGroup key={key} className="py-2">
+                            <SidebarGroupLabel className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 px-2 py-4 border-b border-sidebar-border/10 mb-2">
                                 {section.title}
                             </SidebarGroupLabel>
                             <SidebarMenu>
@@ -107,10 +108,11 @@ function NavMain({ sections, currentPath }: { sections: MenuSection[]; currentPa
                                                 asChild
                                                 isActive={item.href === currentPath}
                                                 tooltip={item.title}
+                                                className="transition-all duration-300 active:scale-95 data-[active=true]:font-bold data-[active=true]:bg-brand data-[active=true]:text-white dark:data-[active=true]:bg-brand dark:data-[active=true]:text-white hover:bg-brand/10 dark:hover:bg-brand/20 group/item"
                                             >
                                                 <Link href={item.href} className="flex items-center gap-2">
-                                                    <Icon className="h-4 w-4" />
-                                                    <span>{item.title}</span>
+                                                    <Icon className="h-4 w-4 transition-transform group-hover/item:scale-110" />
+                                                    <span className="group-hover/item:translate-x-0.5 transition-transform">{item.title}</span>
                                                 </Link>
                                             </SidebarMenuButton>
                                         </SidebarMenuItem>
@@ -138,7 +140,7 @@ function NavMain({ sections, currentPath }: { sections: MenuSection[]; currentPa
                                     </SidebarMenuButton>
                                 </CollapsibleTrigger>
                                 <CollapsibleContent>
-                                    <SidebarMenuSub className="mr-0 border-l border-sidebar-border ml-4">
+                                    <SidebarMenuSub className="mr-0 border-l border-sidebar-border/30 ml-4">
                                         {section.items.map((item) => {
                                             const Icon = item.icon as React.ElementType;
                                             return (
@@ -146,10 +148,11 @@ function NavMain({ sections, currentPath }: { sections: MenuSection[]; currentPa
                                                     <SidebarMenuSubButton
                                                         asChild
                                                         isActive={item.href === currentPath}
+                                                        className="transition-all duration-300 active:scale-95 data-[active=true]:font-bold data-[active=true]:bg-brand data-[active=true]:text-white dark:data-[active=true]:bg-brand dark:data-[active=true]:text-white hover:bg-brand/10 dark:hover:bg-brand/20 group/subitem"
                                                     >
                                                         <Link href={item.href} className="flex items-center gap-2">
-                                                            <Icon className="h-4 w-4" />
-                                                            <span>{item.title}</span>
+                                                            <Icon className="h-4 w-4 transition-transform group-hover/subitem:scale-110" />
+                                                            <span className="group-hover/subitem:translate-x-0.5 transition-transform">{item.title}</span>
                                                         </Link>
                                                     </SidebarMenuSubButton>
                                                 </SidebarMenuSubItem>
@@ -170,7 +173,7 @@ function NavMain({ sections, currentPath }: { sections: MenuSection[]; currentPa
 import { SidebarMenuSub, SidebarMenuSubItem, SidebarMenuSubButton } from '@/components/ui/sidebar';
 
 // 9. Componente principal AppSidebar
-export function AppSidebar() {
+export function AppSidebar({ className }: { className?: string }) {
     const page = usePage<PageProps>();
     const { auth } = page.props;
     const currentPath = page.url;
@@ -287,7 +290,6 @@ export function AppSidebar() {
                 icon: Gift,
                 items: [
                     { title: 'Administrar regalos', href: '/regalo', icon: Settings },
-                    { title: 'Navidad Admus', href: '/regaloview', icon: Flame },
                 ],
                 isCollapsible: true,
             },
@@ -405,7 +407,7 @@ export function AppSidebar() {
                 title: 'Invitado',
                 icon: Users,
                 items: [
-                    { title: 'Regalo secreto', href: '/regaloview', icon: Gift },
+                    { title: 'Panel de Invitado', href: '/dashboard', icon: UserCircle },
                 ],
                 isCollapsible: false,
             });
@@ -413,11 +415,11 @@ export function AppSidebar() {
     }
 
     return (
-        <Sidebar collapsible="icon" variant="inset">
-            <SidebarHeader>
+        <Sidebar collapsible="icon" variant="inset" className={cn("border-r border-sidebar-border/30 shadow-2xl", className)}>
+            <SidebarHeader className="border-b border-sidebar-border/30 bg-background/40 backdrop-blur-xl">
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" asChild>
+                        <SidebarMenuButton size="lg" asChild className="hover:bg-transparent transition-all hover:brightness-110">
                             <Link href="/dashboard" prefetch>
                                 <AppLogo />
                             </Link>
@@ -426,8 +428,8 @@ export function AppSidebar() {
                 </SidebarMenu>
             </SidebarHeader>
 
-            <SidebarContent>
-                <SidebarGroup>
+            <SidebarContent className="bg-gradient-to-b from-background/80 to-background/40">
+                <SidebarGroup className="py-6">
                     <SidebarMenu>
                         <SidebarMenuItem>
                             <SidebarMenuButton
@@ -442,18 +444,6 @@ export function AppSidebar() {
                             </SidebarMenuButton>
                         </SidebarMenuItem>
 
-                        <SidebarMenuItem>
-                            <SidebarMenuButton
-                                asChild
-                                isActive={currentPath === '/regaloview'}
-                                tooltip="Navidad Admus"
-                            >
-                                <Link href="/regaloview" prefetch>
-                                    <Flame className="h-5 w-5" />
-                                    <span>Navidad Admus</span>
-                                </Link>
-                            </SidebarMenuButton>
-                        </SidebarMenuItem>
                     </SidebarMenu>
                 </SidebarGroup>
 

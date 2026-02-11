@@ -72,6 +72,7 @@
         "dayjs": "^1.11.19",
         "framer-motion": "^12.11.3",
         "globals": "^15.14.0",
+        "gsap": "^3.14.2",
         "laravel-vite-plugin": "^1.0",
         "leaflet": "^1.9.4",
         "lucide-react": "^0.475.0",

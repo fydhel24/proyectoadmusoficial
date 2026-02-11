@@ -288,9 +288,6 @@ export default function InfluencerDashboard({
                                             </p>
                                         </div>
                                     ))}
-                                    <Button variant="outline" className="w-full rounded-2xl py-6 font-black tracking-widest uppercase">
-                                        GESTIONAR HORARIO
-                                    </Button>
                                 </CardContent>
                             </Card>
 

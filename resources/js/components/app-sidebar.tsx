@@ -88,7 +88,7 @@ type MenuSection = {
 // 8. NavMain: modern collapsible section with Lucide and refined styles
 function NavMain({ sections, currentPath }: { sections: MenuSection[]; currentPath: string }) {
     return (
-        <SidebarMenu>
+        <SidebarMenu className="gap-2">
             {sections.map((section) => {
                 const key = section.title.toLowerCase().replace(/\s+/g, '');
                 const hasActiveItem = section.items?.some((item) => item.href === currentPath);
@@ -140,7 +140,7 @@ function NavMain({ sections, currentPath }: { sections: MenuSection[]; currentPa
                                     </SidebarMenuButton>
                                 </CollapsibleTrigger>
                                 <CollapsibleContent>
-                                    <SidebarMenuSub className="mr-0 border-l border-sidebar-border/30 ml-4">
+                                    <SidebarMenuSub className="mr-0 border-l border-sidebar-border/30 ml-4 gap-1">
                                         {section.items.map((item) => {
                                             const Icon = item.icon as React.ElementType;
                                             return (
@@ -428,9 +428,9 @@ export function AppSidebar({ className }: { className?: string }) {
                 </SidebarMenu>
             </SidebarHeader>
 
-            <SidebarContent className="bg-gradient-to-b from-background/80 to-background/40">
+            <SidebarContent className="bg-gradient-to-b from-background/80 to-background/40 gap-4">
                 <SidebarGroup className="py-6">
-                    <SidebarMenu>
+                    <SidebarMenu className="gap-2">
                         <SidebarMenuItem>
                             <SidebarMenuButton
                                 asChild

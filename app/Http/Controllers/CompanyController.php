@@ -149,7 +149,7 @@ class CompanyController extends Controller
         }
 
         if ($request->boolean('crear_usuario')) {
-            $email = Str::slug($company->name, '') . 'admusproductions.com';
+            $email = Str::slug($company->name, '') . '@admusproductions.com';
             $password = $email;
 
             $user = User::create([
@@ -295,7 +295,7 @@ class CompanyController extends Controller
         }
 
         if ($request->boolean('crear_usuario')) {
-            $email = Str::slug($company->name, '') . 'admusproductions.com';
+            $email = Str::slug($company->name, '') . '@admusproductions.com';
             $password = $email;
 
             $user = User::create([
@@ -452,7 +452,7 @@ class CompanyController extends Controller
         }
 
         if ($request->boolean('crear_usuario')) {
-            $email = Str::slug($company->name, '') . 'admusproductions.com';
+            $email = Str::slug($company->name, '') . '@admusproductions.com';
             $password = $email;
 
             $user = User::create([
@@ -597,7 +597,7 @@ class CompanyController extends Controller
         }
 
         if ($request->boolean('crear_usuario')) {
-            $email = Str::slug($company->name, '') . 'admusproductions.com';
+            $email = Str::slug($company->name, '') . '@admusproductions.com';
             $password = $email;
 
             $user = User::create([

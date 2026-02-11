@@ -128,6 +128,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/api/users', [UserController::class, 'index']);
     Route::post('/users', [UserController::class, 'store']);
     Route::put('/users/{user}', [UserController::class, 'update']);
+    Route::patch('/users/{user}/toggle-status', [UserController::class, 'toggleStatus']);
     Route::delete('/users/{user}', [UserController::class, 'destroy']);
     Route::put('/users/{id}/reset-password', [UserController::class, 'resetPassword']);
 

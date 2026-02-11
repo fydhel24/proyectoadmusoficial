@@ -9,9 +9,21 @@ use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(User::with('roles')->get());
+        $query = User::with('roles');
+
+        if ($request->has('search')) {
+            $search = $request->query('search');
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        $users = $query->latest()->paginate($request->query('per_page', 10));
+
+        return response()->json($users);
     }
 
     public function store(Request $request)
@@ -20,55 +32,66 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email',
             'password' => 'required|string|min:8',
-            'role' => 'required|exists:roles,name', // Validamos que el rol exista
+            'role' => 'required|exists:roles,name',
+            'is_active' => 'boolean',
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => bcrypt($request->password),
+            'password' => Hash::make($request->password),
+            'is_active' => $request->input('is_active', true),
         ]);
 
-        // Asignar el rol al usuario
-        $user->assignRole($request->role); // Usando el método de Spatie/Permission
+        $user->assignRole($request->role);
 
         return response()->json(['message' => 'Usuario creado con éxito', 'user' => $user], 201);
     }
+
     public function update(Request $request, $id)
     {
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $id,
-            'role' => 'required|exists:roles,name', // Validamos que el rol exista
+            'role' => 'required|exists:roles,name',
+            'is_active' => 'boolean',
         ]);
 
         $user = User::findOrFail($id);
 
-        // Actualizar datos del usuario
         $user->update([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => $request->password ? bcrypt($request->password) : $user->password,
+            'password' => $request->password ? Hash::make($request->password) : $user->password,
+            'is_active' => $request->input('is_active', $user->is_active),
         ]);
 
-        // Asignar el nuevo rol al usuario
-        $user->syncRoles([$request->role]); // Asigna un solo rol
+        $user->syncRoles([$request->role]);
 
         return response()->json(['message' => 'Usuario actualizado con éxito', 'user' => $user]);
     }
 
+    public function toggleStatus(User $user)
+    {
+        $user->is_active = !$user->is_active;
+        $user->save();
+
+        return response()->json([
+            'message' => 'Estado del usuario actualizado',
+            'is_active' => $user->is_active
+        ]);
+    }
 
     public function destroy(User $user)
     {
         $user->delete();
         return response()->json(null, 204);
     }
+
     public function resetPassword($id)
     {
         $user = User::findOrFail($id);
-
-        // Establecer nueva contraseña igual al email
-        $user->password = bcrypt($user->email);
+        $user->password = Hash::make($user->email);
         $user->save();
 
         return response()->json(['message' => 'Contraseña restablecida correctamente']);

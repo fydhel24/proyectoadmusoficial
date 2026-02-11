@@ -14,7 +14,7 @@ export function NavUser() {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center gap-2 px-2 py-1.5 text-left text-sm font-medium hover:bg-accent transition-colors">
+                <Button variant="ghost" className="flex items-center gap-2 px-2 py-1.5 text-left text-sm font-medium hover:bg-black/5 dark:hover:bg-white/10 text-foreground transition-all duration-200">
                     <UserInfo user={auth.user} />
                     <ChevronsUpDown className="ml-auto size-4 opacity-50" />
                 </Button>

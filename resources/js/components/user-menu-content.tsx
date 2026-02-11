@@ -27,16 +27,16 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
                 <DropdownMenuItem asChild>
-                    <Link className="block w-full" href={route('profile.edit')} as="button" prefetch onClick={cleanup}>
-                        <Settings className="mr-2" />
+                    <Link className="flex w-full items-center gap-2 px-2 py-1.5 text-sm font-medium transition-colors hover:bg-black/5 dark:hover:bg-white/10 text-foreground" href={route('profile.edit')} as="button" prefetch onClick={cleanup}>
+                        <Settings className="h-4 w-4" />
                         Configuración
                     </Link>
                 </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-                <Link className="block w-full" method="post" href={route('logout')} as="button" onClick={handleLogout}>
-                    <LogOut className="mr-2" />
+                <Link className="flex w-full items-center gap-2 px-2 py-1.5 text-sm font-medium transition-colors hover:bg-black/5 dark:hover:bg-white/10 text-destructive dark:text-red-400" method="post" href={route('logout')} as="button" onClick={handleLogout}>
+                    <LogOut className="h-4 w-4" />
                     Cerrar sesión
                 </Link>
             </DropdownMenuItem>

@@ -45,6 +45,19 @@ class InfluencerDatosController extends Controller
                     ->values()
                     ->toArray();
 
+                // Transformar las URLs de las fotos
+                $user->photos->each(function ($photo) {
+                    if (!filter_var($photo->path, FILTER_VALIDATE_URL)) {
+                        $photo->url = asset('storage/' . $photo->path);
+                    } else {
+                        $photo->url = $photo->path;
+                    }
+                });
+
+                $profilePhoto = $user->photos->where('tipo', 'perfil')->sortByDesc('created_at')->first();
+                $coverPhoto = $user->photos->where('tipo', 'portada')->sortByDesc('created_at')->first();
+                $feedPhotos = $user->photos->where('tipo', 'foto')->sortByDesc('created_at')->values();
+
                 return [
                     'id' => $user->id,
                     'name' => $user->name,
@@ -52,8 +65,8 @@ class InfluencerDatosController extends Controller
                     'followers' => $dato?->seguidores ?? '0',
                     'category' => $dato?->categoria ?? 'Sin categoría',
                     'description' => $dato?->descripcion ?? 'Sin descripción',
-                    'avatar' => $user->photos->first()?->url ?? '/placeholder.svg',
-                    'coverImage' => $user->photos->skip(1)->first()?->url ?? '/placeholder.svg',
+                    'avatar' => $profilePhoto?->url ?? '/placeholder.svg',
+                    'coverImage' => $coverPhoto?->url ?? '/placeholder.svg',
                     'verified' => true,
                     'engagement' => $dato?->engagement ?? '0%',
                     'rating' => $dato?->rating ?? '0',
@@ -63,6 +76,10 @@ class InfluencerDatosController extends Controller
                     'videos' => $videos,
                     'gallery' => $user->photos->where('tipo', 'foto')->pluck('url')->toArray(),
                     'rawData' => $rawData, // ✅ Datos adicionales desde el JSON
+                    'photos' => $user->photos, // Pasar todas las fotos para el componente FacebookStyle
+                    'profilePhoto' => $profilePhoto,
+                    'coverPhoto' => $coverPhoto,
+                    'feedPhotos' => $feedPhotos,
                 ];
             });
 

@@ -1,24 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
-import { Link, usePage } from '@inertiajs/react';
-import { gsap } from 'gsap';
-import AppearanceToggle from './appearance-toggle';
-import {
-    Menu,
-    X,
-    ChevronDown,
-    Monitor,
-    Palette,
-    Video,
-    Camera,
-    BarChart,
-    Presentation,
-    Users,
-    Mail,
-    Briefcase,
-    Layout
-} from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import {
     NavigationMenu,
     NavigationMenuContent,
@@ -27,16 +9,14 @@ import {
     NavigationMenuList,
     NavigationMenuTrigger,
     navigationMenuTriggerStyle,
-} from "@/components/ui/navigation-menu";
-import {
-    Sheet,
-    SheetContent,
-    SheetHeader,
-    SheetTitle,
-    SheetTrigger,
-} from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+} from '@/components/ui/navigation-menu';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { cn } from '@/lib/utils';
+import { Link, usePage } from '@inertiajs/react';
+import { gsap } from 'gsap';
+import { BarChart, Briefcase, Camera, Menu, Monitor, Palette, Presentation, Users, Video } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import AppearanceToggle from './appearance-toggle';
 
 interface Service {
     title: string;
@@ -67,10 +47,7 @@ export default function Header() {
         window.addEventListener('scroll', handleScroll);
 
         // Entrance animation
-        gsap.fromTo(headerRef.current,
-            { y: -100, opacity: 0 },
-            { y: 0, opacity: 1, duration: 1, ease: 'power4.out' }
-        );
+        gsap.fromTo(headerRef.current, { y: -100, opacity: 0 }, { y: 0, opacity: 1, duration: 1, ease: 'power4.out' });
 
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
@@ -89,37 +66,51 @@ export default function Header() {
         <header
             ref={headerRef}
             className={cn(
-                "fixed top-0 left-0 z-50 w-full transition-all duration-300 ease-in-out px-4 py-3",
-                scrolled
-                    ? "bg-background/90 backdrop-blur-md border-b border-border shadow-lg"
-                    : "bg-transparent"
+                'fixed top-0 left-0 z-50 w-full px-4 py-3 transition-all duration-300 ease-in-out',
+                scrolled ? 'bg-background/90 border-border border-b shadow-lg backdrop-blur-md' : 'bg-transparent',
             )}
         >
             <div className="container mx-auto flex items-center justify-between">
                 {/* Logo Section */}
-                <Link href="/" className="flex items-center gap-3 group">
-                    <div ref={logoRef} className="relative w-12 h-12 overflow-hidden rounded-full border border-red-500/20 group-hover:border-red-500 transition-colors duration-300">
+                <Link href="/" className="group flex items-center gap-3">
+                    <div
+                        ref={logoRef}
+                        className="relative h-12 w-12 overflow-hidden rounded-full border border-red-500/20 transition-colors duration-300 group-hover:border-red-500"
+                    >
                         <img
                             src="/Gflores/logo.png"
                             alt="Admus Logo"
-                            className="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
+                            className="h-full w-full transform object-cover transition-transform duration-500 group-hover:scale-110"
                         />
                     </div>
-                    <span className="text-xl font-black tracking-tighter text-foreground group-hover:text-brand transition-colors duration-300 font-orbitron">
+                    <span className="text-foreground group-hover:text-brand font-orbitron text-xl font-black tracking-tighter transition-colors duration-300">
                         AdmusProductions
                     </span>
                 </Link>
 
                 {/* Desktop Navigation */}
-                <nav className="hidden lg:flex items-center gap-1">
+                <nav className="hidden items-center gap-1 lg:flex">
                     <NavigationMenu>
                         <NavigationMenuList>
                             <NavigationMenuItem>
-                                <NavigationMenuTrigger className="bg-transparent text-foreground hover:text-brand focus:text-brand focus:bg-transparent data-[state=open]:bg-transparent">
+                                <Link href="/">
+                                    <span
+                                        className={cn(
+                                            navigationMenuTriggerStyle(),
+                                            'text-foreground hover:text-brand hover:bg-brand/10 cursor-pointer bg-transparent',
+                                        )}
+                                    >
+                                        Inicio
+                                    </span>
+                                </Link>
+                            </NavigationMenuItem>
+                            <NavigationMenuItem>
+                                
+                                <NavigationMenuTrigger className="text-foreground hover:text-brand focus:text-brand bg-transparent focus:bg-transparent data-[state=open]:bg-transparent">
                                     Servicios
                                 </NavigationMenuTrigger>
                                 <NavigationMenuContent>
-                                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] bg-popover border border-border">
+                                    <ul className="bg-popover border-border grid w-[400px] gap-3 border p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
                                         {services.map((service) => (
                                             <ListItem
                                                 key={service.title}
@@ -128,7 +119,7 @@ export default function Header() {
                                                 onClick={(e) => scrollToSection(e, service.href)}
                                             >
                                                 <div className="flex items-center gap-2">
-                                                    <service.icon className="w-4 h-4 text-red-500" />
+                                                    <service.icon className="h-4 w-4 text-red-500" />
                                                     {service.description}
                                                 </div>
                                             </ListItem>
@@ -138,64 +129,41 @@ export default function Header() {
                             </NavigationMenuItem>
 
                             <NavigationMenuItem>
-                                <Link href="#quienes-somos" onClick={(e) => scrollToSection(e as any, '#quienes-somos')}>
-                                    <span className={cn(navigationMenuTriggerStyle(), "bg-transparent text-foreground hover:text-brand hover:bg-brand/10 cursor-pointer")}>
-                                        Quiénes Somos
+                                <Link href="/influencersts" title="Influencers" icon={Users}>
+                                    <span
+                                        className={cn(
+                                            navigationMenuTriggerStyle(),
+                                            'text-foreground hover:text-brand hover:bg-brand/10 cursor-pointer bg-transparent',
+                                        )}
+                                    >
+                                        Influencers
                                     </span>
                                 </Link>
                             </NavigationMenuItem>
-
-                            <NavigationMenuItem>
-                                <NavigationMenuTrigger className="bg-transparent text-foreground hover:text-brand focus:text-brand focus:bg-transparent data-[state=open]:bg-transparent">
-                                    Portafolios
-                                </NavigationMenuTrigger>
-                                <NavigationMenuContent>
-                                    <ul className="grid w-[200px] gap-2 p-2 bg-popover border border-border">
-                                        <ListItem href="/influencersts" title="Influencers" icon={Users} />
-                                        <ListItem href="/videosportafolio" title="Videos" icon={Video} />
-                                    </ul>
-                                </NavigationMenuContent>
-                            </NavigationMenuItem>
-
-                            <NavigationMenuItem>
-                                <Link href="#como-trabajamos" onClick={(e) => scrollToSection(e as any, '#como-trabajamos')}>
-                                    <span className={cn(navigationMenuTriggerStyle(), "bg-transparent text-foreground hover:text-brand hover:bg-brand/10 cursor-pointer")}>
-                                        Metodología
-                                    </span>
-                                </Link>
-                            </NavigationMenuItem>
-
-                            <NavigationMenuItem>
-                                <Link href="#contactanos" onClick={(e) => scrollToSection(e as any, '#contactanos')}>
-                                    <span className={cn(navigationMenuTriggerStyle(), "bg-transparent text-foreground hover:text-brand hover:bg-brand/10 cursor-pointer")}>
-                                        Contacto
-                                    </span>
-                                </Link>
-                            </NavigationMenuItem>
+                            <Link href="/trabaja-con-nosotros">
+                                <Button variant="ghost" className="text-foreground hover:text-brand hover:bg-brand/10 gap-2">
+                                    <Briefcase className="h-4 w-4" />
+                                    Trabaja con nosotros
+                                </Button>
+                            </Link>
                         </NavigationMenuList>
                     </NavigationMenu>
                 </nav>
 
                 {/* Desktop Buttons */}
-                <div className="hidden lg:flex items-center gap-4">
+                <div className="hidden items-center gap-4 lg:flex">
                     <AppearanceToggle />
-                    <Link href="/trabaja-con-nosotros">
-                        <Button variant="ghost" className="text-foreground hover:text-brand hover:bg-brand/10 gap-2">
-                            <Briefcase className="w-4 h-4" />
-                            Trabaja con nosotros
-                        </Button>
-                    </Link>
 
                     {auth.user ? (
                         <Link href="/dashboard">
-                            <Button className="bg-red-600 hover:bg-red-700 text-white border-none shadow-[0_0_15px_rgba(220,38,38,0.4)] transition-all duration-300 hover:scale-105">
-                                Dashboard
+                            <Button className="border-none bg-red-600 text-white shadow-[0_0_15px_rgba(220,38,38,0.4)] transition-all duration-300 hover:scale-105 hover:bg-red-700">
+                                Panel Principal
                             </Button>
                         </Link>
                     ) : (
                         <Link href="/login">
-                            <Button className="bg-red-600 hover:bg-red-700 text-white border-none shadow-[0_0_15px_rgba(220,38,38,0.4)] transition-all duration-300 hover:scale-105">
-                                Login
+                            <Button className="border-none bg-red-600 text-white shadow-[0_0_15px_rgba(220,38,38,0.4)] transition-all duration-300 hover:scale-105 hover:bg-red-700">
+                                Iniciar Sesion
                             </Button>
                         </Link>
                     )}
@@ -206,49 +174,47 @@ export default function Header() {
                     <Sheet>
                         <SheetTrigger asChild>
                             <Button variant="ghost" size="icon" className="text-foreground hover:bg-brand/10">
-                                <Menu className="w-6 h-6" />
+                                <Menu className="h-6 w-6" />
                             </Button>
                         </SheetTrigger>
-                        <SheetContent side="right" className="w-[300px] bg-background border-border p-0 overflow-y-auto">
-                            <SheetHeader className="p-6 border-b border-border">
-                                <SheetTitle className="text-left text-foreground flex items-center justify-between">
+                        <SheetContent side="right" className="bg-background border-border w-[300px] overflow-y-auto p-0">
+                            <SheetHeader className="border-border border-b p-6">
+                                <SheetTitle className="text-foreground flex items-center justify-between text-left">
                                     <div className="flex items-center gap-2">
-                                        <div className="w-8 h-8 rounded-full border border-red-500/20 overflow-hidden">
-                                            <img src="/Gflores/logo.png" alt="Admus" className="w-full h-full object-cover" />
+                                        <div className="h-8 w-8 overflow-hidden rounded-full border border-red-500/20">
+                                            <img src="/Gflores/logo.png" alt="Admus" className="h-full w-full object-cover" />
                                         </div>
-                                        <span className="font-orbitron font-black text-sm tracking-tighter">ADMUSPRODUCTIONS</span>
+                                        <span className="font-orbitron text-sm font-black tracking-tighter">ADMUSPRODUCTIONS</span>
                                     </div>
-                                    <AppearanceToggle className="w-8 h-8 text-foreground" />
+                                    <AppearanceToggle className="text-foreground h-8 w-8" />
                                 </SheetTitle>
                             </SheetHeader>
                             <div className="flex flex-col gap-2 p-4">
-                                <MobileLink href="#quienes-somos" title="Quiénes Somos" onClick={(e) => scrollToSection(e, '#quienes-somos')} />
-
+<div className="py-2">
+                                    <p className="text-brand mb-2 px-4 text-xs font-semibold tracking-widest uppercase">Inicio</p>
+                                    <MobileLink href="/" title="Inicio" icon={Users} />
+                                </div>
                                 <div className="py-2">
-                                    <p className="text-xs font-semibold text-brand uppercase tracking-widest px-4 mb-2">Servicios</p>
+                                    <p className="text-brand mb-2 px-4 text-xs font-semibold tracking-widest uppercase">Servicios</p>
                                     {services.map((s) => (
                                         <MobileLink key={s.title} href={s.href} title={s.title} icon={s.icon} />
                                     ))}
                                 </div>
 
                                 <div className="py-2">
-                                    <p className="text-xs font-semibold text-brand uppercase tracking-widest px-4 mb-2">Portafolios</p>
+                                    <p className="text-brand mb-2 px-4 text-xs font-semibold tracking-widest uppercase">Portafolios</p>
                                     <MobileLink href="/influencersts" title="Influencers" icon={Users} />
-                                    <MobileLink href="/videosportafolio" title="Videos" icon={Video} />
                                 </div>
-
-                                <MobileLink href="#como-trabajamos" title="Metodología" onClick={(e) => scrollToSection(e, '#como-trabajamos')} />
-                                <MobileLink href="#contactanos" title="Contacto" onClick={(e) => scrollToSection(e, '#contactanos')} />
                                 <MobileLink href="/trabaja-con-nosotros" title="Trabaja con nosotros" icon={Briefcase} />
 
-                                <div className="mt-4 pt-4 border-t border-red-900/20 flex flex-col gap-3">
+                                <div className="mt-4 flex flex-col gap-3 border-t border-red-900/20 pt-4">
                                     {auth.user ? (
                                         <Link href="/dashboard" className="w-full">
-                                            <Button className="w-full bg-red-600 hover:bg-red-700">Dashboard</Button>
+                                            <Button className="w-full bg-red-600 hover:bg-red-700">Panel principal</Button>
                                         </Link>
                                     ) : (
                                         <Link href="/login" className="w-full">
-                                            <Button className="w-full bg-red-600 hover:bg-red-700">Login</Button>
+                                            <Button className="w-full bg-red-600 hover:bg-red-700">Iniciar Sesion</Button>
                                         </Link>
                                     )}
                                 </div>
@@ -261,43 +227,40 @@ export default function Header() {
     );
 }
 
-const ListItem = React.forwardRef<
-    React.ElementRef<"a">,
-    React.ComponentPropsWithoutRef<"a"> & { icon?: React.ElementType }
->(({ className, title, children, icon: Icon, ...props }, ref) => {
-    return (
-        <li>
-            <NavigationMenuLink asChild>
-                <a
-                    ref={ref}
-                    className={cn(
-                        "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-red-500/10 hover:text-red-400 focus:bg-red-500/10 focus:text-red-400 group",
-                        className
-                    )}
-                    {...props}
-                >
-                    <div className="text-sm font-medium leading-none flex items-center gap-2">
-                        {Icon && <Icon className="w-4 h-4 text-brand group-hover:scale-110 transition-transform" />}
-                        {title}
-                    </div>
-                    <p className="line-clamp-2 text-xs leading-snug text-muted-foreground mt-1">
-                        {children}
-                    </p>
-                </a>
-            </NavigationMenuLink>
-        </li>
-    );
-});
-ListItem.displayName = "ListItem";
+const ListItem = React.forwardRef<React.ElementRef<'a'>, React.ComponentPropsWithoutRef<'a'> & { icon?: React.ElementType }>(
+    ({ className, title, children, icon: Icon, ...props }, ref) => {
+        return (
+            <li>
+                <NavigationMenuLink asChild>
+                    <a
+                        ref={ref}
+                        className={cn(
+                            'group block space-y-1 rounded-md p-3 leading-none no-underline transition-colors outline-none select-none hover:bg-red-500/10 hover:text-red-400 focus:bg-red-500/10 focus:text-red-400',
+                            className,
+                        )}
+                        {...props}
+                    >
+                        <div className="flex items-center gap-2 text-sm leading-none font-medium">
+                            {Icon && <Icon className="text-brand h-4 w-4 transition-transform group-hover:scale-110" />}
+                            {title}
+                        </div>
+                        <p className="text-muted-foreground mt-1 line-clamp-2 text-xs leading-snug">{children}</p>
+                    </a>
+                </NavigationMenuLink>
+            </li>
+        );
+    },
+);
+ListItem.displayName = 'ListItem';
 
 function MobileLink({ href, title, icon: Icon, onClick }: { href: string; title: string; icon?: React.ElementType; onClick?: (e: any) => void }) {
     return (
         <Link
             href={href}
             onClick={onClick}
-            className="flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-brand/10 rounded-lg transition-colors group"
+            className="text-muted-foreground hover:text-foreground hover:bg-brand/10 group flex items-center gap-3 rounded-lg px-4 py-3 transition-colors"
         >
-            {Icon && <Icon className="w-5 h-5 text-brand group-hover:scale-110 transition-transform" />}
+            {Icon && <Icon className="text-brand h-5 w-5 transition-transform group-hover:scale-110" />}
             <span className="text-sm font-medium">{title}</span>
         </Link>
     );

@@ -248,7 +248,7 @@ export default function InfluencerDashboard({
                             <CardHeader className="p-8 pb-0">
                                 <CardTitle className="flex items-center gap-3 text-2xl font-black tracking-tight uppercase">
                                     <BarChart3 className="h-7 w-7 text-indigo-600" />
-                                    Performance por Semana
+                                    Dias Asignados por Semana
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="p-8">

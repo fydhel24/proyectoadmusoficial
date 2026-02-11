@@ -4,13 +4,11 @@ import Header from '@/components/header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Head } from '@inertiajs/react';
-import { Heart, Search, Star, TrendingUp, X } from 'lucide-react';
+import { Head, router } from '@inertiajs/react';
+import { Heart, Search, Star, TrendingUp } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import Footer from '../home/footer';
-import FacebookStyle from '../Profile/FacebookStyle';
 
 type Video = {
     id: number;
@@ -52,7 +50,6 @@ export default function TikTokerPortfolio({ influencers }: PageProps) {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState<string>('');
     const [favorites, setFavorites] = useState<Set<number>>(new Set());
-    const [selectedInfluencer, setSelectedInfluencer] = useState<Influencer | null>(null);
 
     const categories = useMemo(() => {
         return [...new Set(influencers.map((inf) => inf.category))].filter(Boolean);
@@ -79,6 +76,10 @@ export default function TikTokerPortfolio({ influencers }: PageProps) {
         setFavorites(newFavorites);
     };
 
+    const navigateToProfile = (id: number) => {
+        router.visit(`/influencers/${id}`);
+    };
+
     return (
         <div className="bg-slate-50 dark:bg-slate-950">
             <Header />
@@ -97,14 +98,14 @@ export default function TikTokerPortfolio({ influencers }: PageProps) {
                         <div className="flex justify-center gap-3">
                             <Badge
                                 variant="outline"
-                                className="gap-2 rounded-full border-yellow-200/50 bg-yellow-50/50 px-5 py-2 text-yellow-700 backdrop-blur-sm dark:bg-yellow-900/20 dark:text-yellow-400"
+                                className="gap-2 rounded-full border-yellow-200/50 bg-yellow-50/50 px-5 py-2 text-yellow-700 shadow-sm backdrop-blur-sm dark:bg-yellow-900/20 dark:text-yellow-400"
                             >
                                 <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
                                 {influencers.length} Creadores Premium
                             </Badge>
                             <Badge
                                 variant="outline"
-                                className="gap-2 rounded-full border-green-200/50 bg-green-50/50 px-5 py-2 text-green-700 backdrop-blur-sm dark:bg-green-900/20 dark:text-green-400"
+                                className="gap-2 rounded-full border-green-200/50 bg-green-50/50 px-5 py-2 text-green-700 shadow-sm backdrop-blur-sm dark:bg-green-900/20 dark:text-green-400"
                             >
                                 <TrendingUp className="h-4 w-4" />
                                 Trending Now
@@ -151,7 +152,7 @@ export default function TikTokerPortfolio({ influencers }: PageProps) {
                             <Card
                                 key={inf.id}
                                 className="group relative h-[480px] cursor-pointer overflow-hidden rounded-[2.5rem] border-0 shadow-2xl transition-all duration-500 hover:-translate-y-3 hover:shadow-red-500/30"
-                                onClick={() => setSelectedInfluencer(inf)}
+                                onClick={() => navigateToProfile(inf.id)}
                             >
                                 {/* Background Image */}
                                 <div className="absolute inset-0">
@@ -213,41 +214,6 @@ export default function TikTokerPortfolio({ influencers }: PageProps) {
                 </div>
             </div>
             <Footer />
-            {/* Modal de Vista Previa Estilo Facebook (Capa Pública) */}
-            <Dialog open={!!selectedInfluencer} onOpenChange={() => setSelectedInfluencer(null)}>
-                <DialogContent className="bg-background max-w-7xl overflow-hidden rounded-[2rem] border-0 p-0 shadow-2xl">
-                    <div className="scrollbar-hide relative max-h-[95vh] w-full overflow-y-auto">
-                        <Button
-                            variant="secondary"
-                            size="icon"
-                            className="fixed top-8 right-8 z-[100] rounded-full border border-white/20 bg-black/50 text-white shadow-2xl backdrop-blur-md transition-transform hover:scale-110"
-                            onClick={() => setSelectedInfluencer(null)}
-                        >
-                            <X className="h-5 w-5" />
-                        </Button>
-
-                        {selectedInfluencer && (
-                            <div className="bg-slate-50 pb-16 dark:bg-slate-950">
-                                <FacebookStyle
-                                    profileUser={
-                                        {
-                                            id: selectedInfluencer.id,
-                                            name: selectedInfluencer.name,
-                                            email: '',
-                                            photos: selectedInfluencer.photos || [],
-                                        } as any
-                                    }
-                                    profilePhoto={selectedInfluencer.profilePhoto}
-                                    coverPhoto={selectedInfluencer.coverPhoto}
-                                    feedPhotos={selectedInfluencer.feedPhotos || []}
-                                    isOwnProfile={false}
-                                    hideLayout={true}
-                                />
-                            </div>
-                        )}
-                    </div>
-                </DialogContent>
-            </Dialog>
         </div>
     );
 }

@@ -90,27 +90,11 @@ export default function TikTokerPortfolio({ influencers }: PageProps) {
                     {/* Header Section */}
                     <div className="mb-12 space-y-4 text-center">
                         <h1 className="font-orbitron bg-gradient-to-r from-red-600 via-orange-500 to-red-600 bg-clip-text py-4 text-4xl font-black tracking-tighter text-transparent uppercase md:text-7xl">
-                            ⚡ INFLUENCERS ELITE
+                            ⚡ INFLUENCERS ADMUS PRODUCTIONS
                         </h1>
                         <p className="text-lg leading-none font-medium tracking-[0.2em] text-slate-500 uppercase dark:text-slate-400">
                             Conecta con los mejores creadores digitales
                         </p>
-                        <div className="flex justify-center gap-3">
-                            <Badge
-                                variant="outline"
-                                className="gap-2 rounded-full border-yellow-200/50 bg-yellow-50/50 px-5 py-2 text-yellow-700 shadow-sm backdrop-blur-sm dark:bg-yellow-900/20 dark:text-yellow-400"
-                            >
-                                <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
-                                {influencers.length} Creadores Premium
-                            </Badge>
-                            <Badge
-                                variant="outline"
-                                className="gap-2 rounded-full border-green-200/50 bg-green-50/50 px-5 py-2 text-green-700 shadow-sm backdrop-blur-sm dark:bg-green-900/20 dark:text-green-400"
-                            >
-                                <TrendingUp className="h-4 w-4" />
-                                Trending Now
-                            </Badge>
-                        </div>
                     </div>
 
                     {/* Filters & Search */}

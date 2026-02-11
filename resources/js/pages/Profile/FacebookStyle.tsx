@@ -305,17 +305,7 @@ export default function FacebookStyle({ profileUser, profilePhoto, coverPhoto, f
                                         <img src={photo.url} alt={photo.nombre} className="h-auto max-h-[600px] max-w-full object-contain" />
                                     </div>
                                 </CardContent>
-                                <div className="flex gap-4 p-4">
-                                    <Button variant="ghost" className="flex-1 font-bold text-slate-600">
-                                        ❤️ Me gusta
-                                    </Button>
-                                    <Button variant="ghost" className="flex-1 font-bold text-slate-600 italic">
-                                        💬 Comentar
-                                    </Button>
-                                    <Button variant="ghost" className="flex-1 font-bold text-slate-600 italic">
-                                        ➡️ Compartir
-                                    </Button>
-                                </div>
+                                
                             </Card>
                         ))}
                     </div>

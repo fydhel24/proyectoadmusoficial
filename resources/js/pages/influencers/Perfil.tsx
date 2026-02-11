@@ -1,20 +1,36 @@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import EmailIcon from '@mui/icons-material/Email';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import PhoneIcon from '@mui/icons-material/Phone';
-import PhotoCamera from '@mui/icons-material/PhotoCamera';
-import { Avatar, Box, Button, Chip, Container, Grid, Paper, Typography } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
-import { useState } from 'react';
+import { Head, router, usePage } from '@inertiajs/react';
+import { useState, useEffect } from 'react';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick-theme.css';
 import 'slick-carousel/slick/slick.css';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { Progress } from '@/components/ui/progress';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { 
+  Camera, 
+  Upload, 
+  Trash2, 
+  Mail, 
+  Phone, 
+  MapPin, 
+  Calendar, 
+  X, 
+  CheckCircle2,
+  Loader2
+} from 'lucide-react';
+
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Perfil de Influencer', href: '/perfil-influencer' }];
 
-// Definir tipos para TypeScript
 interface Photo {
     id: number;
     url: string;
@@ -40,10 +56,9 @@ interface Datos {
 
 interface Availability {
     id: number;
-    date: string;
+    day_of_week: string;
     time_start: string;
     time_end: string;
-    day_of_week: string;
     turno: string;
     status: string;
 }
@@ -67,23 +82,116 @@ interface Props {
 }
 
 export default function InfluencerProfile({ profileData: initialProfileData }: Props) {
-    const theme = useTheme();
+    const { props } = usePage();
     const [profileData, setProfileData] = useState<ProfileData>(initialProfileData);
-    const [loading, setLoading] = useState(false);
+    const [uploading, setUploading] = useState(false);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [alert, setAlert] = useState({ show: false, message: '', type: 'success' as 'success' | 'error' | 'warning' });
+    const [deleteDialog, setDeleteDialog] = useState({ open: false, photoId: null as number | null });
 
-    // Obtener las primeras dos fotos para el fondo
-    const getBackgroundImages = () => {
-        if (profileData.photos.length >= 2) {
-            return [profileData.photos[0].url, profileData.photos[1].url];
-        } else if (profileData.photos.length === 1) {
-            return [profileData.photos[0].url, profileData.photos[0].url];
-        } else {
-            // Fotos por defecto si no hay fotos del usuario
-            return ['https://images.unsplash.com/photo-1614786269829-d24616faf56d', 'https://images.unsplash.com/photo-1589216532372-1c2a367900d9'];
+    // Manejar mensajes flash de Laravel
+    useEffect(() => {
+        const flash = props.flash as any;
+        if (flash?.success || flash?.error) {
+            setAlert({
+                show: true,
+                message: flash.success || flash.error,
+                type: flash.success ? 'success' : 'error'
+            });
+            setTimeout(() => setAlert({ ...alert, show: false }), 5000);
+        }
+    }, [props.flash]);
+
+    // Actualizar profileData cuando cambia initialProfileData (después de operaciones)
+    useEffect(() => {
+        setProfileData(initialProfileData);
+    }, [initialProfileData]);
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            
+            if (file.size > 2 * 1024 * 1024) {
+                setAlert({ show: true, message: 'El archivo debe pesar menos de 2MB', type: 'error' });
+                setTimeout(() => setAlert({ ...alert, show: false }), 3000);
+                return;
+            }
+
+            if (!file.type.startsWith('image/')) {
+                setAlert({ show: true, message: 'Solo se permiten archivos de imagen', type: 'error' });
+                setTimeout(() => setAlert({ ...alert, show: false }), 3000);
+                return;
+            }
+
+            setSelectedFile(file);
+            
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setPreviewUrl(reader.result as string);
+            };
+            reader.readAsDataURL(file);
         }
     };
 
-    const backgroundImages = getBackgroundImages();
+    const handleUpload = () => {
+        if (!selectedFile) {
+            setAlert({ show: true, message: 'Por favor selecciona una foto', type: 'warning' });
+            setTimeout(() => setAlert({ ...alert, show: false }), 3000);
+            return;
+        }
+
+        setUploading(true);
+
+        const formData = new FormData();
+        formData.append('photo', selectedFile);
+        formData.append('nombre', selectedFile.name);
+        formData.append('tipo', 'foto');
+
+        router.post('/perfil-influencer/foto', formData, {
+            preserveScroll: true,
+            preserveState: true,
+            onFinish: () => {
+                setUploading(false);
+                setSelectedFile(null);
+                setPreviewUrl(null);
+                setAlert({ show: true, message: 'Foto subida exitosamente', type: 'success' });
+                setTimeout(() => setAlert({ ...alert, show: false }), 3000);
+            },
+            onError: () => {
+                setUploading(false);
+                setAlert({ show: true, message: 'Error al subir la foto', type: 'error' });
+                setTimeout(() => setAlert({ ...alert, show: false }), 3000);
+            }
+        });
+    };
+
+    const handleDeletePhoto = (photoId: number) => {
+        setDeleteDialog({ open: true, photoId });
+    };
+
+    const confirmDelete = () => {
+        if (!deleteDialog.photoId) return;
+
+        router.delete(`/perfil-influencer/foto/${deleteDialog.photoId}`, {
+            preserveScroll: true,
+            preserveState: true,
+            onFinish: () => {
+                setDeleteDialog({ open: false, photoId: null });
+                setAlert({ show: true, message: 'Foto eliminada exitosamente', type: 'success' });
+                setTimeout(() => setAlert({ ...alert, show: false }), 3000);
+            },
+            onError: () => {
+                setAlert({ show: true, message: 'Error al eliminar la foto', type: 'error' });
+                setTimeout(() => setAlert({ ...alert, show: false }), 3000);
+                setDeleteDialog({ open: false, photoId: null });
+            }
+        });
+    };
+
+    const getBackgroundImage = () => {
+        return profileData.user.avatar || 'https://images.unsplash.com/photo-1614786269829-d24616faf56d';
+    };
 
     const carouselSettings = {
         dots: true,
@@ -109,9 +217,6 @@ export default function InfluencerProfile({ profileData: initialProfileData }: P
         ],
     };
 
-    const getBackgroundImage = () => {
-        return profileData.user.avatar || 'https://images.unsplash.com/photo-1614786269829-d24616faf56d';
-    };
     const diasSemana: Record<string, string> = {
         monday: 'Lunes',
         tuesday: 'Martes',
@@ -126,303 +231,321 @@ export default function InfluencerProfile({ profileData: initialProfileData }: P
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Perfil de Influencer" />
 
-            <Box
-                sx={{
-                    bgcolor: 'background.default',
-                    minHeight: '100vh',
-                    position: 'relative',
-                }}
-            >
-                {/* Portada con Gradiente de las dos primeras fotos */}
-                <Box
-                    sx={{
-                        height: 400,
-                        width: '100%',
-                        position: 'relative',
-                        background: `linear-gradient(45deg, rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url(${getBackgroundImage()}) no-repeat center center / cover`,
-                        '&::before': {
-                            content: '""',
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            backgroundColor: 'rgba(0,0,0,0.3)',
-                            backdropFilter: 'blur(1px)',
-                        },
+            <div className="min-h-screen bg-background relative">
+                {/* Portada con Imagen de Fondo */}
+                <div 
+                    className="h-[400px] w-full relative bg-cover bg-center"
+                    style={{
+                        backgroundImage: `linear-gradient(45deg, rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url(${getBackgroundImage()})`
                     }}
-                />
+                >
+                    <div className="absolute inset-0 bg-black/30 backdrop-blur-sm"></div>
+                </div>
 
-                {/* Foto de Perfil Centrada */}
-                <Avatar
-                    sx={{
-                        width: 200,
-                        height: 200,
-                        position: 'absolute',
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                        top: 300,
-                        border: '4px solid white',
-                        boxShadow: theme.shadows[3],
-                        zIndex: 2,
-                    }}
-                    src={profileData.user.avatar}
-                />
+                {/* Foto de Perfil */}
+                <div className="absolute top-[300px] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
+                    <Avatar className="w-[200px] h-[200px] border-4 border-white shadow-lg">
+                        <AvatarImage src={profileData.user.avatar} alt={profileData.user.name} />
+                        <AvatarFallback>{profileData.user.name.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                </div>
 
                 {/* Contenido Principal */}
-                <Container maxWidth="xl" sx={{ mt: 15, position: 'relative' }}>
-                    {/* Nombre y Biografía Centrados */}
-                    <Box sx={{ textAlign: 'center', mb: 4 }}>
-                        <Typography variant="h3" sx={{ fontWeight: 'bold', mb: 2 }}>
-                            {profileData.user.name}
-                        </Typography>
-                        <Typography variant="h6" color="textSecondary" sx={{ maxWidth: 800, mx: 'auto' }}>
+                <div className="container mx-auto px-4 pt-40 relative">
+                    {/* Nombre y Biografía */}
+                    <div className="text-center mb-8">
+                        <h1 className="text-4xl font-bold mb-4">{profileData.user.name}</h1>
+                        <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
                             {profileData.datos.biografia}
-                        </Typography>
-                    </Box>
+                        </p>
+                    </div>
 
                     {/* Tipos de Influencer */}
                     {profileData.tipos && profileData.tipos.length > 0 && (
-                        <Box sx={{ textAlign: 'center', mb: 4 }}>
+                        <div className="flex flex-wrap justify-center gap-2 mb-8">
                             {profileData.tipos.map((tipo) => (
-                                <Chip
-                                    key={tipo.id}
-                                    label={tipo.nombre}
-                                    sx={{
-                                        bgcolor: tipo.color,
-                                        color: 'white',
-                                        mr: 1,
-                                        mb: 1,
-                                        fontWeight: 'bold',
-                                    }}
-                                />
+                                <Badge 
+                                    key={tipo.id} 
+                                    variant="default"
+                                    className="bg-primary text-white px-4 py-2"
+                                    style={{ backgroundColor: tipo.color }}
+                                >
+                                    {tipo.nombre}
+                                </Badge>
                             ))}
-                        </Box>
+                        </div>
                     )}
 
-                    <Grid container spacing={3}>
-                        <Grid item xs={12} md={9}>
-                            <Paper
-                                elevation={3}
-                                sx={{
-                                    p: 3,
-                                    borderRadius: 2,
-                                    bgcolor: 'background.paper',
-                                    mb: 3,
-                                }}
-                            >
-                                <Typography variant="h5" gutterBottom>
-                                    Información de Contacto
-                                </Typography>
-
-                                <Grid container spacing={2} sx={{ mt: 2 }}>
-                                    <Grid item xs={12} md={4}>
-                                        <Box display="flex" alignItems="center">
-                                            <EmailIcon sx={{ mr: 2, color: 'primary.main' }} />
-                                            <Typography>{profileData.user.email}</Typography>
-                                        </Box>
-                                    </Grid>
-                                    {profileData.datos.telefono && (
-                                        <Grid item xs={12} md={4}>
-                                            <Box display="flex" alignItems="center">
-                                                <PhoneIcon sx={{ mr: 2, color: 'primary.main' }} />
-                                                <Typography>{profileData.datos.telefono}</Typography>
-                                            </Box>
-                                        </Grid>
-                                    )}
-                                    {profileData.datos.ciudad && (
-                                        <Grid item xs={12} md={4}>
-                                            <Box display="flex" alignItems="center">
-                                                <LocationOnIcon sx={{ mr: 2, color: 'primary.main' }} />
-                                                <Typography>{profileData.datos.ciudad}</Typography>
-                                            </Box>
-                                        </Grid>
-                                    )}
-                                </Grid>
-
-                                {/* Redes Sociales */}
-                                {(profileData.datos.redesSociales.instagram ||
-                                    profileData.datos.redesSociales.youtube ||
-                                    profileData.datos.redesSociales.tiktok) && (
-                                    <Box sx={{ mt: 3 }}>
-                                        <Typography variant="h6" gutterBottom>
-                                            Redes Sociales
-                                        </Typography>
-                                        <Grid container spacing={2}>
-                                            {profileData.datos.redesSociales.instagram && (
-                                                <Grid item>
-                                                    <Chip
-                                                        label={`Instagram: ${profileData.datos.redesSociales.instagram}`}
-                                                        color="secondary"
-                                                        variant="outlined"
-                                                    />
-                                                </Grid>
-                                            )}
-                                            {profileData.datos.redesSociales.youtube && (
-                                                <Grid item>
-                                                    <Chip
-                                                        label={`YouTube: ${profileData.datos.redesSociales.youtube}`}
-                                                        color="error"
-                                                        variant="outlined"
-                                                    />
-                                                </Grid>
-                                            )}
-                                            {profileData.datos.redesSociales.tiktok && (
-                                                <Grid item>
-                                                    <Chip
-                                                        label={`TikTok: ${profileData.datos.redesSociales.tiktok}`}
-                                                        color="info"
-                                                        variant="outlined"
-                                                    />
-                                                </Grid>
-                                            )}
-                                        </Grid>
-                                    </Box>
-                                )}
-                            </Paper>
-
-                            {/* Galería */}
-                            {profileData.photos.length > 0 && (
-                                <Paper elevation={3} sx={{ p: 3, borderRadius: 2, mb: 3 }}>
-                                    <Box
-                                        sx={{
-                                            '.slick-slide': { px: 1 },
-                                            '.slick-dots': { bottom: -45 },
-                                            pb: 5,
-                                        }}
+                    <div className="grid grid-cols-1 lg:grid-cols-9 gap-6">
+                        <div className="lg:col-span-6">
+                            {/* Portafolio */}
+                            <Card className="mb-6">
+                                <CardHeader className="flex flex-row items-center justify-between">
+                                    <CardTitle>Mi Portafolio</CardTitle>
+                                    <Button 
+                                        onClick={() => document.getElementById('photo-upload')?.click()}
+                                        disabled={uploading}
                                     >
-                                        <Slider {...carouselSettings}>
-                                            {profileData.photos.map((photo) => (
-                                                <Box key={photo.id}>
-                                                    <Paper
-                                                        elevation={2}
-                                                        sx={{
-                                                            borderRadius: 2,
-                                                            overflow: 'hidden',
-                                                            height: 300,
-                                                            position: 'relative',
-                                                            '&:hover': {
-                                                                transform: 'scale(1.02)',
-                                                                transition: 'transform 0.3s ease-in-out',
-                                                            },
-                                                        }}
-                                                    >
-                                                        <img
-                                                            src={photo.url}
-                                                            alt={photo.nombre}
-                                                            style={{
-                                                                width: '100%',
-                                                                height: '100%',
-                                                                objectFit: 'cover',
-                                                            }}
-                                                        />
-                                                        <Box
-                                                            sx={{
-                                                                position: 'absolute',
-                                                                bottom: 0,
-                                                                left: 0,
-                                                                right: 0,
-                                                                bgcolor: 'rgba(0,0,0,0.7)',
-                                                                color: 'white',
-                                                                p: 2,
-                                                            }}
+                                        <Upload className="w-4 h-4 mr-2" />
+                                        {uploading ? (
+                                            <>
+                                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                                Subiendo...
+                                            </>
+                                        ) : 'Añadir Foto'}
+                                    </Button>
+                                    <Input
+                                        type="file"
+                                        id="photo-upload"
+                                        accept="image/*"
+                                        className="hidden"
+                                        onChange={handleFileChange}
+                                    />
+                                </CardHeader>
+                                <CardContent>
+                                    {/* Preview antes de subir */}
+                                    {selectedFile && (
+                                        <Card className="mb-4 bg-muted/50">
+                                            <CardContent className="p-4">
+                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                                                    <div className="aspect-square bg-muted rounded-lg overflow-hidden">
+                                                        {previewUrl ? (
+                                                            <img 
+                                                                src={previewUrl} 
+                                                                alt="Preview" 
+                                                                className="w-full h-full object-cover"
+                                                            />
+                                                        ) : (
+                                                            <div className="w-full h-full flex items-center justify-center">
+                                                                <Camera className="w-12 h-12 text-muted-foreground" />
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <div>
+                                                        <h3 className="font-semibold">{selectedFile.name}</h3>
+                                                        <p className="text-sm text-muted-foreground">
+                                                            {(selectedFile.size / 1024).toFixed(2)} KB
+                                                        </p>
+                                                        <p className="text-sm text-muted-foreground">
+                                                            {selectedFile.type}
+                                                        </p>
+                                                    </div>
+                                                    <div className="flex gap-2">
+                                                        <Button 
+                                                            onClick={handleUpload} 
+                                                            className="flex-1"
+                                                            disabled={uploading}
                                                         >
-                                                            <Typography variant="subtitle1">{photo.nombre}</Typography>
-                                                        </Box>
-                                                    </Paper>
-                                                </Box>
-                                            ))}
-                                        </Slider>
-                                    </Box>
-                                </Paper>
-                            )}
+                                                            <Upload className="w-4 h-4 mr-2" />
+                                                            Subir
+                                                        </Button>
+                                                        <Button 
+                                                            variant="outline" 
+                                                            onClick={() => {
+                                                                setSelectedFile(null);
+                                                                setPreviewUrl(null);
+                                                            }}
+                                                            className="flex-1"
+                                                        >
+                                                            Cancelar
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    )}
+
+                                    {/* Galería de Fotos */}
+                                    {profileData.photos.length > 0 ? (
+                                        <div className="relative">
+                                            <Slider {...carouselSettings}>
+                                                {profileData.photos.map((photo) => (
+                                                    <div key={photo.id} className="px-2">
+                                                        <Card className="relative overflow-hidden group">
+                                                            <div className="aspect-square bg-muted">
+                                                                <img
+                                                                    src={photo.url}
+                                                                    alt={photo.nombre}
+                                                                    className="w-full h-full object-cover"
+                                                                    onError={(e) => {
+                                                                        e.currentTarget.src = 'https://via.placeholder.com/400x300?text=No+Image';
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                            <button
+                                                                onClick={() => handleDeletePhoto(photo.id)}
+                                                                className="absolute top-2 right-2 p-2 bg-white/90 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500 hover:text-white"
+                                                                type="button"
+                                                            >
+                                                                <Trash2 className="w-5 h-5 text-red-500 hover:text-white" />
+                                                            </button>
+                                                            <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white p-3">
+                                                                <p className="font-medium truncate">{photo.nombre}</p>
+                                                            </div>
+                                                        </Card>
+                                                    </div>
+                                                ))}
+                                            </Slider>
+                                        </div>
+                                    ) : (
+                                        <div className="text-center py-12">
+                                            <Camera className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+                                            <h3 className="text-lg font-semibold mb-2">No tienes fotos en tu portafolio</h3>
+                                            <p className="text-muted-foreground mb-4">
+                                                Añade fotos para mostrar tu trabajo y atraer más clientes
+                                            </p>
+                                            <Button onClick={() => document.getElementById('photo-upload')?.click()}>
+                                                <Camera className="w-4 h-4 mr-2" />
+                                                Subir Primera Foto
+                                            </Button>
+                                        </div>
+                                    )}
+                                </CardContent>
+                            </Card>
+
+                            {/* Información de Contacto */}
+                            <Card className="mb-6">
+                                <CardHeader>
+                                    <CardTitle>Información de Contacto</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="space-y-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="p-3 bg-primary/10 rounded-full">
+                                                <Mail className="w-5 h-5 text-primary" />
+                                            </div>
+                                            <div>
+                                                <p className="text-sm text-muted-foreground">Email</p>
+                                                <p className="font-medium">{profileData.user.email}</p>
+                                            </div>
+                                        </div>
+                                        
+                                        {profileData.datos.telefono && (
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-3 bg-primary/10 rounded-full">
+                                                    <Phone className="w-5 h-5 text-primary" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm text-muted-foreground">Teléfono</p>
+                                                    <p className="font-medium">{profileData.datos.telefono}</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                        
+                                        {profileData.datos.ciudad && (
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-3 bg-primary/10 rounded-full">
+                                                    <MapPin className="w-5 h-5 text-primary" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm text-muted-foreground">Ciudad</p>
+                                                    <p className="font-medium">{profileData.datos.ciudad}</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </CardContent>
+                            </Card>
 
                             {/* Disponibilidad */}
                             {profileData.availabilities && profileData.availabilities.length > 0 && (
-                                <Paper
-                                    elevation={6}
-                                    sx={{
-                                        p: 4,
-                                        borderRadius: 3,
-                                        background: 'linear-gradient(135deg, #f0f4ff, #e0f7fa)',
-                                        mb: 5,
-                                    }}
-                                >
-                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-                                        <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                                <Card className="mb-6 bg-gradient-to-br from-blue-50 to-cyan-50">
+                                    <CardHeader className="flex flex-row items-center justify-between">
+                                        <CardTitle className="text-2xl font-bold text-primary">
                                             Disponibilidad
-                                        </Typography>
-                                        <Button
-                                            startIcon={<CalendarMonthIcon />}
-                                            variant="contained"
-                                            color="primary"
-                                            sx={{ borderRadius: 2, fontWeight: 'bold' }}
-                                        >
+                                        </CardTitle>
+                                        <Button variant="default">
+                                            <Calendar className="w-4 h-4 mr-2" />
                                             Gestionar Horarios
                                         </Button>
-                                    </Box>
-
-                                    <Grid container spacing={3}>
-                                        {profileData.availabilities.map((slot) => (
-                                            <Grid item xs={12} md={4} key={slot.id}>
-                                                <Paper
-                                                    elevation={3}
-                                                    sx={{
-                                                        p: 3,
-                                                        borderRadius: 3,
-                                                        background:
-                                                            slot.status === 'disponible'
-                                                                ? 'linear-gradient(135deg, #e0f7fa, #b2ebf2)'
-                                                                : 'linear-gradient(135deg, #fff3e0, #ffe0b2)',
-                                                        color: 'text.primary',
-                                                        transition: 'transform 0.3s',
-                                                        '&:hover': {
-                                                            transform: 'scale(1.02)',
-                                                        },
-                                                    }}
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            {profileData.availabilities.map((slot) => (
+                                                <Card 
+                                                    key={slot.id} 
+                                                    className={`bg-gradient-to-br ${
+                                                        slot.status === 'disponible' 
+                                                            ? 'from-cyan-100 to-blue-100' 
+                                                            : 'from-orange-100 to-yellow-100'
+                                                    } hover:scale-105 transition-transform`}
                                                 >
-                                                    <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
-                                                        {diasSemana[slot.day_of_week] ?? slot.day_of_week}
-                                                    </Typography>
-                                                    <Typography variant="body1" sx={{ mb: 0.5 }}>
-                                                        <strong>Turno:</strong> {slot.turno}
-                                                    </Typography>
-                                                    <Typography variant="body2">
-                                                        <strong>Horario:</strong> {slot.time_start} – {slot.time_end}
-                                                    </Typography>
-
-                                                    <Chip
-                                                        label={slot.status}
-                                                        color={slot.status === 'disponible' ? 'success' : 'warning'}
-                                                        variant="filled"
-                                                        sx={{ mt: 2 }}
-                                                    />
-                                                </Paper>
-                                            </Grid>
-                                        ))}
-                                    </Grid>
-                                </Paper>
+                                                    <CardContent className="p-4">
+                                                        <h4 className="font-bold text-lg mb-2">
+                                                            {diasSemana[slot.day_of_week] ?? slot.day_of_week}
+                                                        </h4>
+                                                        <div className="space-y-1 text-sm">
+                                                            <div>
+                                                                <span className="text-muted-foreground font-medium">Turno:</span>
+                                                                <span className="ml-2">{slot.turno}</span>
+                                                            </div>
+                                                            <div>
+                                                                <span className="text-muted-foreground font-medium">Horario:</span>
+                                                                <span className="ml-2">{slot.time_start} – {slot.time_end}</span>
+                                                            </div>
+                                                        </div>
+                                                        <Badge 
+                                                            className="mt-3"
+                                                            variant={slot.status === 'disponible' ? 'default' : 'secondary'}
+                                                        >
+                                                            {slot.status}
+                                                        </Badge>
+                                                    </CardContent>
+                                                </Card>
+                                            ))}
+                                        </div>
+                                    </CardContent>
+                                </Card>
                             )}
+                        </div>
+                    </div>
+                </div>
 
-                            {/* Mensaje si no hay fotos */}
-                            {profileData.photos.length === 0 && (
-                                <Paper elevation={3} sx={{ p: 3, borderRadius: 2, textAlign: 'center' }}>
-                                    <PhotoCamera sx={{ fontSize: 48, color: 'grey.400', mb: 2 }} />
-                                    <Typography variant="h6" color="textSecondary" gutterBottom>
-                                        No tienes fotos en tu portafolio
-                                    </Typography>
-                                    <Typography variant="body2" color="textSecondary" sx={{ mb: 3 }}>
-                                        Añade fotos para mostrar tu trabajo y atraer más clientes
-                                    </Typography>
-                                    <Button variant="contained" startIcon={<PhotoCamera />} color="primary">
-                                        Subir Primera Foto
-                                    </Button>
-                                </Paper>
-                            )}
-                        </Grid>
-                    </Grid>
-                </Container>
-            </Box>
+                {/* Alerta Toast */}
+                {alert.show && (
+                    <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-top-2">
+                        <Alert 
+                            variant={alert.type === 'success' ? 'default' : 'destructive'}
+                            className="min-w-[300px]"
+                        >
+                            <div className="flex items-center gap-2">
+                                {alert.type === 'success' ? (
+                                    <CheckCircle2 className="w-5 h-5" />
+                                ) : (
+                                    <X className="w-5 h-5" />
+                                )}
+                                <AlertDescription>{alert.message}</AlertDescription>
+                            </div>
+                        </Alert>
+                    </div>
+                )}
+
+                {/* Dialog Eliminar */}
+                <Dialog open={deleteDialog.open} onOpenChange={(open) => setDeleteDialog({ ...deleteDialog, open })}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle className="text-red-600">Confirmar Eliminación</DialogTitle>
+                            <DialogDescription>
+                                ¿Estás seguro de que quieres eliminar esta foto? Esta acción no se puede deshacer.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <DialogFooter>
+                            <Button 
+                                variant="outline" 
+                                onClick={() => setDeleteDialog({ open: false, photoId: null })}
+                            >
+                                Cancelar
+                            </Button>
+                            <Button 
+                                variant="destructive" 
+                                onClick={confirmDelete}
+                            >
+                                Eliminar
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+            </div>
         </AppLayout>
     );
 }

@@ -346,6 +346,9 @@ Route::post('/users/{user}/photos', [PhotoController::class, 'store'])->name('ph
 
 Route::get('/perfil-influencer', [InfluencerController::class, 'index'])
     ->name('influencer.profile');
+    Route::get('/perfil-influencer', [InfluencerController::class, 'index'])->name('influencer.perfil');
+    Route::post('/perfil-influencer/foto', [InfluencerController::class, 'uploadPhoto'])->name('influencer.foto.upload');
+    Route::delete('/perfil-influencer/foto/{photoId}', [InfluencerController::class, 'deletePhoto'])->name('influencer.foto.delete');
 Route::get('/reportetareas', [AsignacionTareaController::class, 'reportetareas'])->name('asignaciones.reportetareas');
 Route::get('/reportetareas/pdf', [AsignacionTareaController::class, 'generarPdfReporteTareas'])->name('reportetareas.pdf');
 Route::get('/reportetareas/pdfmes', [AsignacionTareaController::class, 'generarPdfReporteTareasmes'])->name('reportetareas.pdfmes');

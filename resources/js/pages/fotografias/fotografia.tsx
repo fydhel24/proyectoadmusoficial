@@ -11,7 +11,7 @@ export default function Fotografia() {
 
     return (
         <>
-            <Head title="Producción Audiovisual" />
+            <Head title="Fotografía" />
 
             {/* Sección principal: imagen + texto, ocupa 80vh */}
             <section
@@ -21,7 +21,7 @@ export default function Fotografia() {
                 <Header />
 
                 {/* Overlay oscuro mitad izquierda */}
-                <div className="absolute top-0 left-0 z-10 h-full w-1/2 bg-black/70" />
+                <div className="absolute top-0 left-0 z-10 h-full w-full bg-background/60 backdrop-blur-sm lg:w-1/2" />
 
                 {/* Contenido */}
                 <div className="relative z-20 flex h-full w-full">
@@ -46,27 +46,28 @@ export default function Fotografia() {
                                 <text
                                     x="150"
                                     y="120"
-                                    fontFamily="Arial"
+                                    fontFamily="Orbitron"
                                     fontSize="60"
                                     fontWeight="bold"
-                                    fill="white"
+                                    fill="currentColor"
                                     textAnchor="middle"
                                     filter="url(#glow)"
+                                    className="text-foreground"
                                 >
                                     ADMUS
                                 </text>
                             </svg>
                         </div>
 
-                        <h1 className="mb-4 text-5xl font-bold text-red-500 md:text-6xl" style={{ textShadow: '0 0 15px rgba(255, 0, 0, 0.4)' }}>
-                            Fotografía Profesional
+                        <h1 className="mb-4 text-5xl font-black font-orbitron text-brand md:text-6xl uppercase tracking-tighter" style={{ textShadow: '0 0 15px rgba(217, 26, 26, 0.4)' }}>
+                            FOTOGRAFÍA PROFESIONAL
                         </h1>
-                        <h2 className="mb-4 text-3xl font-semibold md:text-4xl">Haz viral tus fotos</h2>
-                        <p className="mb-6 text-xl text-white/90">Una imagen dice más que mil palabras</p>
+                        <h2 className="mb-4 text-3xl font-bold md:text-4xl uppercase tracking-widest text-foreground">HAZ VIRAL TUS FOTOS</h2>
+                        <p className="mb-6 text-xl text-muted-foreground uppercase font-medium">UNA IMAGEN DICE MÁS QUE MIL PALABRAS</p>
 
                         <a
-                            href="#quienes-somos"
-                            className="inline-block transform rounded-full bg-red-600 px-6 py-3 text-lg font-bold shadow-md transition hover:scale-105 hover:bg-red-500"
+                            href="#nuestro-trabajo"
+                            className="inline-block transform rounded-none bg-brand px-8 py-4 text-lg font-bold text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)] transition-all duration-300 hover:scale-105 hover:bg-brand/90 uppercase"
                         >
                             Ver Proyectos
                         </a>
@@ -78,22 +79,20 @@ export default function Fotografia() {
             </section>
 
             {/* Sección 3 */}
-            <section id="ideas" className="bg-black/80 py-16 text-white">
+            <section id="ideas" className="bg-background py-24">
                 <IdeasFotografia />
             </section>
 
             {/* Sección 4 */}
-            <section id="nuestro-trabajo" className="bg-black/80 py-16 text-white">
+            <section id="nuestro-trabajo" className="bg-muted/20 py-24 border-y border-border">
                 <NuestroTrabajoFoto />
             </section>
 
             {/* Sección 5 */}
-            <section id="contactanos" className="bg-black/80 py-16 text-white">
+            <section id="contactanos" className="bg-background py-24">
                 <Contactanos />
             </section>
-            <footer className="bg-black py-8 text-white">
-                <Footer />
-            </footer>
+            <Footer />
         </>
     );
 }

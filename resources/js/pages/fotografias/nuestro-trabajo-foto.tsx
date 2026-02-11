@@ -32,9 +32,11 @@ export default function NuestroTrabajoFoto() {
   const [currentImage, setCurrentImage] = useState(imageList[0]);
 
   return (
-    <section className="bg-white py-16">
+    <section className="bg-muted/20 py-24 border-y border-border">
       <div className="container mx-auto px-4">
-        <h2 className="text-4xl font-bold text-gray-900 mb-12 text-center">Mira nuestro trabajo</h2>
+        <h2 className="text-5xl font-black mb-16 text-center text-brand font-orbitron uppercase tracking-tighter" style={{ textShadow: '0 0 15px rgba(217, 26, 26, 0.3)' }}>
+          NUESTRO TRABAJO FOTOGRÁFICO
+        </h2>
 
         <div className="flex flex-col md:flex-row gap-10 items-center md:items-start">
           {/* Miniaturas */}
@@ -43,11 +45,10 @@ export default function NuestroTrabajoFoto() {
               <button
                 key={image.id}
                 onClick={() => setCurrentImage(image)}
-                className={`focus:outline-none rounded-lg overflow-hidden border-4 transition-transform duration-300 ${
-                  currentImage.id === image.id
-                    ? 'border-red-600 scale-105 shadow-xl'
-                    : 'border-transparent hover:border-red-500 hover:scale-105'
-                }`}
+                className={`focus:outline-none rounded-none overflow-hidden border-4 transition-all duration-300 ${currentImage.id === image.id
+                    ? 'border-brand scale-105 shadow-2xl'
+                    : 'border-transparent hover:border-brand/50 hover:scale-105'
+                  }`}
                 style={{ aspectRatio: '1 / 1' }}
                 aria-label={`Ver imagen: ${image.title}`}
               >
@@ -63,12 +64,14 @@ export default function NuestroTrabajoFoto() {
 
           {/* Imagen destacada */}
           <div className="w-full md:w-2/3 flex flex-col items-center">
-            <img
-              src={currentImage.imageUrl}
-              alt={currentImage.title}
-              className="w-full max-h-[520px] rounded-2xl object-contain shadow-xl"
-            />
-            <h3 className="mt-6 text-3xl font-semibold text-gray-900">{currentImage.title}</h3>
+            <div className="relative w-full rounded-none overflow-hidden shadow-2xl border border-border">
+              <img
+                src={currentImage.imageUrl}
+                alt={currentImage.title}
+                className="w-full max-h-[600px] object-contain bg-background"
+              />
+            </div>
+            <h3 className="mt-8 text-3xl font-black text-foreground font-orbitron uppercase tracking-widest">{currentImage.title}</h3>
           </div>
         </div>
       </div>

@@ -21,10 +21,10 @@ export default function IdeasFotografia() {
     <div className="container mx-auto px-4">
       {/* Encabezado */}
       <div className="text-center mb-20">
-        <h2 className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-red-700 mb-6 drop-shadow-lg">
-          Retratamos los mejores momentos
+        <h2 className="text-5xl font-black mb-6 text-brand font-orbitron uppercase tracking-tighter" style={{ textShadow: '0 0 15px rgba(217, 26, 26, 0.3)' }}>
+          RETRATAMOS LOS MEJORES MOMENTOS
         </h2>
-        <p className="text-xl text-white/80 max-w-3xl mx-auto leading-relaxed">
+        <p className="text-xl text-muted-foreground max-w-3xl mx-auto uppercase font-medium">
           Contamos con un equipo de fotógrafos talentosos y creativos siempre listos para hacer brillar tu marca o tu evento.
         </p>
       </div>
@@ -34,17 +34,17 @@ export default function IdeasFotografia() {
         {ideas.map((item, idx) => (
           <div
             key={idx}
-            className="bg-black/60 backdrop-blur-md p-6 rounded-2xl border border-red-500/30 ring-1 ring-white/10 hover:ring-red-500 transition-all duration-300 transform hover:scale-105 shadow-lg"
+            className="bg-muted/50 backdrop-blur-xl p-8 rounded-none border border-border hover:border-brand/50 transition-all duration-500 transform hover:scale-105 group"
           >
-            <div className="mb-6 rounded-xl overflow-hidden shadow-md">
+            <div className="mb-6 rounded-none overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)]">
               <img
                 src={item.image}
                 alt={item.title}
-                className="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
+                className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
               />
             </div>
-            <h3 className="text-2xl font-semibold text-white text-center mb-4">{item.title}</h3>
-            <p className="text-white/80 text-center text-base leading-relaxed">{item.text}</p>
+            <h3 className="text-2xl font-black text-foreground text-center mb-4 font-orbitron uppercase tracking-widest group-hover:text-brand transition-colors">{item.title}</h3>
+            <p className="text-muted-foreground text-center uppercase font-medium">{item.text}</p>
           </div>
         ))}
       </div>

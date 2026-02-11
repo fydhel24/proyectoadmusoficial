@@ -1,6 +1,6 @@
 'use client';
 
-import Header from '@/components/header copy';
+import Header from '@/components/header';
 import { Head, Link } from '@inertiajs/react';
 import { Favorite, FavoriteBorder, Search, Star, TrendingUp } from '@mui/icons-material';
 import { Box, Card, Chip, Container, Fade, Grid, IconButton, InputAdornment, Skeleton, TextField, Typography } from '@mui/material';
@@ -116,14 +116,14 @@ export default function TikTokerPortfolio({ influencers }: PageProps) {
                 <Box
                     sx={{
                         minHeight: '100vh',
-                        background: 'linear-gradient(135deg, #0a0a0a 0%, #1a0a0f 25%, #2a1018 50%, #1a0a0f 75%, #0a0a0a 100%)',
+                        bgcolor: 'background',
                         py: 4,
                     }}
                 >
                     <Container maxWidth="xl">
                         <Grid container spacing={3}>
                             {[...Array(8)].map((_, index) => (
-                                <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+                                <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={index}>
                                     <Skeleton
                                         variant="rectangular"
                                         height={320}
@@ -151,11 +151,7 @@ export default function TikTokerPortfolio({ influencers }: PageProps) {
             <Box
                 sx={{
                     minHeight: '100vh',
-                    background: `
-                        radial-gradient(circle at 20% 80%, rgba(255, 23, 68, 0.15) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 20%, rgba(255, 107, 53, 0.15) 0%, transparent 50%),
-                        linear-gradient(135deg, #0a0a0a 0%, #1a0a0f 25%, #2a1018 50%, #1a0a0f 75%, #0a0a0a 100%)
-                    `,
+                    bgcolor: 'background',
                     py: 4,
                     position: 'relative',
                     '&::before': {
@@ -180,13 +176,14 @@ export default function TikTokerPortfolio({ influencers }: PageProps) {
                                 variant="h1"
                                 sx={{
                                     fontWeight: 900,
-                                    background: 'linear-gradient(45deg, #ff1744 0%, #d50000 25%, #ff6b35 50%, #ff1744 75%, #d50000 100%)',
+                                    fontFamily: 'Orbitron, sans-serif',
+                                    background: 'linear-gradient(45deg, var(--brand) 0%, #d50000 25%, #ff6b35 50%, var(--brand) 75%, #d50000 100%)',
                                     backgroundSize: '400% 400%',
                                     backgroundClip: 'text',
                                     WebkitBackgroundClip: 'text',
                                     WebkitTextFillColor: 'transparent',
                                     animation: 'gradient 8s ease infinite',
-                                    textShadow: '0 0 50px rgba(255,23,68,0.5)',
+                                    textShadow: '0 0 50px rgba(217, 26, 26, 0.5)',
                                     mb: 2,
                                     fontSize: { xs: '2.5rem', sm: '3.5rem', md: '4.5rem' },
                                     letterSpacing: '0.1em',
@@ -254,27 +251,27 @@ export default function TikTokerPortfolio({ influencers }: PageProps) {
                                         width: '100%',
                                         '& .MuiOutlinedInput-root': {
                                             height: 50,
-                                            bgcolor: 'rgba(255,255,255,0.08)',
+                                            bgcolor: 'background.paper',
                                             backdropFilter: 'blur(20px)',
                                             borderRadius: 25,
-                                            color: '#fff',
+                                            color: 'text.primary',
                                             fontSize: '1rem',
-                                            border: '1px solid rgba(255,23,68,0.3)',
+                                            border: '1px solid var(--brand)',
                                             '& fieldset': { border: 'none' },
                                             '&:hover': {
-                                                bgcolor: 'rgba(255,255,255,0.12)',
-                                                border: '1px solid rgba(255,23,68,0.5)',
+                                                bgcolor: 'background.paper',
+                                                border: '1px solid var(--brand)',
                                             },
                                             '&.Mui-focused': {
-                                                bgcolor: 'rgba(255,255,255,0.15)',
-                                                border: '1px solid #ff1744',
-                                                boxShadow: '0 0 20px rgba(255,23,68,0.3)',
+                                                bgcolor: 'background.paper',
+                                                border: '2px solid var(--brand)',
+                                                boxShadow: '0 0 20px rgba(217, 26, 26, 0.3)',
                                             },
                                         },
                                         '& .MuiInputBase-input': {
                                             padding: '12px 16px',
                                             '&::placeholder': {
-                                                color: 'rgba(255,255,255,0.6)',
+                                                color: 'text.secondary',
                                                 fontSize: '1rem',
                                             },
                                         },
@@ -289,11 +286,11 @@ export default function TikTokerPortfolio({ influencers }: PageProps) {
                                     onClick={() => setSelectedCategory('')}
                                     variant={selectedCategory === '' ? 'filled' : 'outlined'}
                                     sx={{
-                                        bgcolor: selectedCategory === '' ? '#ff1744' : 'transparent',
-                                        color: selectedCategory === '' ? '#fff' : 'rgba(255,255,255,0.7)',
-                                        border: '1px solid rgba(255,23,68,0.5)',
+                                        bgcolor: selectedCategory === '' ? 'var(--brand)' : 'transparent',
+                                        color: selectedCategory === '' ? '#fff' : 'text.primary',
+                                        border: '1px solid var(--brand)',
                                         '&:hover': {
-                                            bgcolor: selectedCategory === '' ? '#d50000' : 'rgba(255,23,68,0.1)',
+                                            bgcolor: selectedCategory === '' ? '#d50000' : 'rgba(217, 26, 26, 0.1)',
                                         },
                                     }}
                                 />
@@ -304,11 +301,11 @@ export default function TikTokerPortfolio({ influencers }: PageProps) {
                                         onClick={() => setSelectedCategory(category)}
                                         variant={selectedCategory === category ? 'filled' : 'outlined'}
                                         sx={{
-                                            bgcolor: selectedCategory === category ? '#ff1744' : 'transparent',
-                                            color: selectedCategory === category ? '#fff' : 'rgba(255,255,255,0.7)',
-                                            border: '1px solid rgba(255,23,68,0.5)',
+                                            bgcolor: selectedCategory === category ? 'var(--brand)' : 'transparent',
+                                            color: selectedCategory === category ? '#fff' : 'text.primary',
+                                            border: '1px solid var(--brand)',
                                             '&:hover': {
-                                                bgcolor: selectedCategory === category ? '#d50000' : 'rgba(255,23,68,0.1)',
+                                                bgcolor: selectedCategory === category ? '#d50000' : 'rgba(217, 26, 26, 0.1)',
                                             },
                                         }}
                                     />
@@ -321,7 +318,7 @@ export default function TikTokerPortfolio({ influencers }: PageProps) {
                     {/* Grid de Influencers */}
                     <Grid container spacing={3}>
                         {filteredInfluencers.map((inf) => (
-                            <Grid item xs={12} sm={6} md={4} lg={3} key={inf.id}>
+                            <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={inf.id}>
                                 <Link href={`/influencers/${inf.id}`} style={{ textDecoration: 'none' }}>
                                     <Card
                                         sx={{
@@ -422,6 +419,7 @@ export default function TikTokerPortfolio({ influencers }: PageProps) {
                                                     color: 'rgba(255,255,255,0.8)',
                                                     fontSize: '0.9rem',
                                                     textAlign: 'center',
+                                                    fontFamily: 'Inter, sans-serif',
                                                 }}
                                             >
                                                 @{inf.username}

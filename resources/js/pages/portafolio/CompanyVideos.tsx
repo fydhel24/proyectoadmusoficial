@@ -1,6 +1,6 @@
 'use client';
 
-import Header from '@/components/header copy';
+import Header from '@/components/header';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowBack, PlayCircleOutline } from '@mui/icons-material';
 import { Box, Card, Container, Grid, IconButton, Typography, Fade } from '@mui/material';
@@ -55,42 +55,27 @@ export default function CompanyVideos({ company }: CompanyVideosProps) {
     return (
         <>
             <Header />
-            <Box sx={{ height: '64px', bgcolor: 'rgba(0, 0, 0, 0.95)', zIndex: 75 }} />
+            <Box sx={{ height: '64px', bgcolor: 'background', zIndex: 75 }} />
 
             <Head title={`Videos de ${name} | Portafolio`} />
 
             <Box
                 sx={{
                     minHeight: '100vh',
-                    background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%)',
-                    color: '#fff',
+                    bgcolor: 'background',
+                    color: 'text.primary',
                     py: { xs: 4, md: 6 },
                     position: 'relative',
                     overflow: 'hidden',
-                    '&::before': {
-                        content: '""',
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        background: `
-                            radial-gradient(circle at 25% 25%, rgba(120, 119, 198, 0.08) 0%, transparent 50%),
-                            radial-gradient(circle at 75% 75%, rgba(255, 0, 127, 0.06) 0%, transparent 50%),
-                            radial-gradient(circle at 50% 50%, rgba(255, 111, 97, 0.04) 0%, transparent 50%)
-                        `,
-                        pointerEvents: 'none',
-                        zIndex: 0,
-                    }
                 }}
             >
                 <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
-                    
+
 
                     {/* Header Section Mejorado */}
                     <Fade in timeout={800}>
-                        <Box sx={{ 
-                            textAlign: 'center', 
+                        <Box sx={{
+                            textAlign: 'center',
                             mb: { xs: 4, md: 6 },
                             px: { xs: 2, sm: 0 }
                         }}>
@@ -99,43 +84,40 @@ export default function CompanyVideos({ company }: CompanyVideosProps) {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.7, delay: 0.2 }}
                             >
-                                <Typography 
-                                    variant="h2" 
-                                    fontWeight="bold" 
-                                    sx={{ 
-                                        color: '#fff', 
+                                <Typography
+                                    variant="h2"
+                                    fontWeight="bold"
+                                    sx={{
+                                        color: 'text.primary',
                                         mb: { xs: 1, md: 2 },
+                                        fontFamily: 'Orbitron, sans-serif',
                                         fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem', lg: '3.5rem' },
-                                        background: 'linear-gradient(135deg, #ff007f 0%, #ff6f61 50%, #7877c6 100%)',
+                                        background: 'linear-gradient(135deg, var(--brand) 0%, #ff6f61 50%, #7877c6 100%)',
                                         WebkitBackgroundClip: 'text',
                                         WebkitTextFillColor: 'transparent',
                                         backgroundSize: '200% 200%',
                                         animation: 'gradientShift 6s ease-in-out infinite',
-                                        textShadow: '0 0 30px rgba(255, 0, 127, 0.3)',
-                                        '@keyframes gradientShift': {
-                                            '0%, 100%': { backgroundPosition: '0% 50%' },
-                                            '50%': { backgroundPosition: '100% 50%' },
-                                        }
+                                        textShadow: '0 0 30px rgba(217, 26, 26, 0.3)',
                                     }}
                                 >
                                     Videos para {name}
                                 </Typography>
                             </motion.div>
-                            
+
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.7, delay: 0.4 }}
                             >
-                                <Typography 
-                                    variant="body1" 
-                                    sx={{ 
-                                        color: 'rgba(255,255,255,0.8)',
+                                <Typography
+                                    variant="body1"
+                                    sx={{
+                                        color: 'text.secondary',
                                         fontSize: { xs: '1rem', md: '1.1rem' },
+                                        fontFamily: 'Inter, sans-serif',
                                         maxWidth: 600,
                                         mx: 'auto',
                                         lineHeight: 1.6,
-                                        textShadow: '0 2px 10px rgba(0,0,0,0.5)',
                                     }}
                                 >
                                     Aquí puedes ver todos los videos de TikTok realizados para esta empresa.
@@ -148,27 +130,27 @@ export default function CompanyVideos({ company }: CompanyVideosProps) {
                                 animate={{ opacity: 1, scale: 1 }}
                                 transition={{ duration: 0.8, delay: 0.6 }}
                             >
-                                <Box sx={{ 
-                                    display: 'flex', 
-                                    justifyContent: 'center', 
+                                <Box sx={{
+                                    display: 'flex',
+                                    justifyContent: 'center',
                                     alignItems: 'center',
                                     mt: 3,
                                     gap: 2
                                 }}>
-                                    <Box sx={{ 
-                                        width: { xs: 30, md: 50 }, 
-                                        height: 2, 
-                                        background: 'linear-gradient(90deg, transparent, #ff007f, transparent)' 
+                                    <Box sx={{
+                                        width: { xs: 30, md: 50 },
+                                        height: 2,
+                                        background: 'linear-gradient(90deg, transparent, var(--brand), transparent)'
                                     }} />
-                                    <PlayCircleOutline sx={{ 
-                                        color: '#ff007f', 
+                                    <PlayCircleOutline sx={{
+                                        color: 'var(--brand)',
                                         fontSize: { xs: '2rem', md: '2.5rem' },
-                                        filter: 'drop-shadow(0 0 10px rgba(255,0,127,0.5))'
+                                        filter: 'drop-shadow(0 0 10px rgba(217, 26, 26, 0.5))'
                                     }} />
-                                    <Box sx={{ 
-                                        width: { xs: 30, md: 50 }, 
-                                        height: 2, 
-                                        background: 'linear-gradient(90deg, transparent, #ff007f, transparent)' 
+                                    <Box sx={{
+                                        width: { xs: 30, md: 50 },
+                                        height: 2,
+                                        background: 'linear-gradient(90deg, transparent, var(--brand), transparent)'
                                     }} />
                                 </Box>
                             </motion.div>
@@ -186,17 +168,17 @@ export default function CompanyVideos({ company }: CompanyVideosProps) {
                                 link_comprobantes.map(
                                     (companyLink, index) =>
                                         companyLink.link && (
-                                            <Grid item xs={12} sm={6} md={4} key={companyLink.link.id}>
+                                            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={companyLink.link.id}>
                                                 <motion.div
                                                     initial={{ opacity: 0, y: 30, scale: 0.9 }}
                                                     animate={{ opacity: 1, y: 0, scale: 1 }}
-                                                    transition={{ 
-                                                        duration: 0.6, 
+                                                    transition={{
+                                                        duration: 0.6,
                                                         delay: 0.9 + (index * 0.1),
                                                         ease: "easeOut"
                                                     }}
-                                                    whileHover={{ 
-                                                        y: -8, 
+                                                    whileHover={{
+                                                        y: -8,
                                                         scale: 1.02,
                                                         transition: { duration: 0.2 }
                                                     }}
@@ -206,12 +188,12 @@ export default function CompanyVideos({ company }: CompanyVideosProps) {
                                                             height: { xs: 400, sm: 450, md: 480 },
                                                             borderRadius: { xs: 2, md: 3 },
                                                             overflow: 'hidden',
-                                                            background: 'linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(26,26,46,0.9) 100%)',
-                                                            border: '1px solid rgba(255,255,255,0.15)',
+                                                            background: 'background.paper',
+                                                            border: '1px solid var(--brand)',
                                                             position: 'relative',
                                                             transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                                                             backdropFilter: 'blur(10px)',
-                                                            boxShadow: '0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
+                                                            boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
                                                             '&::before': {
                                                                 content: '""',
                                                                 position: 'absolute',
@@ -226,8 +208,8 @@ export default function CompanyVideos({ company }: CompanyVideosProps) {
                                                                 pointerEvents: 'none',
                                                             },
                                                             '&:hover': {
-                                                                boxShadow: '0 20px 40px rgba(255,0,127,0.15), 0 0 0 1px rgba(255,0,127,0.3)',
-                                                                border: '1px solid rgba(255,0,127,0.4)',
+                                                                boxShadow: '0 20px 40px rgba(217, 26, 26, 0.15)',
+                                                                border: '1px solid var(--brand)',
                                                                 '&::before': {
                                                                     opacity: 1,
                                                                 },
@@ -241,7 +223,7 @@ export default function CompanyVideos({ company }: CompanyVideosProps) {
                                                             left: 0,
                                                             right: 0,
                                                             height: '3px',
-                                                            background: 'linear-gradient(90deg, transparent, #ff007f, #ff6f61, transparent)',
+                                                            background: 'linear-gradient(90deg, transparent, var(--brand), #ff6f61, transparent)',
                                                             zIndex: 10,
                                                         }} />
 
@@ -274,7 +256,7 @@ export default function CompanyVideos({ company }: CompanyVideosProps) {
                                                                     title={`Video de TikTok para ${name}`}
                                                                     width="100%"
                                                                     height="100%"
-                                                                    style={{ 
+                                                                    style={{
                                                                         border: 'none',
                                                                         borderRadius: '8px',
                                                                     }}
@@ -304,7 +286,7 @@ export default function CompanyVideos({ company }: CompanyVideosProps) {
                                         ),
                                 )
                             ) : (
-                                <Grid item xs={12}>
+                                <Grid size={{ xs: 12 }}>
                                     <motion.div
                                         initial={{ opacity: 0, y: 30 }}
                                         animate={{ opacity: 1, y: 0 }}
@@ -316,35 +298,35 @@ export default function CompanyVideos({ company }: CompanyVideosProps) {
                                             px: { xs: 2, sm: 0 }
                                         }}>
                                             <motion.div
-                                                animate={{ 
+                                                animate={{
                                                     scale: [1, 1.1, 1],
                                                     opacity: [0.7, 1, 0.7]
                                                 }}
-                                                transition={{ 
+                                                transition={{
                                                     duration: 2,
                                                     repeat: Infinity,
                                                     ease: "easeInOut"
                                                 }}
                                             >
-                                                <PlayCircleOutline sx={{ 
+                                                <PlayCircleOutline sx={{
                                                     fontSize: { xs: '3rem', md: '4rem' },
                                                     color: 'rgba(255,0,127,0.6)',
                                                     mb: 2,
                                                     filter: 'drop-shadow(0 0 20px rgba(255,0,127,0.3))'
                                                 }} />
                                             </motion.div>
-                                            
-                                            <Typography 
-                                                variant="h6" 
-                                                align="center" 
-                                                sx={{ 
-                                                    color: 'rgba(255,255,255,0.8)', 
+
+                                            <Typography
+                                                variant="h6"
+                                                align="center"
+                                                sx={{
+                                                    color: 'rgba(255,255,255,0.8)',
                                                     fontSize: { xs: '1.1rem', md: '1.3rem' },
                                                     fontWeight: 300,
                                                     textShadow: '0 2px 10px rgba(0,0,0,0.5)',
-                                                    background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(26,26,46,0.2) 100%)',
+                                                    background: 'background.paper',
                                                     backdropFilter: 'blur(10px)',
-                                                    border: '1px solid rgba(255,255,255,0.1)',
+                                                    border: '1px solid var(--brand)',
                                                     borderRadius: 2,
                                                     p: { xs: 3, md: 4 },
                                                     maxWidth: 500,

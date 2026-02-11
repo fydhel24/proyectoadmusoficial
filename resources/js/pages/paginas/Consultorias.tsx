@@ -6,33 +6,33 @@ import { BarChart3, CheckCircle, Lightbulb, Settings, Target, TrendingUp, Users,
 
 export default function Consultoria() {
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-background text-foreground">
       <Header />
 
       {/* Hero Section Mejorado */}
       <section className="relative flex min-h-[80vh] items-center overflow-hidden bg-gradient-to-br from-black via-gray-900 to-black">
         {/* Elementos decorativos de fondo */}
         <div className="absolute inset-0">
-          <div className="absolute top-20 left-10 h-72 w-72 rounded-full bg-red-500/20 blur-3xl"></div>
-          <div className="absolute right-10 bottom-20 h-96 w-96 rounded-full bg-red-800/20 blur-3xl"></div>
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/30 to-black/50"></div>
+          <div className="absolute top-20 left-10 h-72 w-72 rounded-full bg-brand/10 blur-3xl"></div>
+          <div className="absolute right-10 bottom-20 h-96 w-96 rounded-full bg-brand/5 blur-3xl"></div>
+          <div className="absolute inset-0 bg-background/50"></div>
         </div>
 
         <div className="relative z-10 container mx-auto px-4 py-20">
           <div className="max-w-4xl">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-red-900/30 px-4 py-2 text-sm text-red-200 backdrop-blur-sm">
-              <div className="h-2 w-2 animate-pulse rounded-full bg-red-400"></div>
-              Transformación empresarial
+            <div className="mb-6 inline-flex items-center gap-2 rounded-none bg-brand/10 px-4 py-2 text-sm text-brand backdrop-blur-sm border border-brand/20">
+              <div className="h-2 w-2 animate-pulse rounded-full bg-brand"></div>
+              <span className="font-orbitron font-bold uppercase tracking-widest text-xs">Transformación empresarial</span>
             </div>
 
-            <h1 className="mb-8 text-6xl leading-tight font-bold text-white md:text-7xl">
-              Consultorías
-              <span className="block bg-gradient-to-r from-red-600 to-red-400 bg-clip-text text-transparent">
-                AdMus
+            <h1 className="mb-8 text-6xl leading-tight font-black font-orbitron text-foreground md:text-7xl uppercase tracking-tighter">
+              CONSULTORÍAS
+              <span className="block text-brand" style={{ textShadow: '0 0 15px rgba(217, 26, 26, 0.4)' }}>
+                ADMUS
               </span>
             </h1>
 
-            <p className="mb-10 max-w-3xl text-xl leading-relaxed text-gray-300 md:text-2xl">
+            <p className="mb-10 max-w-3xl text-xl leading-relaxed text-muted-foreground md:text-2xl uppercase font-medium">
               Transformamos tu negocio con soluciones estratégicas personalizadas. Nuestro equipo de expertos te
               acompaña en cada paso hacia el éxito empresarial sostenible.
             </p>
@@ -40,14 +40,14 @@ export default function Consultoria() {
             <div className="flex flex-col items-start gap-4 sm:flex-row">
               <Button
                 size="lg"
-                className="bg-gradient-to-r from-red-700 to-red-900 px-8 py-4 text-lg text-white shadow-lg transition-all duration-300 hover:scale-105 hover:from-red-800 hover:to-red-950 hover:shadow-xl"
+                className="bg-brand rounded-none px-8 py-6 text-lg text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)] transition-all duration-300 hover:scale-105 hover:bg-brand/90 uppercase font-bold"
               >
                 Ver proyectos
               </Button>
               <Button
                 size="lg"
                 variant="outline"
-                className="border-2 border-red-700/50 px-8 py-4 text-lg text-white backdrop-blur-sm transition-all duration-300 hover:border-red-700 hover:bg-red-900/20"
+                className="border-2 border-brand/50 rounded-none px-8 py-6 text-lg text-foreground backdrop-blur-sm transition-all duration-300 hover:border-brand hover:bg-brand/10 uppercase font-bold"
               >
                 Cotización gratuita
               </Button>
@@ -56,16 +56,16 @@ export default function Consultoria() {
             {/* Stats Section */}
             <div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-3">
               <div className="text-center sm:text-left">
-                <div className="mb-2 text-3xl font-bold text-white">10+</div>
-                <div className="text-sm text-gray-400">Años de experiencia</div>
+                <div className="mb-2 text-4xl font-black text-foreground font-orbitron">10+</div>
+                <div className="text-sm text-muted-foreground uppercase tracking-widest font-bold">Años de experiencia</div>
               </div>
               <div className="text-center sm:text-left">
-                <div className="mb-2 text-3xl font-bold text-white">500+</div>
-                <div className="text-sm text-gray-400">Proyectos exitosos</div>
+                <div className="mb-2 text-4xl font-black text-foreground font-orbitron">500+</div>
+                <div className="text-sm text-muted-foreground uppercase tracking-widest font-bold">Proyectos exitosos</div>
               </div>
               <div className="text-center sm:text-left">
-                <div className="mb-2 text-3xl font-bold text-white">100%</div>
-                <div className="text-sm text-gray-400">Satisfacción garantizada</div>
+                <div className="mb-2 text-4xl font-black text-foreground font-orbitron">100%</div>
+                <div className="text-sm text-muted-foreground uppercase tracking-widest font-bold">Satisfacción</div>
               </div>
             </div>
           </div>
@@ -76,12 +76,12 @@ export default function Consultoria() {
       <section className="bg-gradient-to-b from-black to-gray-900 py-24">
         <div className="container mx-auto px-4">
           <div className="mb-20 text-center">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-red-900/30 px-4 py-2 text-sm font-medium text-red-200">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-none bg-brand/10 px-4 py-2 text-sm font-bold text-brand border border-brand/20 uppercase tracking-widest">
               <Target className="h-4 w-4" />
               Nuestros Servicios
             </div>
-            <h2 className="mb-6 text-5xl font-bold text-white">Te brindamos soluciones</h2>
-            <p className="mx-auto max-w-3xl text-xl leading-relaxed text-gray-300">
+            <h2 className="mb-6 text-5xl font-black font-orbitron text-foreground uppercase tracking-tighter">TE BRINDAMOS SOLUCIONES</h2>
+            <p className="mx-auto max-w-3xl text-xl leading-relaxed text-muted-foreground uppercase font-medium">
               En AdMus ofrecemos servicios de consultoría especializados para impulsar tu empresa hacia nuevos niveles
               de eficiencia y rentabilidad sostenible.
             </p>

@@ -24,7 +24,7 @@ export default function ProduccionAudiovisual() {
             <Head title="Producción Audiovisual" />
 
             {/* Sección principal: video + texto, ocupa 80vh */}
-            <section className="relative flex h-[80vh] w-full overflow-hidden text-white">
+            <section className="relative flex h-[80vh] w-full overflow-hidden text-foreground">
                 <Header />
                 {/* Video de fondo */}
                 <video ref={videoRef} autoPlay muted loop playsInline className="absolute inset-0 z-0 h-full w-full object-cover">
@@ -33,7 +33,7 @@ export default function ProduccionAudiovisual() {
                 </video>
 
                 {/* Overlay oscuro mitad izquierda */}
-                <div className="absolute top-0 left-0 z-10 h-full w-1/2 bg-black/70" />
+                <div className="absolute top-0 left-0 z-10 h-full w-1/2 bg-background/70 backdrop-blur-sm" />
 
                 {/* Contenido */}
                 <div className="relative z-20 flex h-full w-full">
@@ -59,27 +59,28 @@ export default function ProduccionAudiovisual() {
                                 <text
                                     x="150"
                                     y="120"
-                                    fontFamily="Arial"
+                                    fontFamily="Orbitron"
                                     fontSize="60"
                                     fontWeight="bold"
-                                    fill="white"
+                                    fill="currentColor"
                                     textAnchor="middle"
                                     filter="url(#glow)"
+                                    className="text-foreground"
                                 >
                                     ADMUS
                                 </text>
                             </svg>
                         </div>
 
-                        <h1 className="mb-4 text-5xl font-bold text-red-500 md:text-6xl" style={{ textShadow: '0 0 15px rgba(255, 0, 0, 0.4)' }}>
-                            Producción Audiovisual
+                        <h1 className="mb-4 text-5xl font-black font-orbitron text-brand md:text-6xl uppercase tracking-tighter" style={{ textShadow: '0 0 15px rgba(217, 26, 26, 0.4)' }}>
+                            PRODUCCIÓN AUDIOVISUAL
                         </h1>
-                        <h2 className="mb-4 text-3xl font-semibold md:text-4xl">Haz viral tus videos</h2>
-                        <p className="mb-6 text-xl text-white/90">Producciones audiovisuales que conectan</p>
+                        <h2 className="mb-4 text-3xl font-bold md:text-4xl uppercase tracking-widest text-foreground">HAZ VIRAL TUS VIDEOS</h2>
+                        <p className="mb-6 text-xl text-muted-foreground">PRODUCCIONES AUDIOVISUALES QUE CONECTAN</p>
 
                         <a
-                            href="#quienes-somos"
-                            className="inline-block transform rounded-full bg-red-600 px-6 py-3 text-lg font-bold shadow-md transition hover:scale-105 hover:bg-red-500"
+                            href="#nuestro-trabajo"
+                            className="inline-block transform rounded-none bg-brand px-8 py-4 text-lg font-bold text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)] transition hover:scale-105 hover:bg-brand/90 uppercase"
                         >
                             Ver Proyectos
                         </a>
@@ -91,28 +92,27 @@ export default function ProduccionAudiovisual() {
             </section>
 
             {/* Sección 2 */}
-            <section className="bg-black/80 py-16 text-white">
-                <p className="mx-auto max-w-3xl">
+            <section className="bg-muted/80 py-24 text-foreground border-y border-border">
+                <p className="mx-auto max-w-3xl text-center text-2xl font-medium leading-relaxed font-sans">
                     Queremos ayudarte a alcanzar tus objetivos y a potenciar tus ideas. Estaremos encantados de agendar una reunión contigo para hacer
-                    un diagnóstico gratuito de tu presencia digital o para que nos cuentes de tu proyecto.
+                    un <span className="text-brand font-bold underline decoration-brand/30">diagnóstico gratuito</span> de tu presencia digital o para que nos cuentes de tu proyecto.
                 </p>
             </section>
-            <section id="ideas" className="bg-black/80 py-16 text-white">
+
+            <section id="ideas" className="bg-background py-24">
                 <Ideas />
             </section>
 
             {/* Sección 3 */}
-            <section id="nuestro-trabajo" className="bg-black/80 py-16 text-white">
+            <section id="nuestro-trabajo" className="bg-muted/20 py-24 border-y border-border">
                 <NuestroTrabajo />
             </section>
 
             {/* Sección 4 */}
-            <section id="contactanos" className="bg-black/80 py-16 text-white">
+            <section id="contactanos" className="bg-background py-24">
                 <Contactanos />
             </section>
-            <footer className="bg-black py-8 text-white">
-                <Footer />
-            </footer>
+            <Footer />
         </>
     );
 }

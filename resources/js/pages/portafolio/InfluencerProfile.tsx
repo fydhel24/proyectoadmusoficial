@@ -1,6 +1,6 @@
 "use client"
 
-import Header from "@/components/header copy"
+import Header from "@/components/header"
 
 import { Head, router } from "@inertiajs/react"
 import {
@@ -520,7 +520,7 @@ export default function InfluencerProfile({ influencer }: PageProps) {
       <Box
         sx={{
           minHeight: "100vh",
-          background: "linear-gradient(135deg, #0a0a0a 0%, #1a0a0f 25%, #2a1018 50%, #1a0a0f 75%, #0a0a0a 100%)",
+          bgcolor: "background",
           pb: 4,
         }}
       >
@@ -602,9 +602,9 @@ export default function InfluencerProfile({ influencer }: PageProps) {
           {/* Información principal */}
           <Card
             sx={{
-              bgcolor: "rgba(26, 26, 26, 0.9)",
+              bgcolor: "background.paper",
               backdropFilter: "blur(20px)",
-              border: "1px solid rgba(255,255,255,0.1)",
+              border: "1px solid var(--brand)",
               borderRadius: 3,
               mb: 4,
               overflow: "visible",
@@ -612,41 +612,41 @@ export default function InfluencerProfile({ influencer }: PageProps) {
           >
             <CardContent sx={{ p: 4 }}>
               <Grid container spacing={4} alignItems="center">
-                <Grid item xs={12} md={8}>
+                <Grid size={{ xs: 12, md: 8 }}>
                   <Stack direction="row" spacing={3} alignItems="center" mb={3}>
                     <Badge
-  overlap="circular"
-  anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-  badgeContent={
-    influencer.verified ? (
-      <VerifiedIcon sx={{ color: "#00ff41", fontSize: 24 }} />
-    ) : null
-  }
->
+                      overlap="circular"
+                      anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                      badgeContent={
+                        influencer.verified ? (
+                          <VerifiedIcon sx={{ color: "#00ff41", fontSize: 24 }} />
+                        ) : null
+                      }
+                    >
                       <Avatar
                         src={influencer.avatar}
                         sx={{
                           width: 120,
                           height: 120,
-                          border: "4px solid rgba(255,23,68,0.5)",
-                          boxShadow: "0 0 30px rgba(255,23,68,0.3)",
+                          border: "4px solid var(--brand)",
+                          boxShadow: "0 0 30px rgba(217, 26, 26, 0.3)",
                         }}
                       />
                     </Badge>
                     <Box>
-                      <Typography variant="h3" fontWeight="bold" sx={{ color: "#fff", mb: 1 }}>
+                      <Typography variant="h3" fontWeight="bold" sx={{ color: "text.primary", mb: 1, fontFamily: 'Orbitron, sans-serif' }}>
                         {influencer.name}
                       </Typography>
-                      <Typography variant="h6" sx={{ color: "rgba(255,255,255,0.7)", mb: 2 }}>
+                      <Typography variant="h6" sx={{ color: "text.secondary", mb: 2 }}>
                         @{influencer.username}
                       </Typography>
-                      <Typography variant="body1" sx={{ color: "rgba(255,255,255,0.8)", mb: 2, maxWidth: 500 }}>
+                      <Typography variant="body1" sx={{ color: "text.primary", mb: 2, maxWidth: 500, fontFamily: 'Inter, sans-serif' }}>
                         {influencer.bio}
                       </Typography>
                     </Box>
                   </Stack>
                 </Grid>
-                <Grid item xs={12} md={4}>
+                <Grid size={{ xs: 12, md: 4 }}>
                   <Button
                     variant="contained"
                     size="large"
@@ -677,9 +677,9 @@ export default function InfluencerProfile({ influencer }: PageProps) {
           {/* Tabs de contenido */}
           <Card
             sx={{
-              bgcolor: "rgba(26, 26, 26, 0.9)",
+              bgcolor: "background.paper",
               backdropFilter: "blur(20px)",
-              border: "1px solid rgba(255,255,255,0.1)",
+              border: "1px solid var(--brand)",
               borderRadius: 3,
             }}
           >
@@ -690,16 +690,17 @@ export default function InfluencerProfile({ influencer }: PageProps) {
                 centered
                 sx={{
                   "& .MuiTab-root": {
-                    color: "rgba(255,255,255,0.6)",
+                    color: "text.secondary",
                     fontWeight: "bold",
+                    fontFamily: 'Orbitron, sans-serif',
                     fontSize: "1.1rem",
                     py: 3,
                     "&.Mui-selected": {
-                      color: "#ff1744",
+                      color: "var(--brand)",
                     },
                   },
                   "& .MuiTabs-indicator": {
-                    bgcolor: "#ff1744",
+                    bgcolor: "var(--brand)",
                     height: 3,
                   },
                 }}
@@ -716,7 +717,7 @@ export default function InfluencerProfile({ influencer }: PageProps) {
                   {influencer.videos.length > 0 ? (
                     <Grid container spacing={4}>
                       {influencer.videos.map((video) => (
-                        <Grid item xs={12} sm={6} md={4} key={video.id}>
+                        <Grid size={{ xs: 12, sm: 6, md: 4 }} key={video.id}>
                           <VideoCard video={video} />
                         </Grid>
                       ))}

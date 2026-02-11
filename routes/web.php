@@ -346,6 +346,16 @@ Route::post('/users/{user}/photos', [PhotoController::class, 'store'])->name('ph
 
 Route::get('/perfil-influencer', [InfluencerController::class, 'index'])
     ->name('influencer.profile');
+
+// Rutas de Perfil Estilo Facebook
+Route::middleware(['auth'])->group(function () {
+    Route::get('/facebook-profile/{id?}', [\App\Http\Controllers\FacebookProfileController::class, 'show'])->name('profile.facebook');
+    Route::post('/profile/photo', [\App\Http\Controllers\FacebookProfileController::class, 'storePhoto'])->name('profile.photo.store');
+    Route::post('/profile/photo/{photo}', [\App\Http\Controllers\FacebookProfileController::class, 'updatePhoto'])->name('profile.photo.update');
+    Route::delete('/profile/photo/{photo}', [\App\Http\Controllers\FacebookProfileController::class, 'deletePhoto'])->name('profile.photo.delete');
+});
+
+
 Route::get('/reportetareas', [AsignacionTareaController::class, 'reportetareas'])->name('asignaciones.reportetareas');
 Route::get('/reportetareas/pdf', [AsignacionTareaController::class, 'generarPdfReporteTareas'])->name('reportetareas.pdf');
 Route::get('/reportetareas/pdfmes', [AsignacionTareaController::class, 'generarPdfReporteTareasmes'])->name('reportetareas.pdfmes');
@@ -634,10 +644,9 @@ Route::middleware(['auth'])->group(function () {
     });
     require __DIR__ . '/settings.php';
     require __DIR__ . '/auth.php';
-    
 });
 Route::get('datacache', [GiftExchangeController::class, 'adminCompleteData'])
-             ->name('exchange.admin.data.get');
+    ->name('exchange.admin.data.get');
 Route::get('/trabaja-con-nosotros', [JobApplicationController::class, 'create'])->name('job-applications.create');
 Route::post('/trabaja-con-nosotros', [JobApplicationController::class, 'store'])->name('job-applications.store');
 

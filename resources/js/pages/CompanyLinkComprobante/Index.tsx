@@ -300,45 +300,45 @@ export default function Index({ empresas, registros }: Props) {
             </div>
 
             <div className="bg-muted/30 min-h-screen space-y-8 p-6">
-                {/* Estadísticas Modernas */}
+                {/* Estadísticas con Colores */}
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
-                    <Card className="transition-shadow hover:shadow-md">
+                    <Card className="border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-blue-50/50 shadow-md transition-all duration-300 hover:shadow-lg hover:border-blue-300">
                         <CardContent className="p-6">
                             <div className="flex items-center gap-4">
-                                <div className="rounded-lg bg-blue-500/10 p-3 text-blue-600">
+                                <div className="rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 p-3 text-white shadow-lg">
                                     <Building2 className="h-6 w-6" />
                                 </div>
                                 <div className="space-y-1">
-                                    <p className="text-muted-foreground text-sm font-medium">Total Empresas</p>
-                                    <p className="text-2xl font-bold">{empresas.length}</p>
+                                    <p className="text-blue-700 text-sm font-semibold">Total Empresas</p>
+                                    <p className="text-3xl font-bold text-blue-900">{empresas.length}</p>
                                 </div>
                             </div>
                         </CardContent>
                     </Card>
 
-                    <Card className="transition-shadow hover:shadow-md">
+                    <Card className="border-2 border-green-200 bg-gradient-to-br from-green-50 to-green-50/50 shadow-md transition-all duration-300 hover:shadow-lg hover:border-green-300">
                         <CardContent className="p-6">
                             <div className="flex items-center gap-4">
-                                <div className="rounded-lg bg-green-500/10 p-3 text-green-600">
+                                <div className="rounded-lg bg-gradient-to-br from-green-600 to-green-700 p-3 text-white shadow-lg">
                                     <LinkIcon className="h-6 w-6" />
                                 </div>
                                 <div className="space-y-1">
-                                    <p className="text-muted-foreground text-sm font-medium">Total Links</p>
-                                    <p className="text-2xl font-bold">{allRegistros.length}</p>
+                                    <p className="text-green-700 text-sm font-semibold">Total Links</p>
+                                    <p className="text-3xl font-bold text-green-900">{allRegistros.length}</p>
                                 </div>
                             </div>
                         </CardContent>
                     </Card>
 
-                    <Card className="transition-shadow hover:shadow-md sm:col-span-2 md:col-span-1">
+                    <Card className="border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-purple-50/50 shadow-md transition-all duration-300 hover:shadow-lg hover:border-purple-300 sm:col-span-2 md:col-span-1">
                         <CardContent className="p-6">
                             <div className="flex items-center gap-4">
-                                <div className="rounded-lg bg-purple-500/10 p-3 text-purple-600">
+                                <div className="rounded-lg bg-gradient-to-br from-purple-600 to-purple-700 p-3 text-white shadow-lg">
                                     <VideoIcon className="h-6 w-6" />
                                 </div>
                                 <div className="space-y-1">
-                                    <p className="text-muted-foreground text-sm font-medium">Resultados Filtrados</p>
-                                    <p className="text-2xl font-bold text-purple-600">{filteredRegistros.length}</p>
+                                    <p className="text-purple-700 text-sm font-semibold">Resultados Filtrados</p>
+                                    <p className="text-3xl font-bold text-purple-900">{filteredRegistros.length}</p>
                                 </div>
                             </div>
                         </CardContent>
@@ -346,15 +346,15 @@ export default function Index({ empresas, registros }: Props) {
                 </div>
 
                 {/* Formulario Moderno */}
-                <Card className="border-none shadow-lg">
-                    <CardHeader className="bg-muted/20 border-b pb-6">
+                <Card className="border-l-4 border-l-blue-600 shadow-lg">
+                    <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-50/40 border-b-2 border-blue-200 pb-6">
                         <div className="flex items-center gap-3">
-                            <div className="bg-primary text-primary-foreground rounded-lg p-2">
+                            <div className="rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 p-2 text-white shadow-lg">
                                 <Plus className="h-5 w-5" />
                             </div>
                             <div>
-                                <CardTitle className="text-xl">Agregar Nuevo Link</CardTitle>
-                                <CardDescription>Completa la información para registrar un nuevo enlace de empresa</CardDescription>
+                                <CardTitle className="text-xl text-blue-900">Agregar Nuevo Link</CardTitle>
+                                <CardDescription className="text-blue-700">Completa la información para registrar un nuevo enlace de empresa</CardDescription>
                             </div>
                         </div>
                     </CardHeader>
@@ -363,9 +363,9 @@ export default function Index({ empresas, registros }: Props) {
                             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                                 {/* Empresa */}
                                 <div className="space-y-2">
-                                    <Label htmlFor="company" className="flex items-center gap-2">
-                                        <Building2 className="text-muted-foreground h-4 w-4" />
-                                        Empresa <span className="text-destructive">*</span>
+                                    <Label htmlFor="company" className="flex items-center gap-2 text-blue-900 font-semibold">
+                                        <Building2 className="text-blue-600 h-4 w-4" />
+                                        Empresa <span className="text-red-500">*</span>
                                     </Label>
                                     <Input
                                         id="company"
@@ -379,7 +379,7 @@ export default function Index({ empresas, registros }: Props) {
                                         }}
                                         required
                                         placeholder="Selecciona o busca una empresa..."
-                                        className="h-11"
+                                        className="h-11 border-2 border-blue-200 focus:border-blue-500 focus:ring-blue-500"
                                     />
                                     <datalist id="empresa-list">
                                         {empresas.map((e) => (
@@ -390,9 +390,9 @@ export default function Index({ empresas, registros }: Props) {
 
                                 {/* Link */}
                                 <div className="space-y-2">
-                                    <Label htmlFor="link" className="flex items-center gap-2">
-                                        <LinkIcon className="text-muted-foreground h-4 w-4" />
-                                        Link del Video <span className="text-destructive">*</span>
+                                    <Label htmlFor="link" className="flex items-center gap-2 text-blue-900 font-semibold">
+                                        <LinkIcon className="text-green-600 h-4 w-4" />
+                                        Link del Video <span className="text-red-500">*</span>
                                     </Label>
                                     <Input
                                         id="link"
@@ -401,18 +401,18 @@ export default function Index({ empresas, registros }: Props) {
                                         onChange={(e) => setData('link', e.target.value)}
                                         required
                                         placeholder="https://www.tiktok.com/..."
-                                        className="h-11"
+                                        className="h-11 border-2 border-green-200 focus:border-green-500 focus:ring-green-500"
                                     />
                                 </div>
 
                                 {/* Mes */}
                                 <div className="space-y-2">
-                                    <Label htmlFor="mes" className="flex items-center gap-2">
-                                        <Calendar className="text-muted-foreground h-4 w-4" />
-                                        Mes de Referencia <span className="text-destructive">*</span>
+                                    <Label htmlFor="mes" className="flex items-center gap-2 text-blue-900 font-semibold">
+                                        <Calendar className="text-purple-600 h-4 w-4" />
+                                        Mes de Referencia <span className="text-red-500">*</span>
                                     </Label>
                                     <Select value={data.mes} onValueChange={(val) => setData('mes', val)}>
-                                        <SelectTrigger id="mes" className="h-11">
+                                        <SelectTrigger id="mes" className="h-11 border-2 border-purple-200 focus:border-purple-500 focus:ring-purple-500">
                                             <SelectValue placeholder="Seleccione mes" />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -426,9 +426,9 @@ export default function Index({ empresas, registros }: Props) {
                                 </div>
                             </div>
 
-                            <div className="flex justify-end pt-2">
-                                <Button type="submit" disabled={processing} size="lg" className="gap-2 px-8">
-                                    <Save className="h-4 w-4" />
+                            <div className="flex justify-end pt-4">
+                                <Button type="submit" disabled={processing} size="lg" className="gap-2 px-8 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg font-semibold">
+                                    <Save className="h-5 w-5" />
                                     {processing ? 'Guardando...' : 'Guardar Información'}
                                 </Button>
                             </div>
@@ -437,15 +437,15 @@ export default function Index({ empresas, registros }: Props) {
                 </Card>
 
                 {/* Listado Moderno */}
-                <Card className="border-none shadow-lg">
-                    <CardHeader className="bg-muted/20 flex flex-col gap-4 space-y-0 border-b pb-6 md:flex-row md:items-center md:justify-between">
+                <Card className="border-l-4 border-l-green-600 shadow-lg">
+                    <CardHeader className="bg-gradient-to-r from-green-50 to-green-50/40 flex flex-col gap-4 space-y-0 border-b-2 border-green-200 pb-6 md:flex-row md:items-center md:justify-between">
                         <div className="flex items-center gap-3">
-                            <div className="bg-primary/10 text-primary rounded-lg p-2">
+                            <div className="rounded-lg bg-gradient-to-br from-green-600 to-green-700 p-2 text-white shadow-lg">
                                 <FileText className="h-5 w-5" />
                             </div>
                             <div>
-                                <CardTitle className="text-xl">Empresas y Links</CardTitle>
-                                <CardDescription>
+                                <CardTitle className="text-xl text-green-900">Empresas y Links</CardTitle>
+                                <CardDescription className="text-green-700">
                                     Mostrando {paginatedRegistros.length} de {filteredRegistros.length} registros encontrados
                                 </CardDescription>
                             </div>
@@ -453,10 +453,10 @@ export default function Index({ empresas, registros }: Props) {
 
                         <div className="flex flex-col gap-3 sm:flex-row">
                             <div className="relative">
-                                <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+                                <Search className="text-gray-400 absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
                                 <Input
                                     placeholder="Buscar empresa o link..."
-                                    className="h-10 w-full pl-9 sm:w-[300px]"
+                                    className="h-10 w-full pl-9 sm:w-[300px] border-2 border-gray-300 focus:border-green-500 focus:ring-green-500"
                                     value={searchTerm}
                                     onChange={(e) => {
                                         setSearchTerm(e.target.value);
@@ -464,7 +464,7 @@ export default function Index({ empresas, registros }: Props) {
                                     }}
                                 />
                             </div>
-                            <Button variant="outline" className="h-10 gap-2" onClick={() => setShowFilters(!showFilters)}>
+                            <Button className="h-10 gap-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white shadow-lg font-semibold" onClick={() => setShowFilters(!showFilters)}>
                                 <Filter className="h-4 w-4" />
                                 {showFilters ? 'Ocultar Filtros' : 'Filtros'}
                             </Button>
@@ -472,10 +472,10 @@ export default function Index({ empresas, registros }: Props) {
                     </CardHeader>
 
                     {showFilters && (
-                        <div className="bg-muted/10 animate-in fade-in slide-in-from-top-2 border-b p-6 duration-300">
+                        <div className="bg-purple-50 animate-in fade-in slide-in-from-top-2 border-b-2 border-purple-200 p-6 duration-300">
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                                 <div className="space-y-2">
-                                    <Label className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
+                                    <Label className="text-purple-900 text-xs font-semibold tracking-wider uppercase">
                                         Filtrar por empresa
                                     </Label>
                                     <Select
@@ -485,7 +485,7 @@ export default function Index({ empresas, registros }: Props) {
                                             setCurrentPage(1);
                                         }}
                                     >
-                                        <SelectTrigger className="bg-background">
+                                        <SelectTrigger className="bg-white border-2 border-purple-200 focus:border-purple-500 focus:ring-purple-500">
                                             <SelectValue placeholder="Todas las empresas" />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -500,7 +500,7 @@ export default function Index({ empresas, registros }: Props) {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">Filtrar por mes</Label>
+                                    <Label className="text-purple-900 text-xs font-semibold tracking-wider uppercase">Filtrar por mes</Label>
                                     <Select
                                         value={filterMes}
                                         onValueChange={(val) => {
@@ -508,7 +508,7 @@ export default function Index({ empresas, registros }: Props) {
                                             setCurrentPage(1);
                                         }}
                                     >
-                                        <SelectTrigger className="bg-background">
+                                        <SelectTrigger className="bg-white border-2 border-purple-200 focus:border-purple-500 focus:ring-purple-500">
                                             <SelectValue placeholder="Todos los meses" />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -523,7 +523,7 @@ export default function Index({ empresas, registros }: Props) {
                                 </div>
 
                                 <div className="flex items-end">
-                                    <Button variant="ghost" className="text-muted-foreground hover:text-foreground h-10 gap-2" onClick={clearFilters}>
+                                    <Button className="h-10 gap-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-md font-semibold" onClick={clearFilters}>
                                         <X className="h-4 w-4" />
                                         Limpiar filtros
                                     </Button>
@@ -535,19 +535,19 @@ export default function Index({ empresas, registros }: Props) {
                     <CardContent className="p-0">
                         <div className="overflow-x-auto">
                             <Table>
-                                <TableHeader className="bg-muted/30">
-                                    <TableRow>
-                                        <TableHead className="w-[200px] font-semibold">Empresa</TableHead>
-                                        <TableHead className="font-semibold">Enlace del Video</TableHead>
-                                        <TableHead className="w-[150px] text-center font-semibold">Mes</TableHead>
-                                        <TableHead className="w-[150px] text-center font-semibold">Fecha</TableHead>
-                                        <TableHead className="w-[100px] text-right font-semibold">Acciones</TableHead>
+                                <TableHeader className="bg-gradient-to-r from-green-100 to-green-50 border-b-2 border-green-200">
+                                    <TableRow className="hover:bg-green-100">
+                                        <TableHead className="w-[200px] font-bold text-green-900">Empresa</TableHead>
+                                        <TableHead className="font-bold text-green-900">Enlace del Video</TableHead>
+                                        <TableHead className="w-[150px] text-center font-bold text-green-900">Mes</TableHead>
+                                        <TableHead className="w-[150px] text-center font-bold text-green-900">Fecha</TableHead>
+                                        <TableHead className="w-[100px] text-right font-bold text-green-900">Acciones</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {paginatedRegistros.length > 0 ? (
                                         paginatedRegistros.map((r) => (
-                                            <TableRow key={r.id} className="group hover:bg-muted/50 transition-colors">
+                                            <TableRow key={r.id} className="group border-b border-green-100 hover:bg-green-50/80 transition-colors duration-200">
                                                 <TableCell>
                                                     <Select
                                                         value={inlineData[r.id]?.company_id?.toString()}
@@ -556,7 +556,7 @@ export default function Index({ empresas, registros }: Props) {
                                                             setTimeout(() => handleInlineSave(r.id), 100);
                                                         }}
                                                     >
-                                                        <SelectTrigger className="hover:bg-background group-hover:bg-background h-9 border-none bg-transparent shadow-none focus:ring-1">
+                                                        <SelectTrigger className="hover:bg-background group-hover:bg-background h-9 border-none bg-transparent shadow-none focus:ring-1 focus:ring-green-500">
                                                             <SelectValue />
                                                         </SelectTrigger>
                                                         <SelectContent>
@@ -574,14 +574,13 @@ export default function Index({ empresas, registros }: Props) {
                                                             value={inlineData[r.id]?.link || ''}
                                                             onChange={(e) => handleInlineChange(r.id, 'link', e.target.value)}
                                                             onBlur={() => handleInlineSave(r.id)}
-                                                            className="hover:bg-background group-hover:bg-background h-9 border-none bg-transparent shadow-none focus:ring-1"
+                                                            className="hover:bg-background group-hover:bg-background h-9 border-none bg-transparent shadow-none focus:ring-1 focus:ring-green-500"
                                                         />
                                                         {inlineData[r.id]?.link && (
                                                             <Button
-                                                                variant="ghost"
                                                                 size="icon"
                                                                 asChild
-                                                                className="text-primary hover:text-primary hover:bg-primary/10 h-8 w-8"
+                                                                className="h-8 w-8 bg-blue-600 hover:bg-blue-700 text-white shadow-md"
                                                             >
                                                                 <a href={inlineData[r.id]?.link} target="_blank" rel="noopener noreferrer">
                                                                     <ExternalLink className="h-4 w-4" />
@@ -598,7 +597,7 @@ export default function Index({ empresas, registros }: Props) {
                                                             setTimeout(() => handleInlineSave(r.id), 100);
                                                         }}
                                                     >
-                                                        <SelectTrigger className="hover:bg-background group-hover:bg-background h-9 justify-center border-none bg-transparent text-center shadow-none focus:ring-1">
+                                                        <SelectTrigger className="hover:bg-background group-hover:bg-background h-9 justify-center border-none bg-transparent text-center shadow-none focus:ring-1 focus:ring-green-500">
                                                             <SelectValue />
                                                         </SelectTrigger>
                                                         <SelectContent>
@@ -616,15 +615,14 @@ export default function Index({ empresas, registros }: Props) {
                                                         value={inlineData[r.id]?.fecha || ''}
                                                         onChange={(e) => handleInlineChange(r.id, 'fecha', e.target.value)}
                                                         onBlur={() => handleInlineSave(r.id)}
-                                                        className="hover:bg-background group-hover:bg-background h-9 border-none bg-transparent text-center shadow-none focus:ring-1"
+                                                        className="hover:bg-background group-hover:bg-background h-9 border-none bg-transparent text-center shadow-none focus:ring-1 focus:ring-green-500"
                                                     />
                                                 </TableCell>
                                                 <TableCell className="text-right">
                                                     <Button
-                                                        variant="ghost"
                                                         size="icon"
                                                         onClick={() => eliminarRegistro(r.id)}
-                                                        className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8 w-8"
+                                                        className="h-8 w-8 bg-red-600 hover:bg-red-700 text-white shadow-md transition-all hover:scale-110"
                                                     >
                                                         <Trash2 className="h-4 w-4" />
                                                     </Button>
@@ -633,7 +631,7 @@ export default function Index({ empresas, registros }: Props) {
                                         ))
                                     ) : (
                                         <TableRow>
-                                            <TableCell colSpan={5} className="text-muted-foreground h-24 text-center">
+                                            <TableCell colSpan={5} className="text-muted-foreground h-24 text-center text-gray-500">
                                                 No se encontraron registros que coincidan con los criterios.
                                             </TableCell>
                                         </TableRow>
@@ -643,20 +641,19 @@ export default function Index({ empresas, registros }: Props) {
                         </div>
                     </CardContent>
 
-                    {/* Footer con Paginación Shadcn */}
+                    {/* Footer con Paginación */}
                     {totalPages > 1 && (
-                        <div className="bg-muted/10 flex items-center justify-between border-t p-6">
-                            <p className="text-muted-foreground text-sm">
-                                Página <span className="text-foreground font-medium">{currentPage}</span> de{' '}
-                                <span className="text-foreground font-medium">{totalPages}</span>
+                        <div className="bg-gradient-to-r from-green-50 to-green-50/40 flex items-center justify-between border-t-2 border-green-200 p-6">
+                            <p className="text-gray-600 text-sm">
+                                Página <span className="text-green-900 font-bold">{currentPage}</span> de{' '}
+                                <span className="text-green-900 font-bold">{totalPages}</span>
                             </p>
                             <div className="flex items-center gap-2">
                                 <Button
-                                    variant="outline"
                                     size="sm"
                                     onClick={() => handlePageChange(currentPage - 1)}
                                     disabled={currentPage === 1}
-                                    className="h-9 w-9 p-0"
+                                    className="h-9 w-9 p-0 bg-green-600 hover:bg-green-700 text-white disabled:bg-gray-300 disabled:cursor-not-allowed shadow-md"
                                 >
                                     <ChevronLeft className="h-4 w-4" />
                                 </Button>
@@ -672,10 +669,13 @@ export default function Index({ empresas, registros }: Props) {
                                         return (
                                             <Button
                                                 key={pageNum}
-                                                variant={currentPage === pageNum ? 'default' : 'ghost'}
                                                 size="sm"
                                                 onClick={() => handlePageChange(pageNum)}
-                                                className="h-9 w-9 p-0"
+                                                className={`h-9 w-9 p-0 shadow-md transition-all ${
+                                                    currentPage === pageNum
+                                                        ? 'bg-green-600 hover:bg-green-700 text-white'
+                                                        : 'bg-white border-2 border-green-300 text-green-700 hover:bg-green-50'
+                                                }`}
                                             >
                                                 {pageNum}
                                             </Button>
@@ -683,11 +683,10 @@ export default function Index({ empresas, registros }: Props) {
                                     })}
                                 </div>
                                 <Button
-                                    variant="outline"
                                     size="sm"
                                     onClick={() => handlePageChange(currentPage + 1)}
                                     disabled={currentPage === totalPages}
-                                    className="h-9 w-9 p-0"
+                                    className="h-9 w-9 p-0 bg-green-600 hover:bg-green-700 text-white disabled:bg-gray-300 disabled:cursor-not-allowed shadow-md"
                                 >
                                     <ChevronRight className="h-4 w-4" />
                                 </Button>

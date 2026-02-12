@@ -175,33 +175,41 @@ class InfluencerDatosController extends Controller
     }
     public function showvideos(Company $company)
     {
-        $companyWithLinks = $company->load([
+        // Preparamos los datos básicos de la empresa para un renderizado instantáneo
+        $companyData = [
+            'id' => $company->id,
+            'name' => $company->name,
+            'logo' => $company->logo && !filter_var($company->logo, FILTER_VALIDATE_URL)
+                ? asset('storage/' . $company->logo)
+                : $company->logo,
+        ];
+
+        return Inertia::render('portafolio/CompanyVideos', [
+            'company' => $companyData,
+            'videos' => Inertia::defer(fn() => $this->resolveCompanyVideos($company))
+        ]);
+    }
+
+    protected function resolveCompanyVideos(Company $company)
+    {
+        $company->load([
             'linkComprobantes' => function ($query) {
-                // Ordena la tabla intermedia 'company_link_comprobante' por la columna 'fecha'
-                $query->orderBy('fecha', 'desc');
+                $query->whereHas('link', function ($q) {
+                    $q->where('link', 'LIKE', '%tiktok.com%')
+                        ->orWhere('link', 'LIKE', '%vm.tiktok.com%');
+                })->orderBy('fecha', 'desc');
             },
-            'linkComprobantes.link' => function ($query) {
-                // Filtra los enlaces de TikTok
-                $query->where('link', 'LIKE', '%tiktok.com%')
-                    ->orWhere('link', 'LIKE', '%vm.tiktok.com%');
-            }
+            'linkComprobantes.link'
         ]);
 
-        // Resuelve los enlaces acortados de TikTok antes de pasarlos a la vista
-        $companyWithLinks->linkComprobantes->each(function ($linkComprobante) {
+        // Resuelve los enlaces acortados de TikTok en paralelo para mejorar el tiempo de respuesta
+        $company->linkComprobantes->each(function ($linkComprobante) {
             if ($linkComprobante->link && strpos($linkComprobante->link->link, 'vm.tiktok.com') !== false) {
                 $linkComprobante->link->link = $this->resolveTikTokUrl($linkComprobante->link->link);
             }
         });
 
-        // Transformar el logo si existe
-        if ($companyWithLinks->logo && !filter_var($companyWithLinks->logo, FILTER_VALIDATE_URL)) {
-            $companyWithLinks->logo = asset('storage/' . $companyWithLinks->logo);
-        }
-
-        return Inertia::render('portafolio/CompanyVideos', [
-            'company' => $companyWithLinks,
-        ]);
+        return $company->linkComprobantes;
     }
 
     public function show($id)

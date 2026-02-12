@@ -145,16 +145,6 @@ export default function Header() {
                                     Trabaja con nosotros
                                 </Button>
                             </Link>
-                            <Link href="#empresas" onClick={(e: React.MouseEvent<any>) => scrollToSection(e, '#empresas')}>
-                                <span
-                                    className={cn(
-                                        navigationMenuTriggerStyle(),
-                                        'text-foreground hover:text-brand hover:bg-brand/10 cursor-pointer bg-transparent',
-                                    )}
-                                >
-                                    Empresas
-                                </span>
-                            </Link>
                         </NavigationMenuList>
                     </NavigationMenu>
                 </nav>

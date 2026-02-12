@@ -155,7 +155,7 @@ export default function Welcome({ companies = [] }: { companies?: any[] }) {
                 <div className="container mx-auto mb-12 px-6 text-center">
                     <h2 className="text-brand mb-4 text-sm font-bold tracking-[0.3em] uppercase">Empresas que confían</h2>
                     <h3 className="font-orbitron text-3xl font-black md:text-5xl">
-                        PARTNERS <span className="text-muted-foreground/40 text-foreground/40">ESTRATÉGICOS</span>
+                        PLANES <span className="text-muted-foreground/40 text-foreground/40">ESTRATÉGICOS</span>
                     </h3>
                 </div>
                 <CompanyCarousel companies={companies} />

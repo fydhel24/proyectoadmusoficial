@@ -1,10 +1,12 @@
 'use client';
 
 import Header from '@/components/header';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { Head } from '@inertiajs/react';
-import { ChatBubbleOutline, FavoriteBorder, PlayCircleOutline, Share } from '@mui/icons-material';
-import { Avatar, Box, Card, Container, Fade, Grid, IconButton, Typography } from '@mui/material';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Heart, MessageCircle, Play, Share2 } from 'lucide-react';
 import Footer from '../home/footer';
 
 // Define las interfaces para los datos que llegan de Laravel
@@ -35,10 +37,8 @@ interface CompanyVideosProps {
 const getEmbedUrl = (tiktokUrl: string): string => {
     try {
         const url = new URL(tiktokUrl);
-        // La incrustación de TikTok funciona mejor con la URL completa
-        // Extraemos el ID del video de la URL resuelta por Laravel
         const pathParts = url.pathname.split('/');
-        const videoId = pathParts.pop() || pathParts.pop(); // Manejar el caso de slash final
+        const videoId = pathParts.pop() || pathParts.pop();
 
         if (videoId) {
             return `https://www.tiktok.com/embed/v2/${videoId}`;
@@ -46,337 +46,163 @@ const getEmbedUrl = (tiktokUrl: string): string => {
     } catch (e) {
         console.error('URL de TikTok inválida:', tiktokUrl);
     }
-    return ''; // Retorna una cadena vacía si no se puede generar la URL de incrustación
+    return '';
 };
 
 export default function CompanyVideos({ company }: CompanyVideosProps) {
     const { name, link_comprobantes } = company;
 
     return (
-        <>
+        <div className="bg-background text-foreground selection:bg-brand min-h-screen selection:text-white">
             <Header />
-            <Box sx={{ height: '64px', bgcolor: 'background', zIndex: 75 }} />
-
             <Head title={`Videos de ${name} | Portafolio`} />
 
-            <Box
-                sx={{
-                    minHeight: '100vh',
-                    bgcolor: 'background',
-                    color: 'text.primary',
-                    py: { xs: 4, md: 6 },
-                    position: 'relative',
-                    overflow: 'hidden',
-                }}
-            >
-                <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
-                    {/* Header Section Mejorado */}
-                    <Fade in timeout={800}>
-                        <Box
-                            sx={{
-                                textAlign: 'center',
-                                mb: { xs: 4, md: 6 },
-                                px: { xs: 2, sm: 0 },
-                            }}
-                        >
-                            <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.2 }}>
-                                <Typography
-                                    variant="h2"
-                                    fontWeight="bold"
-                                    sx={{
-                                        color: 'text.primary',
-                                        mb: { xs: 1, md: 2 },
-                                        fontFamily: 'Orbitron, sans-serif',
-                                        fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem', lg: '3.5rem' },
-                                        background: 'linear-gradient(135deg, var(--brand) 0%, #ff6f61 50%, #7877c6 100%)',
-                                        WebkitBackgroundClip: 'text',
-                                        WebkitTextFillColor: 'transparent',
-                                        backgroundSize: '200% 200%',
-                                        animation: 'gradientShift 6s ease-in-out infinite',
-                                        textShadow: '0 0 30px rgba(217, 26, 26, 0.3)',
-                                    }}
-                                >
-                                    Videos para {name}
-                                </Typography>
-                            </motion.div>
+            {/* Spacer for sticky header */}
+            <div className="h-20" />
 
-                            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.4 }}>
-                                <Typography
-                                    variant="body1"
-                                    sx={{
-                                        color: 'text.secondary',
-                                        fontSize: { xs: '1rem', md: '1.1rem' },
-                                        fontFamily: 'Inter, sans-serif',
-                                        maxWidth: 600,
-                                        mx: 'auto',
-                                        lineHeight: 1.6,
-                                    }}
-                                >
-                                    Aquí puedes ver todos los videos de TikTok realizados para esta empresa.
-                                </Typography>
-                            </motion.div>
-
-                            {/* Decorative Elements */}
-                            <motion.div
-                                initial={{ opacity: 0, scale: 0 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ duration: 0.8, delay: 0.6 }}
-                            >
-                                <Box
-                                    sx={{
-                                        display: 'flex',
-                                        justifyContent: 'center',
-                                        alignItems: 'center',
-                                        mt: 3,
-                                        gap: 2,
-                                    }}
-                                >
-                                    <Box
-                                        sx={{
-                                            width: { xs: 30, md: 50 },
-                                            height: 2,
-                                            background: 'linear-gradient(90deg, transparent, var(--brand), transparent)',
-                                        }}
-                                    />
-                                    <PlayCircleOutline
-                                        sx={{
-                                            color: 'var(--brand)',
-                                            fontSize: { xs: '2rem', md: '2.5rem' },
-                                            filter: 'drop-shadow(0 0 10px rgba(217, 26, 26, 0.5))',
-                                        }}
-                                    />
-                                    <Box
-                                        sx={{
-                                            width: { xs: 30, md: 50 },
-                                            height: 2,
-                                            background: 'linear-gradient(90deg, transparent, var(--brand), transparent)',
-                                        }}
-                                    />
-                                </Box>
-                            </motion.div>
-                        </Box>
-                    </Fade>
-
-                    {/* Videos Grid */}
-                    <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.7 }}>
-                        <Grid container spacing={{ xs: 2, sm: 3, md: 3 }} sx={{ px: { xs: 1, sm: 0 } }}>
-                            {link_comprobantes.length > 0 ? (
-                                link_comprobantes.map(
-                                    (companyLink, index) =>
-                                        companyLink.link && (
-                                            <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={companyLink.link.id}>
-                                                <motion.div
-                                                    initial={{ opacity: 0, scale: 0.9 }}
-                                                    animate={{ opacity: 1, scale: 1 }}
-                                                    transition={{
-                                                        duration: 0.5,
-                                                        delay: 0.2 + index * 0.1,
-                                                    }}
-                                                    whileHover={{ y: -10 }}
-                                                >
-                                                    <Card
-                                                        sx={{
-                                                            aspectRatio: '9/16',
-                                                            borderRadius: '20px',
-                                                            overflow: 'hidden',
-                                                            bgcolor: '#010101',
-                                                            border: '2px solid rgba(255,255,255,0.05)',
-                                                            position: 'relative',
-                                                            boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
-                                                            transition: 'all 0.3s ease',
-                                                            '&:hover': {
-                                                                borderColor: 'var(--brand)',
-                                                                boxShadow: '0 0 30px rgba(220,38,38,0.3)',
-                                                            },
-                                                        }}
-                                                    >
-                                                        {/* Floating TikTok Actions */}
-                                                        <Box
-                                                            sx={{
-                                                                position: 'absolute',
-                                                                right: 12,
-                                                                bottom: 80,
-                                                                display: 'flex',
-                                                                flexDirection: 'column',
-                                                                gap: 2,
-                                                                zIndex: 20,
-                                                                alignItems: 'center',
-                                                            }}
-                                                        >
-                                                            <Box sx={{ position: 'relative', mb: 1 }}>
-                                                                <Avatar
-                                                                    src={company.logo || ''}
-                                                                    sx={{
-                                                                        width: 45,
-                                                                        height: 45,
-                                                                        border: '2px solid white',
-                                                                        boxShadow: '0 0 10px rgba(0,0,0,0.5)',
-                                                                    }}
-                                                                />
-                                                                <Box
-                                                                    sx={{
-                                                                        position: 'absolute',
-                                                                        bottom: -10,
-                                                                        left: '50%',
-                                                                        transform: 'translateX(-50%)',
-                                                                        bgcolor: '#ff0050',
-                                                                        color: 'white',
-                                                                        borderRadius: '50%',
-                                                                        width: 20,
-                                                                        height: 20,
-                                                                        display: 'flex',
-                                                                        justifyContent: 'center',
-                                                                        alignItems: 'center',
-                                                                        fontSize: '14px',
-                                                                        fontWeight: 'bold',
-                                                                        border: '2px solid white',
-                                                                    }}
-                                                                >
-                                                                    +
-                                                                </Box>
-                                                            </Box>
-
-                                                            <Box sx={{ textAlign: 'center' }}>
-                                                                <IconButton sx={{ color: 'white', p: 0.5 }}>
-                                                                    <FavoriteBorder
-                                                                        sx={{ fontSize: 32, filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))' }}
-                                                                    />
-                                                                </IconButton>
-                                                                <Typography
-                                                                    variant="caption"
-                                                                    sx={{ color: 'white', display: 'block', fontWeight: 600 }}
-                                                                >
-                                                                    {Math.floor(Math.random() * 50) + 1}k
-                                                                </Typography>
-                                                            </Box>
-
-                                                            <Box sx={{ textAlign: 'center' }}>
-                                                                <IconButton sx={{ color: 'white', p: 0.5 }}>
-                                                                    <ChatBubbleOutline
-                                                                        sx={{ fontSize: 32, filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))' }}
-                                                                    />
-                                                                </IconButton>
-                                                                <Typography
-                                                                    variant="caption"
-                                                                    sx={{ color: 'white', display: 'block', fontWeight: 600 }}
-                                                                >
-                                                                    {Math.floor(Math.random() * 500) + 1}
-                                                                </Typography>
-                                                            </Box>
-
-                                                            <Box sx={{ textAlign: 'center' }}>
-                                                                <IconButton sx={{ color: 'white', p: 0.5 }}>
-                                                                    <Share sx={{ fontSize: 32, filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))' }} />
-                                                                </IconButton>
-                                                                <Typography
-                                                                    variant="caption"
-                                                                    sx={{ color: 'white', display: 'block', fontWeight: 600 }}
-                                                                >
-                                                                    Compartir
-                                                                </Typography>
-                                                            </Box>
-                                                        </Box>
-
-                                                        <iframe
-                                                            src={getEmbedUrl(companyLink.link.link)}
-                                                            title={`Video de TikTok para ${name}`}
-                                                            width="100%"
-                                                            height="100%"
-                                                            style={{
-                                                                border: 'none',
-                                                                display: 'block',
-                                                            }}
-                                                            allowFullScreen
-                                                        />
-
-                                                        {/* TikTok Style Overlay (optional info) */}
-                                                        <Box
-                                                            sx={{
-                                                                position: 'absolute',
-                                                                bottom: 0,
-                                                                left: 0,
-                                                                right: 0,
-                                                                p: 2,
-                                                                background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)',
-                                                                pointerEvents: 'none',
-                                                                zIndex: 10,
-                                                            }}
-                                                        >
-                                                            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>
-                                                                {companyLink.link.detalle || 'Ver en TikTok'}
-                                                            </Typography>
-                                                        </Box>
-                                                    </Card>
-                                                </motion.div>
-                                            </Grid>
-                                        ),
-                                )
-                            ) : (
-                                <Grid size={{ xs: 12 }}>
-                                    <motion.div
-                                        initial={{ opacity: 0, y: 30 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ duration: 0.8, delay: 1 }}
-                                    >
-                                        <Box
-                                            sx={{
-                                                textAlign: 'center',
-                                                py: { xs: 6, md: 8 },
-                                                px: { xs: 2, sm: 0 },
-                                            }}
-                                        >
-                                            <motion.div
-                                                animate={{
-                                                    scale: [1, 1.1, 1],
-                                                    opacity: [0.7, 1, 0.7],
-                                                }}
-                                                transition={{
-                                                    duration: 2,
-                                                    repeat: Infinity,
-                                                    ease: 'easeInOut',
-                                                }}
-                                            >
-                                                <PlayCircleOutline
-                                                    sx={{
-                                                        fontSize: { xs: '3rem', md: '4rem' },
-                                                        color: 'rgba(255,0,127,0.6)',
-                                                        mb: 2,
-                                                        filter: 'drop-shadow(0 0 20px rgba(255,0,127,0.3))',
-                                                    }}
-                                                />
-                                            </motion.div>
-
-                                            <Typography
-                                                variant="h6"
-                                                align="center"
-                                                sx={{
-                                                    color: 'rgba(255,255,255,0.8)',
-                                                    fontSize: { xs: '1.1rem', md: '1.3rem' },
-                                                    fontWeight: 300,
-                                                    textShadow: '0 2px 10px rgba(0,0,0,0.5)',
-                                                    background: 'background.paper',
-                                                    backdropFilter: 'blur(10px)',
-                                                    border: '1px solid var(--brand)',
-                                                    borderRadius: 2,
-                                                    p: { xs: 3, md: 4 },
-                                                    maxWidth: 500,
-                                                    mx: 'auto',
-                                                }}
-                                            >
-                                                No hay videos de TikTok disponibles para esta empresa.
-                                            </Typography>
-                                        </Box>
-                                    </motion.div>
-                                </Grid>
-                            )}
-                        </Grid>
+            <main className="container mx-auto px-4 py-12 md:py-20">
+                {/* Header Section */}
+                <div className="relative mb-16 text-center">
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.7, delay: 0.2 }}
+                        className="mb-4"
+                    >
+                        <h1 className="font-orbitron from-brand animate-gradient-x bg-gradient-to-r via-red-500 to-purple-600 bg-clip-text text-4xl font-black tracking-tighter text-transparent sm:text-5xl md:text-7xl">
+                            VIDEOS PARA {name.toUpperCase()}
+                        </h1>
                     </motion.div>
-                </Container>
-            </Box>
 
-            <Box className="bg-black" sx={{ mt: { xs: 4, md: 8 } }}>
-                <Footer />
-            </Box>
-        </>
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.4 }}>
+                        <p className="text-muted-foreground mx-auto max-w-2xl text-lg md:text-xl">
+                            Explora la colección de contenido estratégico creado exclusivamente para potenciar la presencia digital de esta marca.
+                        </p>
+                    </motion.div>
+
+                    {/* Decorative Elements */}
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.8, delay: 0.6 }}
+                        className="mt-8 flex items-center justify-center gap-4"
+                    >
+                        <div className="bg-brand/20 h-px w-12 md:w-20" />
+                        <div className="bg-brand/10 ring-brand/20 rounded-full p-3 ring-1">
+                            <Play className="fill-brand text-brand h-6 w-6" />
+                        </div>
+                        <div className="bg-brand/20 h-px w-12 md:w-20" />
+                    </motion.div>
+                </div>
+
+                {/* Videos Grid */}
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                    <AnimatePresence>
+                        {link_comprobantes.length > 0 ? (
+                            link_comprobantes.map(
+                                (companyLink, index) =>
+                                    companyLink.link && (
+                                        <motion.div
+                                            key={companyLink.link.id}
+                                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                                            transition={{
+                                                duration: 0.5,
+                                                delay: 0.1 * index,
+                                            }}
+                                            whileHover={{ y: -10 }}
+                                            className="group relative"
+                                        >
+                                            <Card className="hover:border-brand/50 hover:shadow-brand/20 aspect-[9/16] overflow-hidden rounded-[2.5rem] border-white/5 bg-[#010101] shadow-2xl transition-all duration-300">
+                                                <CardContent className="h-full p-0">
+                                                    {/* Floating TikTok Actions */}
+                                                    <div className="absolute right-4 bottom-24 z-20 flex flex-col items-center gap-6">
+                                                        <div className="relative mb-2">
+                                                            <Avatar className="h-12 w-12 border-2 border-white shadow-lg">
+                                                                <AvatarImage src={company.logo || ''} />
+                                                                <AvatarFallback className="bg-brand font-bold text-white">
+                                                                    {name.substring(0, 2).toUpperCase()}
+                                                                </AvatarFallback>
+                                                            </Avatar>
+                                                            <div className="bg-brand absolute -bottom-2 translate-x-[75%] rounded-full border-2 border-white px-1 text-[10px] font-bold text-white">
+                                                                +
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="flex flex-col items-center">
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                className="text-white transition-transform group-hover:scale-110 hover:bg-transparent"
+                                                            >
+                                                                <Heart className="h-8 w-8 drop-shadow-md" />
+                                                            </Button>
+                                                            <span className="text-[12px] font-bold text-white drop-shadow-md">
+                                                                {Math.floor(Math.random() * 50) + 1}k
+                                                            </span>
+                                                        </div>
+
+                                                        <div className="flex flex-col items-center">
+                                                            <Button variant="ghost" size="icon" className="text-white hover:bg-transparent">
+                                                                <MessageCircle className="h-8 w-8 drop-shadow-md" />
+                                                            </Button>
+                                                            <span className="text-[12px] font-bold text-white drop-shadow-md">
+                                                                {Math.floor(Math.random() * 500) + 1}
+                                                            </span>
+                                                        </div>
+
+                                                        <div className="flex flex-col items-center">
+                                                            <Button variant="ghost" size="icon" className="text-white hover:bg-transparent">
+                                                                <Share2 className="h-8 w-8 drop-shadow-md" />
+                                                            </Button>
+                                                            <span className="text-[10px] font-bold text-white drop-shadow-md">Share</span>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Video Iframe */}
+                                                    <iframe
+                                                        src={getEmbedUrl(companyLink.link.link)}
+                                                        title={`Video de TikTok para ${name}`}
+                                                        className="h-full w-full"
+                                                        style={{ border: 'none' }}
+                                                        allowFullScreen
+                                                    />
+
+                                                    {/* Video Description Overlay */}
+                                                    <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6 pt-12">
+                                                        <h4 className="mb-2 font-bold text-white">@{name.replace(/\s+/g, '').toLowerCase()}</h4>
+                                                        <p className="line-clamp-2 text-sm text-white/90">
+                                                            {companyLink.link.detalle || 'Descubre nuestro último trabajo creativo.'}
+                                                        </p>
+                                                        <div className="mt-3 flex items-center gap-2 overflow-hidden text-sm text-white/70">
+                                                            <div className="animate-marquee whitespace-nowrap">
+                                                                🎵 Original Sound - {name} - Marketing Agency
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </CardContent>
+                                            </Card>
+                                        </motion.div>
+                                    ),
+                            )
+                        ) : (
+                            <div className="col-span-full py-20 text-center">
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    className="bg-muted/30 mx-auto max-w-md rounded-3xl border border-dashed p-12"
+                                >
+                                    <Play className="bg-brand/10 text-brand mx-auto mb-6 h-16 w-16 rounded-full p-4" />
+                                    <h3 className="mb-2 text-2xl font-bold">Sin videos disponibles</h3>
+                                    <p className="text-muted-foreground">Pronto compartiremos el contenido estratégico de esta empresa.</p>
+                                </motion.div>
+                            </div>
+                        )}
+                    </AnimatePresence>
+                </div>
+            </main>
+
+            <Footer />
+        </div>
     );
 }

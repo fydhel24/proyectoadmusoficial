@@ -61,7 +61,7 @@ class ContactController extends Controller
 
         Contact::create($request->all());
 
-        return redirect()->route('contacts.index')->with('success', 'Contacto creado exitosamente');
+        return back()->with('success', '¡Gracias! Nos pondremos en contacto contigo pronto.');
     }
 
     public function edit(Contact $contact)

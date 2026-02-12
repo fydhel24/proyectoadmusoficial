@@ -45,7 +45,7 @@ export default function PublicContact() {
                 setTimeout(() => {
                     window.open(whatsappUrl, '_blank');
                     window.location.href = '/';
-                }, 2000);
+                }, 500);
             },
             onError: () => {
                 toast.error('Por favor, verifica los campos del formulario.');

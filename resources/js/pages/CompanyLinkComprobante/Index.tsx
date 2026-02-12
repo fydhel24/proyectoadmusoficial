@@ -3,10 +3,10 @@
 import AppLayout from '@/layouts/app-layout';
 import { Head, useForm } from '@inertiajs/react';
 import {
-    AlertCircle,
     Building2,
     Calendar,
-    CheckCircle,
+    ChevronLeft,
+    ChevronRight,
     ExternalLink,
     FileText,
     Filter,
@@ -19,6 +19,15 @@ import {
     X,
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
+
+// Shadcn UI Components
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { toast } from 'sonner';
 
 // Types
 interface Company {
@@ -75,7 +84,6 @@ export default function Index({ empresas, registros }: Props) {
 
     // Component state
     const [empresaNombre, setEmpresaNombre] = useState('');
-    const [notificaciones, setNotificaciones] = useState<string | null>(null);
     const [allRegistros, setAllRegistros] = useState(registros);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterMes, setFilterMes] = useState('');
@@ -126,8 +134,15 @@ export default function Index({ empresas, registros }: Props) {
     };
 
     const showNotification = (message: string) => {
-        setNotificaciones(message);
-        setTimeout(() => setNotificaciones(null), 3000);
+        if (message.includes('✅')) {
+            toast.success(message.replace('✅', '').trim());
+        } else if (message.includes('❌')) {
+            toast.error(message.replace('❌', '').trim());
+        } else if (message.includes('🗑')) {
+            toast.info(message.replace('🗑', '').trim());
+        } else {
+            toast(message);
+        }
     };
 
     const clearFilters = () => {
@@ -269,420 +284,417 @@ export default function Index({ empresas, registros }: Props) {
         <AppLayout>
             <Head title="Links por Empresa" />
 
-            {/* Header con gradiente mejorado */}
-            <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white shadow-2xl">
-                <div className="px-6 py-10">
-                    <div className="mb-4 flex items-center gap-4">
-                        <div className="rounded-2xl bg-white/20 p-3 backdrop-blur-sm">
-                            <LinkIcon className="h-10 w-10" />
+            {/* Header Moderno */}
+            <div className="bg-background relative overflow-hidden border-b px-6 py-8">
+                <div className="relative z-10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <div className="flex items-center gap-4">
+                        <div className="bg-primary/10 text-primary ring-primary/20 rounded-xl p-3 ring-1">
+                            <LinkIcon className="h-8 w-8" />
                         </div>
                         <div>
-                            <h1 className="text-4xl font-bold tracking-tight">Gestión de Links</h1>
-                            <p className="mt-2 text-xl text-blue-100">Administra los enlaces y comprobantes de cada empresa</p>
+                            <h1 className="text-foreground text-3xl font-bold tracking-tight">Gestión de Links</h1>
+                            <p className="text-muted-foreground">Administra los enlaces y comprobantes de cada empresa de forma profesional</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div className="min-h-screen space-y-8 bg-gradient-to-br from-gray-50 to-blue-50/30 p-6">
-                {/* Notificaciones mejoradas */}
-                {notificaciones && (
-                    <div className="animate-in slide-in-from-right fixed top-4 right-4 z-50 duration-300">
-                        <div
-                            className={`rounded-xl border-l-4 p-4 shadow-2xl backdrop-blur-sm ${
-                                notificaciones.includes('❌')
-                                    ? 'border-red-500 bg-red-50/90 text-red-800'
-                                    : 'border-green-500 bg-green-50/90 text-green-800'
-                            }`}
-                        >
-                            <div className="flex items-center gap-3">
-                                {notificaciones.includes('❌') ? <AlertCircle className="h-5 w-5" /> : <CheckCircle className="h-5 w-5" />}
-                                <span className="font-medium">{notificaciones}</span>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {/* Estadísticas mejoradas */}
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-                    <div className="group rounded-2xl border border-blue-100/50 bg-white/80 p-6 shadow-lg backdrop-blur-sm transition-all hover:scale-105 hover:shadow-2xl">
-                        <div className="flex items-center gap-4">
-                            <div className="rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 p-4 shadow-lg">
-                                <Building2 className="h-7 w-7 text-white" />
-                            </div>
-                            <div>
-                                <p className="text-sm font-medium text-gray-600">Total Empresas</p>
-                                <p className="text-3xl font-bold text-gray-900">{empresas.length}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="group rounded-2xl border border-green-100/50 bg-white/80 p-6 shadow-lg backdrop-blur-sm transition-all hover:scale-105 hover:shadow-2xl">
-                        <div className="flex items-center gap-4">
-                            <div className="rounded-xl bg-gradient-to-br from-green-500 to-green-600 p-4 shadow-lg">
-                                <LinkIcon className="h-7 w-7 text-white" />
-                            </div>
-                            <div>
-                                <p className="text-sm font-medium text-gray-600">Total Links</p>
-                                <p className="text-3xl font-bold text-gray-900">{allRegistros.length}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="group rounded-2xl border border-purple-100/50 bg-white/80 p-6 shadow-lg backdrop-blur-sm transition-all hover:scale-105 hover:shadow-2xl">
-                        <div className="flex items-center gap-4">
-                            <div className="rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 p-4 shadow-lg">
-                                <VideoIcon className="h-7 w-7 text-white" />
-                            </div>
-                            <div>
-                                <p className="text-sm font-medium text-gray-600">Videos Activos</p>
-                                <p className="text-3xl font-bold text-gray-900">{filteredRegistros.length}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Formulario mejorado */}
-                <div className="overflow-hidden rounded-2xl border border-gray-200/50 bg-white/80 shadow-2xl backdrop-blur-sm">
-                    <div className="border-b border-blue-200/50 bg-gradient-to-r from-blue-50/80 to-indigo-50/80 px-8 py-6">
-                        <div className="flex items-center gap-4">
-                            <div className="rounded-xl bg-blue-600 p-3">
-                                <Plus className="h-6 w-6 text-white" />
-                            </div>
-                            <div>
-                                <h2 className="text-2xl font-bold text-blue-900">Agregar Nuevo Link</h2>
-                                <p className="mt-1 text-blue-700">Completa la información para registrar un nuevo enlace</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <form onSubmit={handleSubmit} className="p-8">
-                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                            {/* Empresa */}
-                            <div className="space-y-3">
-                                <label className="flex items-center gap-2 text-sm font-bold text-gray-700">
-                                    <Building2 className="h-5 w-5 text-blue-600" />
-                                    Empresa *
-                                </label>
-                                <input
-                                    list="empresa-list"
-                                    className="w-full rounded-xl border-2 border-gray-200 p-4 text-sm transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20"
-                                    value={empresaNombre}
-                                    onChange={(e) => {
-                                        const nombre = e.target.value;
-                                        setEmpresaNombre(nombre);
-                                        const idEncontrado = getEmpresaIdByName(nombre);
-                                        setData('company_id', idEncontrado);
-                                    }}
-                                    required
-                                    placeholder="Selecciona una empresa..."
-                                />
-                                <datalist id="empresa-list">
-                                    {empresas.map((e) => (
-                                        <option key={e.id} value={e.name} />
-                                    ))}
-                                </datalist>
-                            </div>
-                            <div className="space-y-3">
-                                <label className="flex items-center gap-2 text-sm font-bold text-gray-700">
-                                            <LinkIcon className="h-5 w-5 text-blue-600" />
-                                            Link *
-                                        </label>
-                                        <input
-                                            type="url"
-                                            className="w-full rounded-xl border-2 border-gray-200 p-4 text-sm transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20"
-                                            value={data.link}
-                                            onChange={(e) => setData('link', e.target.value)}
-                                            required
-                                            placeholder="https://www.tiktok.com/"
-                                        />
-                            </div>
-                            {/* Mes */}
-                            <div className="space-y-3">
-                                <label className="flex items-center gap-2 text-sm font-bold text-gray-700">
-                                    <Calendar className="h-5 w-5 text-blue-600" />
-                                    Mes *
-                                </label>
-                                <select
-                                    className="w-full rounded-xl border-2 border-gray-200 p-4 text-sm transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20"
-                                    value={data.mes}
-                                    onChange={(e) => setData('mes', e.target.value)}
-                                    required
-                                >
-                                    <option value="">Seleccione mes</option>
-                                    {MESES.map((m) => (
-                                        <option key={m} value={m}>
-                                            {m}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            {/* Fecha */}
-                            <div className="space-y-3" hidden>
-                                <label className="flex items-center gap-2 text-sm font-bold text-gray-700">
-                                    <Calendar className="h-5 w-5 text-blue-600" />
-                                    Fecha *
-                                </label>
-                                <input
-                                    type="date"
-                                    className="w-full rounded-xl border-2 border-gray-200 p-4 text-sm transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20"
-                                    value={data.fecha}
-                                    onChange={(e) => setData('fecha', e.target.value)}
-                                    required
-                                />
-                            </div>
-                        </div>
-
-                        <div className="mt-8 flex justify-end">
-                            <button
-                                type="submit"
-                                disabled={processing}
-                                className="flex items-center gap-3 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-4 font-bold text-white shadow-xl transition-all duration-200 hover:scale-105 hover:from-blue-700 hover:to-blue-800 hover:shadow-2xl disabled:cursor-not-allowed disabled:opacity-50"
-                            >
-                                <Save className="h-5 w-5" />
-                                {processing ? 'Guardando...' : 'Guardar Link'}
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
-                {/* Tabla con buscador y filtros */}
-                <div className="overflow-hidden rounded-2xl border border-gray-200/50 bg-white/80 shadow-2xl backdrop-blur-sm">
-                    {/* Header con controles */}
-                    <div className="border-b border-blue-200/50 bg-gradient-to-r from-blue-50/80 to-indigo-50/80 px-8 py-6">
-                        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="bg-muted/30 min-h-screen space-y-8 p-6">
+                {/* Estadísticas Modernas */}
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
+                    <Card className="transition-shadow hover:shadow-md">
+                        <CardContent className="p-6">
                             <div className="flex items-center gap-4">
-                                <div className="rounded-xl bg-blue-600 p-3">
-                                    <FileText className="h-6 w-6 text-white" />
+                                <div className="rounded-lg bg-blue-500/10 p-3 text-blue-600">
+                                    <Building2 className="h-6 w-6" />
                                 </div>
-                                <div>
-                                    <h3 className="text-2xl font-bold text-blue-900">Registros Existentes</h3>
-                                    <p className="text-blue-700">
-                                        Mostrando {paginatedRegistros.length} de {filteredRegistros.length} registros
-                                    </p>
+                                <div className="space-y-1">
+                                    <p className="text-muted-foreground text-sm font-medium">Total Empresas</p>
+                                    <p className="text-2xl font-bold">{empresas.length}</p>
                                 </div>
                             </div>
+                        </CardContent>
+                    </Card>
 
-                            <div className="flex flex-col gap-3 sm:flex-row">
-                                {/* Buscador */}
-                                <div className="relative">
-                                    <Search className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-gray-400" />
-                                    <input
-                                        type="text"
-                                        placeholder="Buscar por empresa, link"
-                                        className="w-full rounded-xl border-2 border-gray-200 py-3 pr-4 pl-10 text-sm transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 sm:w-80"
-                                        value={searchTerm}
+                    <Card className="transition-shadow hover:shadow-md">
+                        <CardContent className="p-6">
+                            <div className="flex items-center gap-4">
+                                <div className="rounded-lg bg-green-500/10 p-3 text-green-600">
+                                    <LinkIcon className="h-6 w-6" />
+                                </div>
+                                <div className="space-y-1">
+                                    <p className="text-muted-foreground text-sm font-medium">Total Links</p>
+                                    <p className="text-2xl font-bold">{allRegistros.length}</p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="transition-shadow hover:shadow-md sm:col-span-2 md:col-span-1">
+                        <CardContent className="p-6">
+                            <div className="flex items-center gap-4">
+                                <div className="rounded-lg bg-purple-500/10 p-3 text-purple-600">
+                                    <VideoIcon className="h-6 w-6" />
+                                </div>
+                                <div className="space-y-1">
+                                    <p className="text-muted-foreground text-sm font-medium">Resultados Filtrados</p>
+                                    <p className="text-2xl font-bold text-purple-600">{filteredRegistros.length}</p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                {/* Formulario Moderno */}
+                <Card className="border-none shadow-lg">
+                    <CardHeader className="bg-muted/20 border-b pb-6">
+                        <div className="flex items-center gap-3">
+                            <div className="bg-primary text-primary-foreground rounded-lg p-2">
+                                <Plus className="h-5 w-5" />
+                            </div>
+                            <div>
+                                <CardTitle className="text-xl">Agregar Nuevo Link</CardTitle>
+                                <CardDescription>Completa la información para registrar un nuevo enlace de empresa</CardDescription>
+                            </div>
+                        </div>
+                    </CardHeader>
+                    <CardContent className="pt-6">
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                                {/* Empresa */}
+                                <div className="space-y-2">
+                                    <Label htmlFor="company" className="flex items-center gap-2">
+                                        <Building2 className="text-muted-foreground h-4 w-4" />
+                                        Empresa <span className="text-destructive">*</span>
+                                    </Label>
+                                    <Input
+                                        id="company"
+                                        list="empresa-list"
+                                        value={empresaNombre}
                                         onChange={(e) => {
-                                            setSearchTerm(e.target.value);
-                                            setCurrentPage(1);
+                                            const nombre = e.target.value;
+                                            setEmpresaNombre(nombre);
+                                            const idEncontrado = getEmpresaIdByName(nombre);
+                                            setData('company_id', idEncontrado);
                                         }}
+                                        required
+                                        placeholder="Selecciona o busca una empresa..."
+                                        className="h-11"
+                                    />
+                                    <datalist id="empresa-list">
+                                        {empresas.map((e) => (
+                                            <option key={e.id} value={e.name} />
+                                        ))}
+                                    </datalist>
+                                </div>
+
+                                {/* Link */}
+                                <div className="space-y-2">
+                                    <Label htmlFor="link" className="flex items-center gap-2">
+                                        <LinkIcon className="text-muted-foreground h-4 w-4" />
+                                        Link del Video <span className="text-destructive">*</span>
+                                    </Label>
+                                    <Input
+                                        id="link"
+                                        type="url"
+                                        value={data.link}
+                                        onChange={(e) => setData('link', e.target.value)}
+                                        required
+                                        placeholder="https://www.tiktok.com/..."
+                                        className="h-11"
                                     />
                                 </div>
 
-                                {/* Toggle filtros */}
-                                <button
-                                    onClick={() => setShowFilters(!showFilters)}
-                                    className="flex items-center gap-2 rounded-xl border-2 border-gray-200 px-4 py-3 text-sm font-medium transition-all hover:bg-gray-50"
-                                >
-                                    <Filter className="h-4 w-4" />
-                                    Filtros
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Panel de filtros */}
-                        {showFilters && (
-                            <div className="mt-6 rounded-xl bg-white/50 p-6 backdrop-blur-sm">
-                                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                                    <div>
-                                        <label className="mb-2 block text-sm font-medium text-gray-700">Filtrar por empresa</label>
-                                        <select
-                                            className="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
-                                            value={filterEmpresa}
-                                            onChange={(e) => {
-                                                setFilterEmpresa(e.target.value);
-                                                setCurrentPage(1);
-                                            }}
-                                        >
-                                            <option value="">Todas las empresas</option>
-                                            {empresas.map((e) => (
-                                                <option key={e.id} value={e.id}>
-                                                    {e.name}
-                                                </option>
+                                {/* Mes */}
+                                <div className="space-y-2">
+                                    <Label htmlFor="mes" className="flex items-center gap-2">
+                                        <Calendar className="text-muted-foreground h-4 w-4" />
+                                        Mes de Referencia <span className="text-destructive">*</span>
+                                    </Label>
+                                    <Select value={data.mes} onValueChange={(val) => setData('mes', val)}>
+                                        <SelectTrigger id="mes" className="h-11">
+                                            <SelectValue placeholder="Seleccione mes" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {MESES.map((m) => (
+                                                <SelectItem key={m} value={m}>
+                                                    {m}
+                                                </SelectItem>
                                             ))}
-                                        </select>
-                                    </div>
-
-                                    <div>
-                                        <label className="mb-2 block text-sm font-medium text-gray-700">Filtrar por mes</label>
-                                        <select
-                                            className="w-full rounded-lg border-2 border-gray-200 p-3 text-sm"
-                                            value={filterMes}
-                                            onChange={(e) => {
-                                                setFilterMes(e.target.value);
-                                                setCurrentPage(1);
-                                            }}
-                                        >
-                                            <option value="">Todos los meses</option>
-                                            {MESES.map((mes) => (
-                                                <option key={mes} value={mes}>
-                                                    {mes}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-
-                                    <div className="flex items-end">
-                                        <button
-                                            onClick={clearFilters}
-                                            className="flex items-center gap-2 rounded-lg bg-gray-100 px-4 py-3 text-sm font-medium text-gray-700 transition-all hover:bg-gray-200"
-                                        >
-                                            <X className="h-4 w-4" />
-                                            Limpiar filtros
-                                        </button>
-                                    </div>
+                                        </SelectContent>
+                                    </Select>
                                 </div>
                             </div>
-                        )}
-                    </div>
 
-                    {/* Tabla */}
-                    <div className="overflow-x-auto">
-                        <table className="w-full">
-                            <thead>
-                                <tr className="bg-gradient-to-r from-gray-50 to-blue-50">
-                                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-700">
-                                        <div className="flex items-center gap-2">
-                                            <Building2 className="h-4 w-4" />
-                                            Empresa
-                                        </div>
-                                    </th>
-                                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-700">
-                                        <div className="flex items-center gap-2">
-                                            <LinkIcon className="h-4 w-4" />
-                                            Link
-                                        </div>
-                                    </th>
-                                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-700">
-                                        <div className="flex items-center gap-2">
-                                            <Calendar className="h-4 w-4" />
-                                            Mes
-                                        </div>
-                                    </th>
-                                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-700">Fecha</th>
-                                    <th className="px-6 py-4 text-center text-sm font-bold text-gray-700">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-100">
-                                {paginatedRegistros.map((r, index) => (
-                                    <tr
-                                        key={r.id}
-                                        className={`transition-all duration-200 hover:bg-blue-50/50 ${
-                                            index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'
-                                        }`}
-                                    >
-                                        {/* Empresa */}
-                                        <td className="px-6 py-4">
-                                            <select
-                                                className="w-full rounded-lg border-2 border-gray-200 p-3 text-sm transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20"
-                                                value={inlineData[r.id]?.company_id || ''}
-                                                onChange={(e) => handleInlineChange(r.id, 'company_id', e.target.value)}
-                                                onBlur={() => handleInlineSave(r.id)}
-                                            >
-                                                {empresas.map((e) => (
-                                                    <option key={e.id} value={e.id}>
-                                                        {e.name}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </td>
-
-                                        {/* Link */}
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-3">
-                                                <input
-                                                    type="url"
-                                                    className="flex-1 rounded-lg border-2 border-gray-200 p-3 text-sm transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20"
-                                                    value={inlineData[r.id]?.link || ''}
-                                                    onChange={(e) => handleInlineChange(r.id, 'link', e.target.value)}
-                                                    onBlur={() => handleInlineSave(r.id)}
-                                                />
-                                                {inlineData[r.id]?.link && (
-                                                    <a
-                                                        href={inlineData[r.id]?.link}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="rounded-lg p-3 text-blue-600 transition-all hover:bg-blue-50 hover:text-blue-800"
-                                                    >
-                                                        <ExternalLink className="h-4 w-4" />
-                                                    </a>
-                                                )}
-                                            </div>
-                                        </td>
-
-                                        {/* Mes */}
-                                        <td className="px-6 py-4">
-                                            <select
-                                                className="w-full rounded-lg border-2 border-gray-200 p-3 text-sm transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20"
-                                                value={inlineData[r.id]?.mes || ''}
-                                                onChange={(e) => handleInlineChange(r.id, 'mes', e.target.value)}
-                                                onBlur={() => handleInlineSave(r.id)}
-                                            >
-                                                {MESES.map((mes) => (
-                                                    <option key={mes} value={mes}>
-                                                        {mes}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </td>
-
-                                        {/* Fecha */}
-                                        <td className="px-6 py-4">
-                                            <input
-                                                type="date"
-                                                className="w-full rounded-lg border-2 border-gray-200 p-3 text-sm transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20"
-                                                value={inlineData[r.id]?.fecha || ''}
-                                                onChange={(e) => handleInlineChange(r.id, 'fecha', e.target.value)}
-                                                onBlur={() => handleInlineSave(r.id)}
-                                            />
-                                        </td>
-
-                                        {/* Acciones */}
-                                        <td className="px-6 py-4 text-center">
-                                            <button
-                                                onClick={() => eliminarRegistro(r.id)}
-                                                className="rounded-lg bg-red-100 p-2 text-red-600 transition-all hover:bg-red-200"
-                                                title="Eliminar"
-                                            >
-                                                <Trash2 className="h-5 w-5" />
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                        {/* Paginación */}
-                        <div className="flex items-center justify-between border-t border-gray-200 bg-white/50 p-6 backdrop-blur-sm">
-                            <div className="text-sm text-gray-600">
-                                Página {currentPage} de {totalPages}
+                            <div className="flex justify-end pt-2">
+                                <Button type="submit" disabled={processing} size="lg" className="gap-2 px-8">
+                                    <Save className="h-4 w-4" />
+                                    {processing ? 'Guardando...' : 'Guardar Información'}
+                                </Button>
                             </div>
-                            <div className="flex items-center gap-3">
-                                {Array.from({ length: totalPages }, (_, i) => (
-                                    <button
-                                        key={i + 1}
-                                        onClick={() => handlePageChange(i + 1)}
-                                        className={`rounded-lg px-4 py-2 transition-all ${
-                                            currentPage === i + 1 ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-blue-50'
-                                        }`}
-                                    >
-                                        {i + 1}
-                                    </button>
-                                ))}
+                        </form>
+                    </CardContent>
+                </Card>
+
+                {/* Listado Moderno */}
+                <Card className="border-none shadow-lg">
+                    <CardHeader className="bg-muted/20 flex flex-col gap-4 space-y-0 border-b pb-6 md:flex-row md:items-center md:justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="bg-primary/10 text-primary rounded-lg p-2">
+                                <FileText className="h-5 w-5" />
+                            </div>
+                            <div>
+                                <CardTitle className="text-xl">Empresas y Links</CardTitle>
+                                <CardDescription>
+                                    Mostrando {paginatedRegistros.length} de {filteredRegistros.length} registros encontrados
+                                </CardDescription>
                             </div>
                         </div>
-                    </div>
-                </div>
+
+                        <div className="flex flex-col gap-3 sm:flex-row">
+                            <div className="relative">
+                                <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+                                <Input
+                                    placeholder="Buscar empresa o link..."
+                                    className="h-10 w-full pl-9 sm:w-[300px]"
+                                    value={searchTerm}
+                                    onChange={(e) => {
+                                        setSearchTerm(e.target.value);
+                                        setCurrentPage(1);
+                                    }}
+                                />
+                            </div>
+                            <Button variant="outline" className="h-10 gap-2" onClick={() => setShowFilters(!showFilters)}>
+                                <Filter className="h-4 w-4" />
+                                {showFilters ? 'Ocultar Filtros' : 'Filtros'}
+                            </Button>
+                        </div>
+                    </CardHeader>
+
+                    {showFilters && (
+                        <div className="bg-muted/10 animate-in fade-in slide-in-from-top-2 border-b p-6 duration-300">
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                                <div className="space-y-2">
+                                    <Label className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
+                                        Filtrar por empresa
+                                    </Label>
+                                    <Select
+                                        value={filterEmpresa}
+                                        onValueChange={(val) => {
+                                            setFilterEmpresa(val);
+                                            setCurrentPage(1);
+                                        }}
+                                    >
+                                        <SelectTrigger className="bg-background">
+                                            <SelectValue placeholder="Todas las empresas" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">Todas las empresas</SelectItem>
+                                            {empresas.map((e) => (
+                                                <SelectItem key={e.id} value={e.id.toString()}>
+                                                    {e.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">Filtrar por mes</Label>
+                                    <Select
+                                        value={filterMes}
+                                        onValueChange={(val) => {
+                                            setFilterMes(val === 'all' ? '' : val);
+                                            setCurrentPage(1);
+                                        }}
+                                    >
+                                        <SelectTrigger className="bg-background">
+                                            <SelectValue placeholder="Todos los meses" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">Todos los meses</SelectItem>
+                                            {MESES.map((mes) => (
+                                                <SelectItem key={mes} value={mes}>
+                                                    {mes}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                <div className="flex items-end">
+                                    <Button variant="ghost" className="text-muted-foreground hover:text-foreground h-10 gap-2" onClick={clearFilters}>
+                                        <X className="h-4 w-4" />
+                                        Limpiar filtros
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    <CardContent className="p-0">
+                        <div className="overflow-x-auto">
+                            <Table>
+                                <TableHeader className="bg-muted/30">
+                                    <TableRow>
+                                        <TableHead className="w-[200px] font-semibold">Empresa</TableHead>
+                                        <TableHead className="font-semibold">Enlace del Video</TableHead>
+                                        <TableHead className="w-[150px] text-center font-semibold">Mes</TableHead>
+                                        <TableHead className="w-[150px] text-center font-semibold">Fecha</TableHead>
+                                        <TableHead className="w-[100px] text-right font-semibold">Acciones</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {paginatedRegistros.length > 0 ? (
+                                        paginatedRegistros.map((r) => (
+                                            <TableRow key={r.id} className="group hover:bg-muted/50 transition-colors">
+                                                <TableCell>
+                                                    <Select
+                                                        value={inlineData[r.id]?.company_id?.toString()}
+                                                        onValueChange={(val) => {
+                                                            handleInlineChange(r.id, 'company_id', val);
+                                                            setTimeout(() => handleInlineSave(r.id), 100);
+                                                        }}
+                                                    >
+                                                        <SelectTrigger className="hover:bg-background group-hover:bg-background h-9 border-none bg-transparent shadow-none focus:ring-1">
+                                                            <SelectValue />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {empresas.map((e) => (
+                                                                <SelectItem key={e.id} value={e.id.toString()}>
+                                                                    {e.name}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="flex items-center gap-2">
+                                                        <Input
+                                                            value={inlineData[r.id]?.link || ''}
+                                                            onChange={(e) => handleInlineChange(r.id, 'link', e.target.value)}
+                                                            onBlur={() => handleInlineSave(r.id)}
+                                                            className="hover:bg-background group-hover:bg-background h-9 border-none bg-transparent shadow-none focus:ring-1"
+                                                        />
+                                                        {inlineData[r.id]?.link && (
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                asChild
+                                                                className="text-primary hover:text-primary hover:bg-primary/10 h-8 w-8"
+                                                            >
+                                                                <a href={inlineData[r.id]?.link} target="_blank" rel="noopener noreferrer">
+                                                                    <ExternalLink className="h-4 w-4" />
+                                                                </a>
+                                                            </Button>
+                                                        )}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Select
+                                                        value={inlineData[r.id]?.mes}
+                                                        onValueChange={(val) => {
+                                                            handleInlineChange(r.id, 'mes', val);
+                                                            setTimeout(() => handleInlineSave(r.id), 100);
+                                                        }}
+                                                    >
+                                                        <SelectTrigger className="hover:bg-background group-hover:bg-background h-9 justify-center border-none bg-transparent text-center shadow-none focus:ring-1">
+                                                            <SelectValue />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {MESES.map((mes) => (
+                                                                <SelectItem key={mes} value={mes}>
+                                                                    {mes}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Input
+                                                        type="date"
+                                                        value={inlineData[r.id]?.fecha || ''}
+                                                        onChange={(e) => handleInlineChange(r.id, 'fecha', e.target.value)}
+                                                        onBlur={() => handleInlineSave(r.id)}
+                                                        className="hover:bg-background group-hover:bg-background h-9 border-none bg-transparent text-center shadow-none focus:ring-1"
+                                                    />
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={() => eliminarRegistro(r.id)}
+                                                        className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8 w-8"
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    ) : (
+                                        <TableRow>
+                                            <TableCell colSpan={5} className="text-muted-foreground h-24 text-center">
+                                                No se encontraron registros que coincidan con los criterios.
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    </CardContent>
+
+                    {/* Footer con Paginación Shadcn */}
+                    {totalPages > 1 && (
+                        <div className="bg-muted/10 flex items-center justify-between border-t p-6">
+                            <p className="text-muted-foreground text-sm">
+                                Página <span className="text-foreground font-medium">{currentPage}</span> de{' '}
+                                <span className="text-foreground font-medium">{totalPages}</span>
+                            </p>
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handlePageChange(currentPage - 1)}
+                                    disabled={currentPage === 1}
+                                    className="h-9 w-9 p-0"
+                                >
+                                    <ChevronLeft className="h-4 w-4" />
+                                </Button>
+                                <div className="flex items-center gap-1">
+                                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                                        // Simple logic to show pages around current
+                                        let pageNum = i + 1;
+                                        if (totalPages > 5 && currentPage > 3) {
+                                            pageNum = currentPage - 3 + i + 1;
+                                            if (pageNum > totalPages) pageNum = totalPages - 4 + i;
+                                        }
+
+                                        return (
+                                            <Button
+                                                key={pageNum}
+                                                variant={currentPage === pageNum ? 'default' : 'ghost'}
+                                                size="sm"
+                                                onClick={() => handlePageChange(pageNum)}
+                                                className="h-9 w-9 p-0"
+                                            >
+                                                {pageNum}
+                                            </Button>
+                                        );
+                                    })}
+                                </div>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handlePageChange(currentPage + 1)}
+                                    disabled={currentPage === totalPages}
+                                    className="h-9 w-9 p-0"
+                                >
+                                    <ChevronRight className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        </div>
+                    )}
+                </Card>
             </div>
         </AppLayout>
     );

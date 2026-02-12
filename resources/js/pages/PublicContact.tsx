@@ -147,7 +147,7 @@ export default function PublicContact() {
                                 </div>
                                 <div className="space-y-2">
                                     <Label className="flex items-center gap-2 font-bold uppercase tracking-widest text-[10px] text-muted-foreground">
-                                        <Mail className="h-3 w-3 text-brand" /> Correo Corporativo
+                                        <Mail className="h-3 w-3 text-brand" /> Correo
                                     </Label>
                                     <Input
                                         type="email"
@@ -222,7 +222,7 @@ export default function PublicContact() {
                                 className="space-y-2"
                             >
                                 <Label className="flex items-center gap-2 font-bold uppercase tracking-widest text-[10px] text-muted-foreground">
-                                    <MessageSquare className="h-3 w-3 text-brand" /> Descripción del Requerimiento
+                                    <MessageSquare className="h-3 w-3 text-brand" /> Describe tu Empresa
                                 </Label>
                                 <Textarea
                                     value={data.descripcion}

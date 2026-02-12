@@ -32,6 +32,7 @@ import {
 import { toast } from 'sonner';
 import { Loader2, Pencil, Trash2, CheckCircle, Clock, Mail } from 'lucide-react';
 import { ContactCreateDialog } from './components/ContactCreateDialog';
+import { ContactEditDialog } from './components/ContactEditDialog';
 import { ContactFilters } from './components/ContactFilters';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -50,7 +51,9 @@ interface PageProps extends InertiaPageProps {
 export default function Index() {
   const { contacts, flash = {} } = usePage<PageProps>().props;
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [contactToDelete, setContactToDelete] = useState<Contact | null>(null);
+  const [contactToEdit, setContactToEdit] = useState<Contact | null>(null);
   const [loadingStates, setLoadingStates] = useState<Record<number, boolean>>({});
 
   // Filtering states
@@ -68,7 +71,7 @@ export default function Index() {
   useEffect(() => {
     const interval = setInterval(() => {
       router.reload({ only: ['contacts'] });
-    }, 10000); // dynamic polling to reduce server load
+    }, 10000);
 
     return () => clearInterval(interval);
   }, []);
@@ -76,6 +79,11 @@ export default function Index() {
   const handleDeleteClick = (contact: Contact) => {
     setContactToDelete(contact);
     setDeleteDialogOpen(true);
+  };
+
+  const handleEditClick = (contact: Contact) => {
+    setContactToEdit(contact);
+    setEditDialogOpen(true);
   };
 
   const handleDeleteConfirm = () => {
@@ -245,13 +253,11 @@ export default function Index() {
                               <Button
                                 variant="outline"
                                 size="sm"
-                                asChild
+                                onClick={() => handleEditClick(contact)}
                                 className="h-9 px-3 border-brand/20 text-brand hover:bg-brand hover:text-white transition-all shadow-sm"
                               >
-                                <Link href={route('contacts.edit', contact.id)}>
-                                  <Pencil className="h-4 w-4 mr-2" />
-                                  Editar
-                                </Link>
+                                <Pencil className="h-4 w-4 mr-2" />
+                                Editar
                               </Button>
                               <Button
                                 variant="ghost"
@@ -273,6 +279,12 @@ export default function Index() {
           </Card>
         </div>
       </div>
+
+      <ContactEditDialog
+        contact={contactToEdit}
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+      />
 
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent className="border-destructive/20 gap-6 bg-card text-card-foreground shadow-2xl">

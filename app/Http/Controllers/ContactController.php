@@ -39,14 +39,25 @@ class ContactController extends Controller
 
     public function store(Request $request)
     {
+        $messages = [
+            'nombrecompleto.required' => 'El nombre completo es obligatorio.',
+            'correoelectronico.required' => 'El correo electrónico es obligatorio.',
+            'correoelectronico.email' => 'Debes ingresar un correo electrónico válido.',
+            'presupuesto.required' => 'El presupuesto es obligatorio.',
+            'presupuesto.numeric' => 'El presupuesto debe ser un número.',
+            'celular.required' => 'El número de celular es obligatorio.',
+            'descripcion.required' => 'La descripción es obligatoria.',
+            'empresa.required' => 'El nombre de la empresa es obligatorio.',
+        ];
+
         Validator::make($request->all(), [
             'nombrecompleto' => 'required|string|max:255',
-            'correoelectronico' => 'required|email|unique:contacts,correoelectronico',
+            'correoelectronico' => 'required|email',
             'presupuesto' => 'required|numeric|min:0',
             'celular' => 'required|string|max:20',
             'descripcion' => 'required|string',
             'empresa' => 'required|string|max:255',
-        ])->validate();
+        ], $messages)->validate();
 
         Contact::create($request->all());
 
@@ -62,15 +73,26 @@ class ContactController extends Controller
 
     public function update(Request $request, Contact $contact)
     {
+        $messages = [
+            'nombrecompleto.required' => 'El nombre completo es obligatorio.',
+            'correoelectronico.required' => 'El correo electrónico es obligatorio.',
+            'correoelectronico.email' => 'Debes ingresar un correo electrónico válido.',
+            'presupuesto.required' => 'El presupuesto es obligatorio.',
+            'presupuesto.numeric' => 'El presupuesto debe ser un número.',
+            'celular.required' => 'El número de celular es obligatorio.',
+            'descripcion.required' => 'La descripción es obligatoria.',
+            'empresa.required' => 'El nombre de la empresa es obligatorio.',
+        ];
+
         Validator::make($request->all(), [
             'nombrecompleto' => 'required|string|max:255',
-            'correoelectronico' => 'required|email|unique:contacts,correoelectronico,' . $contact->id,
+            'correoelectronico' => 'required|email',
             'presupuesto' => 'required|numeric|min:0',
             'celular' => 'required|string|max:20',
             'descripcion' => 'required|string',
             'empresa' => 'required|string|max:255',
             'estado' => 'boolean'
-        ])->validate();
+        ], $messages)->validate();
 
         $contact->update($request->all());
 

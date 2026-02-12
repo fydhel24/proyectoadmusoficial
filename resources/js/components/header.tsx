@@ -166,9 +166,17 @@ export default function Header() {
                             </NavigationMenuItem>
 
                             <NavigationMenuItem>
-                                <Link href="#contactanos" onClick={(e) => scrollToSection(e as any, '#contactanos')}>
+                                <Link href={route('public.contact')}>
                                     <span className={cn(navigationMenuTriggerStyle(), "bg-transparent text-foreground hover:text-brand hover:bg-brand/10 cursor-pointer")}>
-                                        Contacto
+                                        Contáctanos
+                                    </span>
+                                </Link>
+                            </NavigationMenuItem>
+
+                            <NavigationMenuItem>
+                                <Link href={route('public.location')}>
+                                    <span className={cn(navigationMenuTriggerStyle(), "bg-transparent text-foreground hover:text-brand hover:bg-brand/10 cursor-pointer")}>
+                                        Ubicación
                                     </span>
                                 </Link>
                             </NavigationMenuItem>
@@ -238,7 +246,8 @@ export default function Header() {
                                 </div>
 
                                 <MobileLink href="#como-trabajamos" title="Metodología" onClick={(e) => scrollToSection(e, '#como-trabajamos')} />
-                                <MobileLink href="#contactanos" title="Contacto" onClick={(e) => scrollToSection(e, '#contactanos')} />
+                                <MobileLink href={route('public.contact')} title="Contáctanos" icon={Mail} />
+                                <MobileLink href={route('public.location')} title="Ubicación" icon={Layout} />
                                 <MobileLink href="/trabaja-con-nosotros" title="Trabaja con nosotros" icon={Briefcase} />
 
                                 <div className="mt-4 pt-4 border-t border-red-900/20 flex flex-col gap-3">

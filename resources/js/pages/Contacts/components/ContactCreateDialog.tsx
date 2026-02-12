@@ -16,7 +16,7 @@ import { Loader2, Plus, User, Mail, Building2, Phone, DollarSign, MessageSquare 
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-interface ContactForm {
+interface ContactForm extends Record<string, any> {
     nombrecompleto: string;
     correoelectronico: string;
     presupuesto: string | number;

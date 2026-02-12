@@ -67,7 +67,7 @@ export default function ComoTrabajamos() {
           alta calidad.
         </p>
         <a
-          href="#contactanos"
+          href="/contactanos"
           className="inline-block bg-red-600 text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-red-500 transition-all duration-300 transform hover:scale-105"
           onClick={(e) => {
             e.preventDefault()

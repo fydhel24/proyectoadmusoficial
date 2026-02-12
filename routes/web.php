@@ -63,6 +63,12 @@ Route::get('/consultorias', fn() => Inertia::render('paginas/Consultorias'))
 Route::get('/eventos-digitales', fn() => Inertia::render('paginas/EventosDigitales'))
     ->name('eventos.digitales');
 
+Route::get('/contactanos', fn() => Inertia::render('PublicContact'))
+    ->name('public.contact');
+
+Route::get('/ubicacion', fn() => Inertia::render('PublicLocation'))
+    ->name('public.location');
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->middleware(['auth', 'verified'])

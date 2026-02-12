@@ -166,11 +166,6 @@ export default function Welcome() {
                 <section id="metodologia" className="py-24 bg-muted/40 border-y border-border">
                     <ComoTrabajamos />
                 </section>
-
-                <section id="contacto" className="py-24 relative">
-                    <div className="absolute right-0 top-0 w-1/3 h-full bg-brand/5 pointer-events-none" />
-                    <Contactanos />
-                </section>
             </main>
 
             <Footer />

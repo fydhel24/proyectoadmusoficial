@@ -52,7 +52,7 @@ export default function Header() {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    const scrollToSection = (e: React.MouseEvent<any>, href: string) => {
         if (href.startsWith('#')) {
             e.preventDefault();
             const element = document.getElementById(href.substring(1));
@@ -105,7 +105,6 @@ export default function Header() {
                                 </Link>
                             </NavigationMenuItem>
                             <NavigationMenuItem>
-                                
                                 <NavigationMenuTrigger className="text-foreground hover:text-brand focus:text-brand bg-transparent focus:bg-transparent data-[state=open]:bg-transparent">
                                     Servicios
                                 </NavigationMenuTrigger>
@@ -129,7 +128,7 @@ export default function Header() {
                             </NavigationMenuItem>
 
                             <NavigationMenuItem>
-                                <Link href="/influencersts" title="Influencers" icon={Users}>
+                                <Link href="/influencersts">
                                     <span
                                         className={cn(
                                             navigationMenuTriggerStyle(),
@@ -145,6 +144,16 @@ export default function Header() {
                                     <Briefcase className="h-4 w-4" />
                                     Trabaja con nosotros
                                 </Button>
+                            </Link>
+                            <Link href="#empresas" onClick={(e: React.MouseEvent<any>) => scrollToSection(e, '#empresas')}>
+                                <span
+                                    className={cn(
+                                        navigationMenuTriggerStyle(),
+                                        'text-foreground hover:text-brand hover:bg-brand/10 cursor-pointer bg-transparent',
+                                    )}
+                                >
+                                    Empresas
+                                </span>
                             </Link>
                         </NavigationMenuList>
                     </NavigationMenu>
@@ -190,7 +199,7 @@ export default function Header() {
                                 </SheetTitle>
                             </SheetHeader>
                             <div className="flex flex-col gap-2 p-4">
-<div className="py-2">
+                                <div className="py-2">
                                     <p className="text-brand mb-2 px-4 text-xs font-semibold tracking-widest uppercase">Inicio</p>
                                     <MobileLink href="/" title="Inicio" icon={Users} />
                                 </div>
@@ -204,6 +213,15 @@ export default function Header() {
                                 <div className="py-2">
                                     <p className="text-brand mb-2 px-4 text-xs font-semibold tracking-widest uppercase">Portafolios</p>
                                     <MobileLink href="/influencersts" title="Influencers" icon={Users} />
+                                    <MobileLink
+                                        href="#empresas"
+                                        title="Empresas"
+                                        icon={Briefcase}
+                                        onClick={(e: React.MouseEvent<any>) => {
+                                            scrollToSection(e, '#empresas');
+                                            // Usually Sheet handles closing, but if we need to close it manually we'd need state
+                                        }}
+                                    />
                                 </div>
                                 <MobileLink href="/trabaja-con-nosotros" title="Trabaja con nosotros" icon={Briefcase} />
 
@@ -253,7 +271,17 @@ const ListItem = React.forwardRef<React.ElementRef<'a'>, React.ComponentPropsWit
 );
 ListItem.displayName = 'ListItem';
 
-function MobileLink({ href, title, icon: Icon, onClick }: { href: string; title: string; icon?: React.ElementType; onClick?: (e: any) => void }) {
+function MobileLink({
+    href,
+    title,
+    icon: Icon,
+    onClick,
+}: {
+    href: string;
+    title: string;
+    icon?: React.ElementType;
+    onClick?: (e: React.MouseEvent<any>) => void;
+}) {
     return (
         <Link
             href={href}

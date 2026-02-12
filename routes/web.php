@@ -45,7 +45,20 @@ use App\Http\Controllers\WeekController;
 use App\Models\Company;
 
 Route::get('/', function () {
-    return Inertia::render('welcome');
+    $companies = Company::select('id', 'name', 'logo')
+        ->whereNotNull('logo')
+        ->get()
+        ->map(function ($company) {
+            return [
+                'id' => $company->id,
+                'name' => $company->name,
+                'logo' => $company->logo ? asset('storage/' . $company->logo) : null
+            ];
+        });
+
+    return Inertia::render('welcome', [
+        'companies' => $companies
+    ]);
 })->name('home');
 
 Route::get('/fotografias', fn() => Inertia::render('fotografias/fotografia'))

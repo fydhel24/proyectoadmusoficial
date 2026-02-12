@@ -148,26 +148,6 @@ export default function Header() {
                             </Link>
 
                             <NavigationMenuItem>
-                                <NavigationMenuTrigger className="bg-transparent text-foreground hover:text-brand focus:text-brand focus:bg-transparent data-[state=open]:bg-transparent">
-                                    Portafolios
-                                </NavigationMenuTrigger>
-                                <NavigationMenuContent>
-                                    <ul className="grid w-[200px] gap-2 p-2 bg-popover border border-border">
-                                        <ListItem href="/influencersts" title="Influencers" icon={Users} />
-                                        <ListItem href="/videosportafolio" title="Videos" icon={Video} />
-                                    </ul>
-                                </NavigationMenuContent>
-                            </NavigationMenuItem>
-
-                            <NavigationMenuItem>
-                                <Link href="#como-trabajamos" onClick={(e) => scrollToSection(e as any, '#como-trabajamos')}>
-                                    <span className={cn(navigationMenuTriggerStyle(), "bg-transparent text-foreground hover:text-brand hover:bg-brand/10 cursor-pointer")}>
-                                        Metodología
-                                    </span>
-                                </Link>
-                            </NavigationMenuItem>
-
-                            <NavigationMenuItem>
                                 <Link href={route('public.contact')}>
                                     <span className={cn(navigationMenuTriggerStyle(), "bg-transparent text-foreground hover:text-brand hover:bg-brand/10 cursor-pointer")}>
                                         Contáctanos

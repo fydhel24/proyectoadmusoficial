@@ -65,7 +65,8 @@ import {
     ChevronUp,
     Store,
     Clock,
-    UserCircle
+    UserCircle,
+    Mail
 } from 'lucide-react';
 
 // 6. Props que trae Inertia
@@ -286,10 +287,10 @@ export function AppSidebar({ className }: { className?: string }) {
                 isCollapsible: true,
             },
             {
-                title: 'Gestion regalos',
-                icon: Gift,
+                title: 'Gestion de Contactos',
+                icon: Mail,
                 items: [
-                    { title: 'Administrar regalos', href: '/regalo', icon: Settings },
+                    { title: 'Contactos', href: '/contacts', icon: Mail },
                 ],
                 isCollapsible: true,
             },

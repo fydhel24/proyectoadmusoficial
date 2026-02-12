@@ -43,6 +43,7 @@ use App\Http\Controllers\TipoController;
 use App\Http\Controllers\VideosController;
 use App\Http\Controllers\WeekController;
 use App\Models\Company;
+use App\Http\Controllers\ContactController;
 
 Route::get('/', function () {
     return Inertia::render('welcome');
@@ -643,6 +644,8 @@ Route::middleware(['auth'])->group(function () {
         // URL: /exchange/admin/draw
         Route::post('draw', [GiftExchangeController::class, 'draw'])->name('exchange.admin.draw');
     });
+    Route::resource('contacts', ContactController::class);
+    Route::patch('contacts/{contact}/toggle-estado', [ContactController::class, 'toggleEstado'])->name('contacts.toggle-estado');
     require __DIR__ . '/settings.php';
     require __DIR__ . '/auth.php';
 });

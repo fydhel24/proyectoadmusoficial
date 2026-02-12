@@ -14,7 +14,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { cn } from '@/lib/utils';
 import { Link, usePage } from '@inertiajs/react';
 import { gsap } from 'gsap';
-import { BarChart, Briefcase, Camera, Menu, Monitor, Palette, Presentation, Users, Video } from 'lucide-react';
+import { BarChart, Briefcase, Camera, Layout, Mail, Menu, Monitor, Palette, Presentation, Users, Video } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 import AppearanceToggle from './appearance-toggle';
 

@@ -2,6 +2,7 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
+import { Link } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 
 interface Company {
@@ -43,8 +44,9 @@ export default function CompanyCarousel({ companies, className }: CompanyCarouse
                 style={{ width: 'fit-content' }}
             >
                 {displayCompanies.map((company, index) => (
-                    <div
+                    <Link
                         key={`${company.id}-${index}`}
+                        href={`/companiesvideos/${company.id}`}
                         className="group flex flex-col items-center gap-6 transition-all duration-500 hover:scale-105"
                     >
                         <div className="group-hover:from-brand relative rounded-full p-[2px] transition-all duration-500 group-hover:bg-gradient-to-tr group-hover:to-red-500">
@@ -67,7 +69,7 @@ export default function CompanyCarousel({ companies, className }: CompanyCarouse
                             </span>
                             <div className="bg-brand h-0.5 w-0 transition-all duration-500 group-hover:w-full" />
                         </div>
-                    </div>
+                    </Link>
                 ))}
             </motion.div>
         </div>

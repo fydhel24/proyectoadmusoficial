@@ -1,11 +1,11 @@
 'use client';
 
 import Header from '@/components/header';
-import { Head, Link } from '@inertiajs/react';
-import { ArrowBack, PlayCircleOutline } from '@mui/icons-material';
-import { Box, Card, Container, Grid, IconButton, Typography, Fade } from '@mui/material';
-import Footer from '../home/footer';
+import { Head } from '@inertiajs/react';
+import { ChatBubbleOutline, FavoriteBorder, PlayCircleOutline, Share } from '@mui/icons-material';
+import { Avatar, Box, Card, Container, Fade, Grid, IconButton, Typography } from '@mui/material';
 import { motion } from 'framer-motion';
+import Footer from '../home/footer';
 
 // Define las interfaces para los datos que llegan de Laravel
 interface LinkData {
@@ -70,20 +70,16 @@ export default function CompanyVideos({ company }: CompanyVideosProps) {
                 }}
             >
                 <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
-
-
                     {/* Header Section Mejorado */}
                     <Fade in timeout={800}>
-                        <Box sx={{
-                            textAlign: 'center',
-                            mb: { xs: 4, md: 6 },
-                            px: { xs: 2, sm: 0 }
-                        }}>
-                            <motion.div
-                                initial={{ opacity: 0, y: 30 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.7, delay: 0.2 }}
-                            >
+                        <Box
+                            sx={{
+                                textAlign: 'center',
+                                mb: { xs: 4, md: 6 },
+                                px: { xs: 2, sm: 0 },
+                            }}
+                        >
+                            <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.2 }}>
                                 <Typography
                                     variant="h2"
                                     fontWeight="bold"
@@ -104,11 +100,7 @@ export default function CompanyVideos({ company }: CompanyVideosProps) {
                                 </Typography>
                             </motion.div>
 
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.7, delay: 0.4 }}
-                            >
+                            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.4 }}>
                                 <Typography
                                     variant="body1"
                                     sx={{
@@ -130,156 +122,190 @@ export default function CompanyVideos({ company }: CompanyVideosProps) {
                                 animate={{ opacity: 1, scale: 1 }}
                                 transition={{ duration: 0.8, delay: 0.6 }}
                             >
-                                <Box sx={{
-                                    display: 'flex',
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    mt: 3,
-                                    gap: 2
-                                }}>
-                                    <Box sx={{
-                                        width: { xs: 30, md: 50 },
-                                        height: 2,
-                                        background: 'linear-gradient(90deg, transparent, var(--brand), transparent)'
-                                    }} />
-                                    <PlayCircleOutline sx={{
-                                        color: 'var(--brand)',
-                                        fontSize: { xs: '2rem', md: '2.5rem' },
-                                        filter: 'drop-shadow(0 0 10px rgba(217, 26, 26, 0.5))'
-                                    }} />
-                                    <Box sx={{
-                                        width: { xs: 30, md: 50 },
-                                        height: 2,
-                                        background: 'linear-gradient(90deg, transparent, var(--brand), transparent)'
-                                    }} />
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        mt: 3,
+                                        gap: 2,
+                                    }}
+                                >
+                                    <Box
+                                        sx={{
+                                            width: { xs: 30, md: 50 },
+                                            height: 2,
+                                            background: 'linear-gradient(90deg, transparent, var(--brand), transparent)',
+                                        }}
+                                    />
+                                    <PlayCircleOutline
+                                        sx={{
+                                            color: 'var(--brand)',
+                                            fontSize: { xs: '2rem', md: '2.5rem' },
+                                            filter: 'drop-shadow(0 0 10px rgba(217, 26, 26, 0.5))',
+                                        }}
+                                    />
+                                    <Box
+                                        sx={{
+                                            width: { xs: 30, md: 50 },
+                                            height: 2,
+                                            background: 'linear-gradient(90deg, transparent, var(--brand), transparent)',
+                                        }}
+                                    />
                                 </Box>
                             </motion.div>
                         </Box>
                     </Fade>
 
                     {/* Videos Grid */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 40 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.7 }}
-                    >
+                    <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.7 }}>
                         <Grid container spacing={{ xs: 2, sm: 3, md: 3 }} sx={{ px: { xs: 1, sm: 0 } }}>
                             {link_comprobantes.length > 0 ? (
                                 link_comprobantes.map(
                                     (companyLink, index) =>
                                         companyLink.link && (
-                                            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={companyLink.link.id}>
+                                            <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={companyLink.link.id}>
                                                 <motion.div
-                                                    initial={{ opacity: 0, y: 30, scale: 0.9 }}
-                                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                    initial={{ opacity: 0, scale: 0.9 }}
+                                                    animate={{ opacity: 1, scale: 1 }}
                                                     transition={{
-                                                        duration: 0.6,
-                                                        delay: 0.9 + (index * 0.1),
-                                                        ease: "easeOut"
+                                                        duration: 0.5,
+                                                        delay: 0.2 + index * 0.1,
                                                     }}
-                                                    whileHover={{
-                                                        y: -8,
-                                                        scale: 1.02,
-                                                        transition: { duration: 0.2 }
-                                                    }}
+                                                    whileHover={{ y: -10 }}
                                                 >
                                                     <Card
                                                         sx={{
-                                                            height: { xs: 400, sm: 450, md: 480 },
-                                                            borderRadius: { xs: 2, md: 3 },
+                                                            aspectRatio: '9/16',
+                                                            borderRadius: '20px',
                                                             overflow: 'hidden',
-                                                            background: 'background.paper',
-                                                            border: '1px solid var(--brand)',
+                                                            bgcolor: '#010101',
+                                                            border: '2px solid rgba(255,255,255,0.05)',
                                                             position: 'relative',
-                                                            transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                                                            backdropFilter: 'blur(10px)',
-                                                            boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
-                                                            '&::before': {
-                                                                content: '""',
-                                                                position: 'absolute',
-                                                                top: 0,
-                                                                left: 0,
-                                                                right: 0,
-                                                                bottom: 0,
-                                                                background: 'linear-gradient(135deg, transparent 30%, rgba(255,0,127,0.05) 70%)',
-                                                                opacity: 0,
-                                                                transition: 'opacity 0.3s ease',
-                                                                zIndex: 1,
-                                                                pointerEvents: 'none',
-                                                            },
+                                                            boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
+                                                            transition: 'all 0.3s ease',
                                                             '&:hover': {
-                                                                boxShadow: '0 20px 40px rgba(217, 26, 26, 0.15)',
-                                                                border: '1px solid var(--brand)',
-                                                                '&::before': {
-                                                                    opacity: 1,
-                                                                },
+                                                                borderColor: 'var(--brand)',
+                                                                boxShadow: '0 0 30px rgba(220,38,38,0.3)',
                                                             },
                                                         }}
                                                     >
-                                                        {/* Top gradient border */}
-                                                        <Box sx={{
-                                                            position: 'absolute',
-                                                            top: 0,
-                                                            left: 0,
-                                                            right: 0,
-                                                            height: '3px',
-                                                            background: 'linear-gradient(90deg, transparent, var(--brand), #ff6f61, transparent)',
-                                                            zIndex: 10,
-                                                        }} />
-
-                                                        {/* Video Container */}
-                                                        <Box
-                                                            sx={{
-                                                                p: { xs: 1, md: 1.5 },
-                                                                height: '100%',
-                                                                display: 'flex',
-                                                                flexDirection: 'column',
-                                                                justifyContent: 'center',
-                                                                alignItems: 'center',
-                                                                position: 'relative',
-                                                                zIndex: 5,
-                                                            }}
-                                                        >
-                                                            <Box
-                                                                sx={{
-                                                                    width: '100%',
-                                                                    height: '100%',
-                                                                    borderRadius: { xs: 1, md: 2 },
-                                                                    overflow: 'hidden',
-                                                                    position: 'relative',
-                                                                    background: 'linear-gradient(135deg, #000 0%, #1a1a1a 100%)',
-                                                                    boxShadow: 'inset 0 0 20px rgba(0,0,0,0.8)',
-                                                                }}
-                                                            >
-                                                                <iframe
-                                                                    src={getEmbedUrl(companyLink.link.link)}
-                                                                    title={`Video de TikTok para ${name}`}
-                                                                    width="100%"
-                                                                    height="100%"
-                                                                    style={{
-                                                                        border: 'none',
-                                                                        borderRadius: '8px',
-                                                                    }}
-                                                                    allowFullScreen
-                                                                />
-                                                            </Box>
-                                                        </Box>
-
-                                                        {/* Subtle shine effect */}
+                                                        {/* Floating TikTok Actions */}
                                                         <Box
                                                             sx={{
                                                                 position: 'absolute',
-                                                                top: 0,
+                                                                right: 12,
+                                                                bottom: 80,
+                                                                display: 'flex',
+                                                                flexDirection: 'column',
+                                                                gap: 2,
+                                                                zIndex: 20,
+                                                                alignItems: 'center',
+                                                            }}
+                                                        >
+                                                            <Box sx={{ position: 'relative', mb: 1 }}>
+                                                                <Avatar
+                                                                    src={company.logo || ''}
+                                                                    sx={{
+                                                                        width: 45,
+                                                                        height: 45,
+                                                                        border: '2px solid white',
+                                                                        boxShadow: '0 0 10px rgba(0,0,0,0.5)',
+                                                                    }}
+                                                                />
+                                                                <Box
+                                                                    sx={{
+                                                                        position: 'absolute',
+                                                                        bottom: -10,
+                                                                        left: '50%',
+                                                                        transform: 'translateX(-50%)',
+                                                                        bgcolor: '#ff0050',
+                                                                        color: 'white',
+                                                                        borderRadius: '50%',
+                                                                        width: 20,
+                                                                        height: 20,
+                                                                        display: 'flex',
+                                                                        justifyContent: 'center',
+                                                                        alignItems: 'center',
+                                                                        fontSize: '14px',
+                                                                        fontWeight: 'bold',
+                                                                        border: '2px solid white',
+                                                                    }}
+                                                                >
+                                                                    +
+                                                                </Box>
+                                                            </Box>
+
+                                                            <Box sx={{ textAlign: 'center' }}>
+                                                                <IconButton sx={{ color: 'white', p: 0.5 }}>
+                                                                    <FavoriteBorder
+                                                                        sx={{ fontSize: 32, filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))' }}
+                                                                    />
+                                                                </IconButton>
+                                                                <Typography
+                                                                    variant="caption"
+                                                                    sx={{ color: 'white', display: 'block', fontWeight: 600 }}
+                                                                >
+                                                                    {Math.floor(Math.random() * 50) + 1}k
+                                                                </Typography>
+                                                            </Box>
+
+                                                            <Box sx={{ textAlign: 'center' }}>
+                                                                <IconButton sx={{ color: 'white', p: 0.5 }}>
+                                                                    <ChatBubbleOutline
+                                                                        sx={{ fontSize: 32, filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))' }}
+                                                                    />
+                                                                </IconButton>
+                                                                <Typography
+                                                                    variant="caption"
+                                                                    sx={{ color: 'white', display: 'block', fontWeight: 600 }}
+                                                                >
+                                                                    {Math.floor(Math.random() * 500) + 1}
+                                                                </Typography>
+                                                            </Box>
+
+                                                            <Box sx={{ textAlign: 'center' }}>
+                                                                <IconButton sx={{ color: 'white', p: 0.5 }}>
+                                                                    <Share sx={{ fontSize: 32, filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))' }} />
+                                                                </IconButton>
+                                                                <Typography
+                                                                    variant="caption"
+                                                                    sx={{ color: 'white', display: 'block', fontWeight: 600 }}
+                                                                >
+                                                                    Compartir
+                                                                </Typography>
+                                                            </Box>
+                                                        </Box>
+
+                                                        <iframe
+                                                            src={getEmbedUrl(companyLink.link.link)}
+                                                            title={`Video de TikTok para ${name}`}
+                                                            width="100%"
+                                                            height="100%"
+                                                            style={{
+                                                                border: 'none',
+                                                                display: 'block',
+                                                            }}
+                                                            allowFullScreen
+                                                        />
+
+                                                        {/* TikTok Style Overlay (optional info) */}
+                                                        <Box
+                                                            sx={{
+                                                                position: 'absolute',
+                                                                bottom: 0,
                                                                 left: 0,
                                                                 right: 0,
-                                                                bottom: 0,
-                                                                background: 'linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%)',
-                                                                opacity: 0,
-                                                                transition: 'opacity 0.3s ease',
+                                                                p: 2,
+                                                                background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)',
                                                                 pointerEvents: 'none',
-                                                                zIndex: 2,
+                                                                zIndex: 10,
                                                             }}
-                                                        />
+                                                        >
+                                                            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>
+                                                                {companyLink.link.detalle || 'Ver en TikTok'}
+                                                            </Typography>
+                                                        </Box>
                                                     </Card>
                                                 </motion.div>
                                             </Grid>
@@ -292,28 +318,32 @@ export default function CompanyVideos({ company }: CompanyVideosProps) {
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ duration: 0.8, delay: 1 }}
                                     >
-                                        <Box sx={{
-                                            textAlign: 'center',
-                                            py: { xs: 6, md: 8 },
-                                            px: { xs: 2, sm: 0 }
-                                        }}>
+                                        <Box
+                                            sx={{
+                                                textAlign: 'center',
+                                                py: { xs: 6, md: 8 },
+                                                px: { xs: 2, sm: 0 },
+                                            }}
+                                        >
                                             <motion.div
                                                 animate={{
                                                     scale: [1, 1.1, 1],
-                                                    opacity: [0.7, 1, 0.7]
+                                                    opacity: [0.7, 1, 0.7],
                                                 }}
                                                 transition={{
                                                     duration: 2,
                                                     repeat: Infinity,
-                                                    ease: "easeInOut"
+                                                    ease: 'easeInOut',
                                                 }}
                                             >
-                                                <PlayCircleOutline sx={{
-                                                    fontSize: { xs: '3rem', md: '4rem' },
-                                                    color: 'rgba(255,0,127,0.6)',
-                                                    mb: 2,
-                                                    filter: 'drop-shadow(0 0 20px rgba(255,0,127,0.3))'
-                                                }} />
+                                                <PlayCircleOutline
+                                                    sx={{
+                                                        fontSize: { xs: '3rem', md: '4rem' },
+                                                        color: 'rgba(255,0,127,0.6)',
+                                                        mb: 2,
+                                                        filter: 'drop-shadow(0 0 20px rgba(255,0,127,0.3))',
+                                                    }}
+                                                />
                                             </motion.div>
 
                                             <Typography
@@ -330,7 +360,7 @@ export default function CompanyVideos({ company }: CompanyVideosProps) {
                                                     borderRadius: 2,
                                                     p: { xs: 3, md: 4 },
                                                     maxWidth: 500,
-                                                    mx: 'auto'
+                                                    mx: 'auto',
                                                 }}
                                             >
                                                 No hay videos de TikTok disponibles para esta empresa.

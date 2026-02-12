@@ -194,6 +194,11 @@ class InfluencerDatosController extends Controller
             }
         });
 
+        // Transformar el logo si existe
+        if ($companyWithLinks->logo && !filter_var($companyWithLinks->logo, FILTER_VALIDATE_URL)) {
+            $companyWithLinks->logo = asset('storage/' . $companyWithLinks->logo);
+        }
+
         return Inertia::render('portafolio/CompanyVideos', [
             'company' => $companyWithLinks,
         ]);

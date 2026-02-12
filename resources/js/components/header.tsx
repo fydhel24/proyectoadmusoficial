@@ -14,7 +14,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { cn } from '@/lib/utils';
 import { Link, usePage } from '@inertiajs/react';
 import { gsap } from 'gsap';
-import { BarChart, Briefcase, Camera, Menu, Monitor, Palette, Presentation, Users, Video } from 'lucide-react';
+import { BarChart, Briefcase, Camera, Layout, Mail, Menu, Monitor, Palette, Presentation, Users, Video } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 import AppearanceToggle from './appearance-toggle';
 
@@ -105,6 +105,7 @@ export default function Header() {
                                 </Link>
                             </NavigationMenuItem>
                             <NavigationMenuItem>
+
                                 <NavigationMenuTrigger className="text-foreground hover:text-brand focus:text-brand bg-transparent focus:bg-transparent data-[state=open]:bg-transparent">
                                     Servicios
                                 </NavigationMenuTrigger>
@@ -145,6 +146,42 @@ export default function Header() {
                                     Trabaja con nosotros
                                 </Button>
                             </Link>
+
+                            <NavigationMenuItem>
+                                <NavigationMenuTrigger className="bg-transparent text-foreground hover:text-brand focus:text-brand focus:bg-transparent data-[state=open]:bg-transparent">
+                                    Portafolios
+                                </NavigationMenuTrigger>
+                                <NavigationMenuContent>
+                                    <ul className="grid w-[200px] gap-2 p-2 bg-popover border border-border">
+                                        <ListItem href="/influencersts" title="Influencers" icon={Users} />
+                                        <ListItem href="/videosportafolio" title="Videos" icon={Video} />
+                                    </ul>
+                                </NavigationMenuContent>
+                            </NavigationMenuItem>
+
+                            <NavigationMenuItem>
+                                <Link href="#como-trabajamos" onClick={(e) => scrollToSection(e as any, '#como-trabajamos')}>
+                                    <span className={cn(navigationMenuTriggerStyle(), "bg-transparent text-foreground hover:text-brand hover:bg-brand/10 cursor-pointer")}>
+                                        Metodología
+                                    </span>
+                                </Link>
+                            </NavigationMenuItem>
+
+                            <NavigationMenuItem>
+                                <Link href={route('public.contact')}>
+                                    <span className={cn(navigationMenuTriggerStyle(), "bg-transparent text-foreground hover:text-brand hover:bg-brand/10 cursor-pointer")}>
+                                        Contáctanos
+                                    </span>
+                                </Link>
+                            </NavigationMenuItem>
+
+                            <NavigationMenuItem>
+                                <Link href={route('public.location')}>
+                                    <span className={cn(navigationMenuTriggerStyle(), "bg-transparent text-foreground hover:text-brand hover:bg-brand/10 cursor-pointer")}>
+                                        Ubicación
+                                    </span>
+                                </Link>
+                            </NavigationMenuItem>
                         </NavigationMenuList>
                     </NavigationMenu>
                 </nav>
@@ -213,6 +250,10 @@ export default function Header() {
                                         }}
                                     />
                                 </div>
+
+                                <MobileLink href="#como-trabajamos" title="Metodología" onClick={(e) => scrollToSection(e, '#como-trabajamos')} />
+                                <MobileLink href={route('public.contact')} title="Contáctanos" icon={Mail} />
+                                <MobileLink href={route('public.location')} title="Ubicación" icon={Layout} />
                                 <MobileLink href="/trabaja-con-nosotros" title="Trabaja con nosotros" icon={Briefcase} />
 
                                 <div className="mt-4 flex flex-col gap-3 border-t border-red-900/20 pt-4">

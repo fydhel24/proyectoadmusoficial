@@ -43,6 +43,7 @@ use App\Http\Controllers\TipoController;
 use App\Http\Controllers\VideosController;
 use App\Http\Controllers\WeekController;
 use App\Models\Company;
+use App\Http\Controllers\ContactController;
 
 Route::get('/', function () {
     $companies = Company::select('id', 'name', 'logo')
@@ -74,6 +75,12 @@ Route::get('/consultorias', fn() => Inertia::render('paginas/Consultorias'))
 
 Route::get('/eventos-digitales', fn() => Inertia::render('paginas/EventosDigitales'))
     ->name('eventos.digitales');
+
+Route::get('/contactanos', fn() => Inertia::render('PublicContact'))
+    ->name('public.contact');
+
+Route::get('/ubicacion', fn() => Inertia::render('PublicLocation'))
+    ->name('public.location');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])
@@ -656,9 +663,13 @@ Route::middleware(['auth'])->group(function () {
         // URL: /exchange/admin/draw
         Route::post('draw', [GiftExchangeController::class, 'draw'])->name('exchange.admin.draw');
     });
+    Route::resource('contacts', ContactController::class)->except('store');
+    Route::patch('contacts/{contact}/toggle-estado', [ContactController::class, 'toggleEstado'])->name('contacts.toggle-estado');
     require __DIR__ . '/settings.php';
     require __DIR__ . '/auth.php';
 });
+
+Route::post('contacts', [ContactController::class, 'store'])->name('contacts.store');
 Route::get('datacache', [GiftExchangeController::class, 'adminCompleteData'])
     ->name('exchange.admin.data.get');
 Route::get('/trabaja-con-nosotros', [JobApplicationController::class, 'create'])->name('job-applications.create');

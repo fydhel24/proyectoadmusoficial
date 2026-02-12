@@ -7,7 +7,6 @@ import {
     Building2,
     Calendar,
     CheckCircle,
-    Edit3,
     ExternalLink,
     FileText,
     Filter,
@@ -30,7 +29,6 @@ interface Company {
 interface Link {
     id: number;
     link: string;
-    detalle?: string;
 }
 
 interface CompanyLinkRecord {
@@ -47,7 +45,6 @@ interface CompanyLinkRecord {
 interface InlineDataItem {
     company_id: number;
     link: string;
-    detalle: string;
     mes: string;
     fecha: string;
     comprobante_id: string;
@@ -72,7 +69,6 @@ export default function Index({ empresas, registros }: Props) {
     const { data, setData, post, reset, processing } = useForm({
         company_id: '',
         link: '',
-        detalle: '',
         mes: defaultMes,
         fecha: defaultFecha,
     });
@@ -94,7 +90,6 @@ export default function Index({ empresas, registros }: Props) {
             mapa[r.id] = {
                 company_id: r.company.id,
                 link: r.link.link,
-                detalle: r.link.detalle || '',
                 mes: r.mes,
                 fecha: r.fecha?.slice(0, 10) || '',
                 comprobante_id: r.comprobante?.id?.toString() || '',
@@ -108,8 +103,7 @@ export default function Index({ empresas, registros }: Props) {
         return allRegistros.filter((record) => {
             const matchesSearch =
                 record.company.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                record.link.link.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                (record.link.detalle || '').toLowerCase().includes(searchTerm.toLowerCase());
+                record.link.link.toLowerCase().includes(searchTerm.toLowerCase());
 
             const matchesMes = !filterMes || record.mes === filterMes;
             const matchesEmpresa = !filterEmpresa || record.company.id.toString() === filterEmpresa;
@@ -160,7 +154,6 @@ export default function Index({ empresas, registros }: Props) {
                         [nuevo.id]: {
                             company_id: nuevo.company_id,
                             link: nuevo.link.link,
-                            detalle: nuevo.link.detalle || '',
                             mes: nuevo.mes,
                             fecha: nuevo.fecha,
                             comprobante_id: nuevo.comprobante_id || '',
@@ -204,7 +197,6 @@ export default function Index({ empresas, registros }: Props) {
                     mes: campos.mes,
                     fecha: campos.fecha,
                     link: campos.link,
-                    detalle: campos.detalle,
                 }),
             });
 
@@ -230,7 +222,6 @@ export default function Index({ empresas, registros }: Props) {
                               link: {
                                   ...record.link,
                                   link: campos.link,
-                                  detalle: campos.detalle,
                               },
                           }
                         : record,
@@ -392,7 +383,20 @@ export default function Index({ empresas, registros }: Props) {
                                     ))}
                                 </datalist>
                             </div>
-
+                            <div className="space-y-3">
+                                <label className="flex items-center gap-2 text-sm font-bold text-gray-700">
+                                            <LinkIcon className="h-5 w-5 text-blue-600" />
+                                            Link *
+                                        </label>
+                                        <input
+                                            type="url"
+                                            className="w-full rounded-xl border-2 border-gray-200 p-4 text-sm transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20"
+                                            value={data.link}
+                                            onChange={(e) => setData('link', e.target.value)}
+                                            required
+                                            placeholder="https://www.tiktok.com/"
+                                        />
+                            </div>
                             {/* Mes */}
                             <div className="space-y-3">
                                 <label className="flex items-center gap-2 text-sm font-bold text-gray-700">
@@ -415,7 +419,7 @@ export default function Index({ empresas, registros }: Props) {
                             </div>
 
                             {/* Fecha */}
-                            <div className="space-y-3">
+                            <div className="space-y-3" hidden>
                                 <label className="flex items-center gap-2 text-sm font-bold text-gray-700">
                                     <Calendar className="h-5 w-5 text-blue-600" />
                                     Fecha *
@@ -427,42 +431,6 @@ export default function Index({ empresas, registros }: Props) {
                                     onChange={(e) => setData('fecha', e.target.value)}
                                     required
                                 />
-                            </div>
-
-                            {/* Link + Detalle en una fila (ocupan 2 columnas) */}
-                            <div className="md:col-span-2 lg:col-span-3">
-                                <div className="flex flex-col gap-4 md:flex-row">
-                                    {/* Link */}
-                                    <div className="w-full space-y-2 md:w-1/3">
-                                        <label className="flex items-center gap-2 text-sm font-bold text-gray-700">
-                                            <LinkIcon className="h-5 w-5 text-blue-600" />
-                                            Link *
-                                        </label>
-                                        <input
-                                            type="url"
-                                            className="w-full rounded-xl border-2 border-gray-200 p-4 text-sm transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20"
-                                            value={data.link}
-                                            onChange={(e) => setData('link', e.target.value)}
-                                            required
-                                            placeholder="https://www.tiktok.com/"
-                                        />
-                                    </div>
-
-                                    {/* Detalle */}
-                                    <div className="w-full space-y-2 md:w-2/3">
-                                        <label className="flex items-center gap-2 text-sm font-bold text-gray-700">
-                                            <Edit3 className="h-5 w-5 text-blue-600" />
-                                            Detalle
-                                        </label>
-                                        <textarea
-                                            className="w-full resize-none rounded-xl border-2 border-gray-200 p-4 text-sm transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20"
-                                            rows={4}
-                                            value={data.detalle}
-                                            onChange={(e) => setData('detalle', e.target.value)}
-                                            placeholder="Descripción adicional del contenido (opcional)"
-                                        />
-                                    </div>
-                                </div>
                             </div>
                         </div>
 
@@ -502,7 +470,7 @@ export default function Index({ empresas, registros }: Props) {
                                     <Search className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-gray-400" />
                                     <input
                                         type="text"
-                                        placeholder="Buscar por empresa, link o detalle..."
+                                        placeholder="Buscar por empresa, link"
                                         className="w-full rounded-xl border-2 border-gray-200 py-3 pr-4 pl-10 text-sm transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 sm:w-80"
                                         value={searchTerm}
                                         onChange={(e) => {
@@ -596,7 +564,6 @@ export default function Index({ empresas, registros }: Props) {
                                             Link
                                         </div>
                                     </th>
-                                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-700">Detalle</th>
                                     <th className="px-6 py-4 text-left text-sm font-bold text-gray-700">
                                         <div className="flex items-center gap-2">
                                             <Calendar className="h-4 w-4" />
@@ -652,18 +619,6 @@ export default function Index({ empresas, registros }: Props) {
                                                     </a>
                                                 )}
                                             </div>
-                                        </td>
-
-                                        {/* Detalle */}
-                                        <td className="px-6 py-4">
-                                            <input
-                                                type="text"
-                                                className="w-full rounded-lg border-2 border-gray-200 p-3 text-sm transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20"
-                                                value={inlineData[r.id]?.detalle || ''}
-                                                onChange={(e) => handleInlineChange(r.id, 'detalle', e.target.value)}
-                                                onBlur={() => handleInlineSave(r.id)}
-                                                placeholder="Detalle..."
-                                            />
                                         </td>
 
                                         {/* Mes */}

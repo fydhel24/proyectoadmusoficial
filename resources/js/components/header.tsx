@@ -220,15 +220,6 @@ export default function Header() {
                                 <div className="py-2">
                                     <p className="text-brand mb-2 px-4 text-xs font-semibold tracking-widest uppercase">Portafolios</p>
                                     <MobileLink href="/influencersts" title="Influencers" icon={Users} />
-                                    <MobileLink
-                                        href="#empresas"
-                                        title="Empresas"
-                                        icon={Briefcase}
-                                        onClick={(e: React.MouseEvent<any>) => {
-                                            scrollToSection(e, '#empresas');
-                                            // Usually Sheet handles closing, but if we need to close it manually we'd need state
-                                        }}
-                                    />
                                 </div>
 
                                 <MobileLink href="#como-trabajamos" title="Metodología" onClick={(e) => scrollToSection(e, '#como-trabajamos')} />

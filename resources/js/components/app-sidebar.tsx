@@ -303,7 +303,7 @@ export function AppSidebar({ className }: { className?: string }) {
                 items: [
                     { title: 'Influencers', href: '/influencers', icon: Users },
                     { title: 'Ver Calendario', href: '/bookings', icon: CalendarCheck },
-                    { title: 'Mi perfil', href: '/perfil-influencer', icon: UserCircle },
+                     { title: 'Mi Perfil', href: '/facebook-profile', icon: User },
                 ],
                 isCollapsible: false,
             });

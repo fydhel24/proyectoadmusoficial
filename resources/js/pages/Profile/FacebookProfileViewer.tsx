@@ -175,23 +175,6 @@ export default function FacebookProfileViewer({ profileUser, profilePhoto, cover
                                         <img src={photo.url} alt={photo.nombre} className="h-auto max-h-[600px] max-w-full object-contain" />
                                     </div>
                                 </CardContent>
-                                <div className="flex gap-4 p-4">
-                                    <Button variant="ghost" className="flex-1 font-bold text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800">
-                                        ❤️ Me gusta
-                                    </Button>
-                                    <Button
-                                        variant="ghost"
-                                        className="flex-1 font-bold text-slate-600 italic hover:bg-slate-100 dark:hover:bg-slate-800"
-                                    >
-                                        💬 Comentar
-                                    </Button>
-                                    <Button
-                                        variant="ghost"
-                                        className="flex-1 font-bold text-slate-600 italic hover:bg-slate-100 dark:hover:bg-slate-800"
-                                    >
-                                        ➡️ Compartir
-                                    </Button>
-                                </div>
                             </Card>
                         ))}
                     </div>

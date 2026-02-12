@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -62,6 +61,7 @@ export default function FacebookStyle({ profileUser, profilePhoto, coverPhoto, f
         errors,
     } = useForm({
         file: null as File | null,
+        files: [] as File[],
         tipo: 'foto' as 'foto' | 'perfil' | 'portada',
         nombre: '',
     });
@@ -90,6 +90,7 @@ export default function FacebookStyle({ profileUser, profilePhoto, coverPhoto, f
     };
 
     const openUploadModal = (type: 'foto' | 'perfil' | 'portada') => {
+        reset('file', 'files', 'nombre');
         setUploadType(type);
         setData('tipo', type);
         setIsUploadOpen(true);
@@ -305,17 +306,6 @@ export default function FacebookStyle({ profileUser, profilePhoto, coverPhoto, f
                                         <img src={photo.url} alt={photo.nombre} className="h-auto max-h-[600px] max-w-full object-contain" />
                                     </div>
                                 </CardContent>
-                                <div className="flex gap-4 p-4">
-                                    <Button variant="ghost" className="flex-1 font-bold text-slate-600">
-                                        ❤️ Me gusta
-                                    </Button>
-                                    <Button variant="ghost" className="flex-1 font-bold text-slate-600 italic">
-                                        💬 Comentar
-                                    </Button>
-                                    <Button variant="ghost" className="flex-1 font-bold text-slate-600 italic">
-                                        ➡️ Compartir
-                                    </Button>
-                                </div>
                             </Card>
                         ))}
                     </div>
@@ -350,28 +340,55 @@ export default function FacebookStyle({ profileUser, profilePhoto, coverPhoto, f
                         <div className="space-y-4 py-6">
                             <div className="space-y-2">
                                 <Label htmlFor="file" className="font-bold text-slate-700 dark:text-slate-300">
-                                    Seleccionar imagen
+                                    {uploadType === 'foto' ? 'Seleccionar imágenes' : 'Seleccionar imagen'}
                                 </Label>
-                                <div className="relative rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 p-8 text-center transition-colors hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800">
-                                    <Input
+                                <label
+                                    htmlFor="file"
+                                    className="relative flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 p-8 text-center transition-colors hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800"
+                                >
+                                    <Plus className="h-10 w-10 text-slate-400" />
+                                    <p className="text-sm font-semibold text-slate-500 italic">
+                                        {uploadType === 'foto'
+                                            ? data.files.length > 0
+                                                ? `${data.files.length} fotos seleccionadas`
+                                                : 'Haz click para elegir fotos'
+                                            : data.file
+                                              ? data.file.name
+                                              : 'Haz click para elegir una foto'}
+                                    </p>
+                                    <input
                                         id="file"
                                         type="file"
                                         accept="image/*"
-                                        onChange={(e) => setData('file', e.target.files?.[0] || null)}
-                                        className="absolute inset-0 cursor-pointer opacity-0"
-                                        required
+                                        multiple={uploadType === 'foto'}
+                                        onChange={(e) => {
+                                            if (uploadType === 'foto') {
+                                                const selectedFiles = Array.from(e.target.files || []);
+                                                setData('files', selectedFiles);
+                                            } else {
+                                                setData('file', e.target.files?.[0] || null);
+                                            }
+                                        }}
+                                        className="sr-only"
+                                        required={uploadType !== 'foto' || data.files.length === 0}
                                     />
-                                    <div className="flex flex-col items-center gap-2">
-                                        <Plus className="h-10 w-10 text-slate-400" />
-                                        <p className="text-sm font-semibold text-slate-500 italic">
-                                            {data.file ? data.file.name : 'Haz click para elegir una foto'}
-                                        </p>
-                                    </div>
-                                </div>
+                                </label>
                                 {errors.file && <p className="mt-2 text-center text-xs font-bold text-red-600">{errors.file}</p>}
+                                {errors.files && <p className="mt-2 text-center text-xs font-bold text-red-600">{errors.files}</p>}
                             </div>
 
-                            {data.file && (
+                            {/* Previews */}
+                            {uploadType === 'foto' && data.files.length > 0 && (
+                                <div className="mt-4 grid max-h-48 grid-cols-3 gap-2 overflow-y-auto p-1">
+                                    {data.files.map((file, idx) => (
+                                        <div key={idx} className="relative aspect-square overflow-hidden rounded-lg border">
+                                            <img src={URL.createObjectURL(file)} alt={`Preview ${idx}`} className="h-full w-full object-cover" />
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            {uploadType !== 'foto' && data.file && (
                                 <div className="mt-4 flex justify-center overflow-hidden rounded-xl border p-1 shadow-inner">
                                     <img src={URL.createObjectURL(data.file)} alt="Preview" className="h-44 w-auto rounded-lg object-contain" />
                                 </div>

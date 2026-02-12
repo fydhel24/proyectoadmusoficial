@@ -51,7 +51,9 @@ class FacebookProfileController extends Controller
     public function storePhoto(Request $request)
     {
         $request->validate([
-            'file' => 'required|image|max:10240', // Máx 10MB para fotos
+            'files' => 'nullable|array',
+            'files.*' => 'image|max:10240',
+            'file' => 'nullable|image|max:10240',
             'tipo' => 'required|in:foto,perfil,portada',
             'nombre' => 'nullable|string|max:255',
         ]);
@@ -59,21 +61,39 @@ class FacebookProfileController extends Controller
         $user = Auth::user();
         /** @var \App\Models\User $user */
 
+        $uploadedCount = 0;
+
+        // Manejar múltiples archivos
+        if ($request->hasFile('files')) {
+            foreach ($request->file('files') as $file) {
+                $path = $file->store('user_photos', 'public');
+                $media = Photo::create([
+                    'path' => $path,
+                    'nombre' => $request->nombre,
+                    'tipo' => $request->tipo,
+                ]);
+                $user->photos()->attach($media->id);
+                $uploadedCount++;
+            }
+        }
+
+        // Manejar archivo único (opción tradicional o perfil/portada)
         if ($request->hasFile('file')) {
             $path = $request->file('file')->store('user_photos', 'public');
-
             $media = Photo::create([
                 'path' => $path,
                 'nombre' => $request->nombre,
                 'tipo' => $request->tipo,
             ]);
-
             $user->photos()->attach($media->id);
-
-            return back()->with('success', 'Foto subida correctamente.');
+            $uploadedCount++;
         }
 
-        return back()->withErrors(['file' => 'Debe seleccionar una imagen.']);
+        if ($uploadedCount > 0) {
+            return back()->with('success', $uploadedCount > 1 ? 'Fotos subidas correctamente.' : 'Foto subida correctamente.');
+        }
+
+        return back()->withErrors(['file' => 'Debe seleccionar al menos una imagen.']);
     }
 
     /**

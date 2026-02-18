@@ -1,36 +1,31 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar';
 import { UserInfo } from '@/components/user-info';
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { type SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
 import { ChevronsUpDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export function NavUser() {
     const { auth } = usePage<SharedData>().props;
-    const { state } = useSidebar();
     const isMobile = useIsMobile();
 
     return (
-        <SidebarMenu>
-            <SidebarMenuItem className="bg-opacity-95 bg-gradient-to-b from-gray-700 via-gray-700 to-gray-700">
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <SidebarMenuButton size="lg" className="data-[state=open]:bg-sidebar-accent group text-white/80">
-                            <UserInfo user={auth.user} />
-                            <ChevronsUpDown className="ml-auto size-4" />
-                        </SidebarMenuButton>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                        className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
-                        align="end"
-                        side={isMobile ? 'bottom' : state === 'collapsed' ? 'left' : 'bottom'}
-                    >
-                        <UserMenuContent user={auth.user} />
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            </SidebarMenuItem>
-        </SidebarMenu>
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="flex items-center gap-2 px-2 py-1.5 text-left text-sm font-medium hover:bg-black/5 dark:hover:bg-white/10 text-foreground transition-all duration-200">
+                    <UserInfo user={auth.user} />
+                    <ChevronsUpDown className="ml-auto size-4 opacity-50" />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+                className="w-56 rounded-lg"
+                align="end"
+                side={isMobile ? 'bottom' : 'bottom'}
+            >
+                <UserMenuContent user={auth.user} />
+            </DropdownMenuContent>
+        </DropdownMenu>
     );
 }

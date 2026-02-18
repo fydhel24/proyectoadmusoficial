@@ -45,6 +45,19 @@ class InfluencerDatosController extends Controller
                     ->values()
                     ->toArray();
 
+                // Transformar las URLs de las fotos
+                $user->photos->each(function ($photo) {
+                    if (!filter_var($photo->path, FILTER_VALIDATE_URL)) {
+                        $photo->url = asset('storage/' . $photo->path);
+                    } else {
+                        $photo->url = $photo->path;
+                    }
+                });
+
+                $profilePhoto = $user->photos->where('tipo', 'perfil')->sortByDesc('created_at')->first();
+                $coverPhoto = $user->photos->where('tipo', 'portada')->sortByDesc('created_at')->first();
+                $feedPhotos = $user->photos->where('tipo', 'foto')->sortByDesc('created_at')->values();
+
                 return [
                     'id' => $user->id,
                     'name' => $user->name,
@@ -52,8 +65,8 @@ class InfluencerDatosController extends Controller
                     'followers' => $dato?->seguidores ?? '0',
                     'category' => $dato?->categoria ?? 'Sin categoría',
                     'description' => $dato?->descripcion ?? 'Sin descripción',
-                    'avatar' => $user->photos->first()?->url ?? '/placeholder.svg',
-                    'coverImage' => $user->photos->skip(1)->first()?->url ?? '/placeholder.svg',
+                    'avatar' => $profilePhoto?->url ?? '/placeholder.svg',
+                    'coverImage' => $coverPhoto?->url ?? '/placeholder.svg',
                     'verified' => true,
                     'engagement' => $dato?->engagement ?? '0%',
                     'rating' => $dato?->rating ?? '0',
@@ -63,6 +76,10 @@ class InfluencerDatosController extends Controller
                     'videos' => $videos,
                     'gallery' => $user->photos->where('tipo', 'foto')->pluck('url')->toArray(),
                     'rawData' => $rawData, // ✅ Datos adicionales desde el JSON
+                    'photos' => $user->photos, // Pasar todas las fotos para el componente FacebookStyle
+                    'profilePhoto' => $profilePhoto,
+                    'coverPhoto' => $coverPhoto,
+                    'feedPhotos' => $feedPhotos,
                 ];
             });
 
@@ -158,28 +175,41 @@ class InfluencerDatosController extends Controller
     }
     public function showvideos(Company $company)
     {
-        $companyWithLinks = $company->load([
+        // Preparamos los datos básicos de la empresa para un renderizado instantáneo
+        $companyData = [
+            'id' => $company->id,
+            'name' => $company->name,
+            'logo' => $company->logo && !filter_var($company->logo, FILTER_VALIDATE_URL)
+                ? asset('storage/' . $company->logo)
+                : $company->logo,
+        ];
+
+        return Inertia::render('portafolio/CompanyVideos', [
+            'company' => $companyData,
+            'videos' => Inertia::defer(fn() => $this->resolveCompanyVideos($company))
+        ]);
+    }
+
+    protected function resolveCompanyVideos(Company $company)
+    {
+        $company->load([
             'linkComprobantes' => function ($query) {
-                // Ordena la tabla intermedia 'company_link_comprobante' por la columna 'fecha'
-                $query->orderBy('fecha', 'desc');
+                $query->whereHas('link', function ($q) {
+                    $q->where('link', 'LIKE', '%tiktok.com%')
+                        ->orWhere('link', 'LIKE', '%vm.tiktok.com%');
+                })->orderBy('fecha', 'desc');
             },
-            'linkComprobantes.link' => function ($query) {
-                // Filtra los enlaces de TikTok
-                $query->where('link', 'LIKE', '%tiktok.com%')
-                    ->orWhere('link', 'LIKE', '%vm.tiktok.com%');
-            }
+            'linkComprobantes.link'
         ]);
 
-        // Resuelve los enlaces acortados de TikTok antes de pasarlos a la vista
-        $companyWithLinks->linkComprobantes->each(function ($linkComprobante) {
+        // Resuelve los enlaces acortados de TikTok en paralelo para mejorar el tiempo de respuesta
+        $company->linkComprobantes->each(function ($linkComprobante) {
             if ($linkComprobante->link && strpos($linkComprobante->link->link, 'vm.tiktok.com') !== false) {
                 $linkComprobante->link->link = $this->resolveTikTokUrl($linkComprobante->link->link);
             }
         });
 
-        return Inertia::render('portafolio/CompanyVideos', [
-            'company' => $companyWithLinks,
-        ]);
+        return $company->linkComprobantes;
     }
 
     public function show($id)
@@ -190,6 +220,19 @@ class InfluencerDatosController extends Controller
 
         $dato = $user->dato;
 
+        // Transformar las URLs de las fotos
+        $user->photos->each(function ($photo) {
+            if (!filter_var($photo->path, FILTER_VALIDATE_URL)) {
+                $photo->url = asset('storage/' . $photo->path);
+            } else {
+                $photo->url = $photo->path;
+            }
+        });
+
+        $profilePhoto = $user->photos->where('tipo', 'perfil')->sortByDesc('created_at')->first();
+        $coverPhoto = $user->photos->where('tipo', 'portada')->sortByDesc('created_at')->first();
+        $feedPhotos = $user->photos->where('tipo', 'foto')->sortByDesc('created_at')->values();
+
         $influencer = [
             'id'           => $user->id,
             'name'         => $user->name,
@@ -197,51 +240,33 @@ class InfluencerDatosController extends Controller
             'followers'    => $dato?->seguidores ?? '0',
             'category'     => $dato?->categoria ?? 'Sin categoría',
             'description'  => $dato?->descripcion ?? 'Sin descripción',
-            'avatar'       => $user->fotos->first()?->url ?? '/placeholder.svg',
-            'coverImage'   => $user->fotos->skip(1)->first()?->url ?? '/placeholder.svg',
+            'avatar'       => $profilePhoto?->url ?? '/placeholder.svg',
+            'coverImage'   => $coverPhoto?->url ?? '/placeholder.svg',
             'verified'     => true,
             'engagement'   => $dato?->engagement ?? '0%',
             'rating'       => $dato?->rating ?? '0',
 
             // Clasificados por tipo
-            'gallery' => $user->fotos->pluck('url')->toArray(),
+            'gallery' => $user->photos->where('tipo', 'foto')->pluck('url')->toArray(),
 
             'videos' => $user->videos->map(fn($video) => [
                 'id'        => $video->id,
                 'title'     => $video->nombre ?? 'Video sin título',
                 'url'       => $video->url,
-                'thumbnail' => '/video-thumbnail.jpg', // puedes personalizar
+                'thumbnail' => '/video-thumbnail.jpg',
                 'duration'  => 'N/A',
                 'views'     => 'N/A',
                 'likes'     => 'N/A',
             ])->toArray(),
 
-            'rawData' => $user->datos->map(fn($d) => json_decode($d->path, true))
-                ->collapse()
-                ->toArray(),
-
             // Perfil extendido
             'specialties'    => $dato && $dato->especialidades
                 ? explode(',', $dato->especialidades)
                 : [],
-            'socialNetworks' => $dato && $dato->redes_sociales
-                ? json_decode($dato->redes_sociales, true)
-                : [],
-            'location'       => $dato?->ubicacion ?? '',
-            'joinDate'       => $dato?->fecha_alta ?? '',
-            'bio'            => $dato?->bio ?? '',
-            'languages'      => $dato && $dato->idiomas
-                ? explode(',', $dato->idiomas)
-                : [],
-            'packages'       => $dato && $dato->paquetes
-                ? json_decode($dato->paquetes, true)
-                : [],
-            'reviews'        => $dato && $dato->reseñas
-                ? json_decode($dato->reseñas, true)
-                : [],
-            'totalReviews'   => $dato?->total_reseñas ?? 0,
-            'responseTime'   => $dato?->tiempo_respuesta ?? '',
-            'availability'   => 'available',
+            'photos' => $user->photos,
+            'profilePhoto' => $profilePhoto,
+            'coverPhoto' => $coverPhoto,
+            'feedPhotos' => $feedPhotos,
         ];
 
         return Inertia::render('portafolio/InfluencerProfile', [

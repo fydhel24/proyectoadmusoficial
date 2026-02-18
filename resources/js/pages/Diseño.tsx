@@ -44,7 +44,7 @@ const HeroSection = () => {
     const [isHovered, setIsHovered] = useState(false);
 
     return (
-        <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-[#1A1A1A] via-[#2F2F2F] to-[#000000]">
+        <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background">
             {/* Fondo diagonal con gradiente */}
             <div className="absolute inset-0">
                 <svg className="h-full w-full" preserveAspectRatio="none">
@@ -54,7 +54,7 @@ const HeroSection = () => {
                             <stop offset="100%" stopColor="#D70040" />
                         </linearGradient>
                     </defs>
-                    <polygon points="0,0 100%,0 0,100%" fill="url(#diagonalGradient)" fillOpacity="0.8" />
+                    <polygon points="0,0 100%,0 0,100%" fill="url(#diagonalGradient)" fillOpacity="0.1" />
                 </svg>
             </div>
 
@@ -105,36 +105,30 @@ const HeroSection = () => {
                     }}
                 >
                     <motion.h1
-                        className="mb-6 text-5xl leading-tight font-extrabold tracking-tight md:text-7xl lg:text-8xl"
-                        style={{ textShadow: '0 4px 16px rgba(255, 36, 0, 0.5)' }}
+                        className="mb-6 text-5xl leading-tight font-black tracking-tighter md:text-7xl lg:text-8xl font-orbitron"
+                        style={{ textShadow: '0 4px 16px rgba(217, 36, 0, 0.4)' }}
                         variants={{
                             hidden: { opacity: 0 },
                             visible: { opacity: 1, transition: { duration: 1 } },
                         }}
                     >
-                        <span className="inline-flex items-center gap-3">
-                            <FaPalette className="text-[#FF2400]" />
-                            Diseñador
+                        <span className="inline-flex items-center gap-3 uppercase">
+                            DISEÑO
                         </span>
-                        <span className="relative ml-2 text-[#FF2400]">
-                            Gráfico
-                            <motion.div
-                                className="absolute -inset-2 rounded-md bg-gradient-to-r from-red-600/30 to-gray-700/30 blur-xl"
-                                animate={{ scale: [1, 1.1, 1] }}
-                                transition={{ duration: 2, repeat: Infinity }}
-                            />
+                        <br />
+                        <span className="relative text-brand uppercase">
+                            GRÁFICO
                         </span>
                     </motion.h1>
 
                     <motion.p
-                        className="mb-8 max-w-lg text-lg leading-relaxed text-gray-300 md:text-xl"
+                        className="mb-8 max-w-lg text-lg leading-relaxed text-muted-foreground md:text-xl uppercase font-medium"
                         variants={{
                             hidden: { opacity: 0 },
                             visible: { opacity: 1, transition: { duration: 1.5 } },
                         }}
                     >
-                        Creando <span className="font-semibold text-[#FF2400]">experiencias visuales</span> únicas que conectan marcas con emociones.
-                        Cada diseño cuenta una historia, cada color transmite un sentimiento.
+                        Creando <span className="font-bold text-brand">experiencias visuales</span> únicas que conectan marcas con emociones.
                     </motion.p>
 
                     <motion.div
@@ -146,7 +140,7 @@ const HeroSection = () => {
                     >
                         <motion.a
                             href="#portfolio"
-                            className="rounded-full bg-gradient-to-r from-[#FF2400] via-[#8B0000] to-[#2F2F2F] px-10 py-4 text-xl font-semibold text-white shadow-lg transition-all duration-300 hover:shadow-red-600/40"
+                            className="rounded-none bg-brand px-10 py-5 text-xl font-bold text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)] transition-all duration-300 uppercase"
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={(e) => {
@@ -181,10 +175,10 @@ const HeroSection = () => {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.8, delay: 0.4, ease: 'easeOut' }}
                 >
-                    <div className="w-full max-w-md rounded-3xl border border-[#FF2400]/20 bg-gradient-to-br from-[#FF2400] via-[#333] to-[#1a1a1a] p-6 text-white shadow-2xl transition-transform duration-300 hover:scale-105">
-                        <h3 className="mb-3 text-2xl font-bold">¿Listo para crear?</h3>
-                        <p className="text-sm text-gray-200">
-                            Juntos podemos llevar tu marca al siguiente nivel a través de diseños visualmente impactantes y emocionalmente poderosos.
+                    <div className="w-full max-w-md rounded-none border border-border bg-muted/50 p-8 text-foreground shadow-2xl transition-all duration-300 hover:scale-105 backdrop-blur-sm">
+                        <h3 className="mb-3 text-2xl font-black font-orbitron text-brand uppercase">¿Listo para crear?</h3>
+                        <p className="text-lg text-muted-foreground uppercase font-medium">
+                            Juntos podemos llevar tu marca al siguiente nivel a través de diseños visualmente impactantes.
                         </p>
                     </div>
                 </motion.div>
@@ -202,7 +196,7 @@ const AboutSection = () => {
     ];
 
     return (
-        <section id="quienes-somos" className="bg-[#2F2F2F] px-6 py-24">
+        <section id="quienes-somos" className="bg-muted/30 px-6 py-24 border-y border-border">
             <motion.div
                 className="container mx-auto max-w-6xl text-center text-white"
                 initial="hidden"
@@ -272,66 +266,66 @@ const ServicesSection = () => {
     ];
 
     return (
-    <section id="servicios" className="bg-gradient-to-br from-[#1a1a1a] via-[#2f2f2f] to-[#3e3e3e] px-6 py-24 text-white">
-      <motion.div
-        className="container mx-auto"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
-        variants={staggerContainer}
-      >
-        {/* Título de la sección */}
-        <motion.div className="mb-20 text-center" variants={fadeIn}>
-          <h2 className="mb-6 text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#FF2400] via-[#8B0000] to-[#2f2f2f]">
-            Mis Servicios
-          </h2>
-          <p className="mx-auto max-w-3xl text-xl text-gray-300">
-            Ofrezco soluciones integrales de diseño que van desde la conceptualización hasta la implementación final, siempre con un enfoque creativo y estratégico.
-          </p>
-        </motion.div>
-
-        {/* Tarjetas de servicios */}
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
-          {services.map((service, index) => (
+        <section id="servicios" className="bg-gradient-to-br from-[#1a1a1a] via-[#2f2f2f] to-[#3e3e3e] px-6 py-24 text-white">
             <motion.div
-              key={index}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={fadeIn}
-              whileHover={{ y: -12, scale: 1.03 }}
-              className="relative overflow-hidden rounded-3xl bg-[#121212] p-8 shadow-xl transition-all duration-300 hover:shadow-red-700/40 group"
+                className="container mx-auto"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={staggerContainer}
             >
-              {/* Sombra animada al fondo */}
-              <div className="absolute inset-0 z-0 bg-gradient-to-br from-[#FF2400]/20 to-transparent opacity-0 group-hover:opacity-100 transition duration-500 blur-2xl" />
+                {/* Título de la sección */}
+                <motion.div className="mb-20 text-center" variants={fadeIn}>
+                    <h2 className="mb-6 text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#FF2400] via-[#8B0000] to-[#2f2f2f]">
+                        Mis Servicios
+                    </h2>
+                    <p className="mx-auto max-w-3xl text-xl text-gray-300">
+                        Ofrezco soluciones integrales de diseño que van desde la conceptualización hasta la implementación final, siempre con un enfoque creativo y estratégico.
+                    </p>
+                </motion.div>
 
-              {/* Contenido */}
-              <div className="relative z-10">
-                <div className="mb-6 text-[#FF6347] text-4xl">{service.icon}</div>
+                {/* Tarjetas de servicios */}
+                <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
+                    {services.map((service, index) => (
+                        <motion.div
+                            key={index}
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true }}
+                            variants={fadeIn}
+                            whileHover={{ y: -12, scale: 1.03 }}
+                            className="relative overflow-hidden rounded-3xl bg-[#121212] p-8 shadow-xl transition-all duration-300 hover:shadow-red-700/40 group"
+                        >
+                            {/* Sombra animada al fondo */}
+                            <div className="absolute inset-0 z-0 bg-gradient-to-br from-[#FF2400]/20 to-transparent opacity-0 group-hover:opacity-100 transition duration-500 blur-2xl" />
 
-                <h3 className="mb-4 text-2xl font-semibold text-white">
-                  {service.title}
-                </h3>
+                            {/* Contenido */}
+                            <div className="relative z-10">
+                                <div className="mb-6 text-[#FF6347] text-4xl">{service.icon}</div>
 
-                <p className="mb-6 text-gray-400 leading-relaxed">
-                  {service.description}
-                </p>
+                                <h3 className="mb-4 text-2xl font-semibold text-white">
+                                    {service.title}
+                                </h3>
 
-                <ul className="space-y-2 text-gray-300">
-                  {service.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-start gap-3">
-                      <span className="mt-1 h-2 w-2 rounded-full bg-[#FF2400] inline-block" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+                                <p className="mb-6 text-gray-400 leading-relaxed">
+                                    {service.description}
+                                </p>
+
+                                <ul className="space-y-2 text-gray-300">
+                                    {service.features.map((feature, idx) => (
+                                        <li key={idx} className="flex items-start gap-3">
+                                            <span className="mt-1 h-2 w-2 rounded-full bg-[#FF2400] inline-block" />
+                                            {feature}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </motion.div>
+                    ))}
+                </div>
             </motion.div>
-          ))}
-        </div>
-      </motion.div>
-    </section>
-  );
+        </section>
+    );
 };
 
 const PortfolioSection = () => {
@@ -428,9 +422,8 @@ const PortfolioSection = () => {
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={() => setActiveFilter(category)}
-                                className={`rounded-full px-6 py-3 font-medium transition-all duration-300 ${
-                                    activeFilter === category ? 'bg-[#FF2400] text-white' : 'border-2 border-[#444] text-gray-400 hover:text-white'
-                                }`}
+                                className={`rounded-full px-6 py-3 font-medium transition-all duration-300 ${activeFilter === category ? 'bg-[#FF2400] text-white' : 'border-2 border-[#444] text-gray-400 hover:text-white'
+                                    }`}
                             >
                                 {category.charAt(0).toUpperCase() + category.slice(1)}
                             </motion.button>
@@ -440,18 +433,16 @@ const PortfolioSection = () => {
                         <motion.button
                             whileHover={{ scale: 1.05 }}
                             onClick={() => setViewMode('grid')}
-                            className={`rounded-lg p-3 transition-colors ${
-                                viewMode === 'grid' ? 'bg-[#FF2400] text-white' : 'bg-gray-700 text-gray-300'
-                            }`}
+                            className={`rounded-lg p-3 transition-colors ${viewMode === 'grid' ? 'bg-[#FF2400] text-white' : 'bg-gray-700 text-gray-300'
+                                }`}
                         >
                             <Grid size={20} />
                         </motion.button>
                         <motion.button
                             whileHover={{ scale: 1.05 }}
                             onClick={() => setViewMode('list')}
-                            className={`rounded-lg p-3 transition-colors ${
-                                viewMode === 'list' ? 'bg-[#FF2400] text-white' : 'bg-gray-700 text-gray-300'
-                            }`}
+                            className={`rounded-lg p-3 transition-colors ${viewMode === 'list' ? 'bg-[#FF2400] text-white' : 'bg-gray-700 text-gray-300'
+                                }`}
                         >
                             <List size={20} />
                         </motion.button>

@@ -13,10 +13,4 @@ class Photo extends Model
     {
         return $this->belongsToMany(User::class, 'photo_user');
     }
-
-    // Función para obtener URL completa
-    public function getUrlAttribute()
-    {
-        return asset($this->path); // ✅ ya no uses 'storage/', solo el path tal cual esté guardado
-    }
 }

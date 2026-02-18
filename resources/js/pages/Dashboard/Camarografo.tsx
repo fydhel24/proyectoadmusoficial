@@ -1,21 +1,13 @@
+'use client';
+
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
 import AppLayout from '@/layouts/app-layout';
 import type { PageProps } from '@/types';
 import { Head } from '@inertiajs/react';
-import { Box, Button, Chip, Grid, LinearProgress, Paper, Typography, useTheme } from '@mui/material';
-import { motion } from 'framer-motion';
+import { Activity, Calendar, CheckCircle2, Clock, Film, History, Star, Target, TrendingUp } from 'lucide-react';
 
-// Íconos de MUI (Simplificamos usando los de MUI para evitar redefinir SVGs)
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import BarChartIcon from '@mui/icons-material/BarChart';
-import CalendarIcon from '@mui/icons-material/CalendarToday';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
-import PendingActionsIcon from '@mui/icons-material/PendingActions';
-import RocketIcon from '@mui/icons-material/RocketLaunch';
-import StarIcon from '@mui/icons-material/Star';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-
-// --- Interfaces ---
 interface DashboardProps extends PageProps {
     user: {
         name: string;
@@ -33,387 +25,167 @@ interface DashboardProps extends PageProps {
     estadoFrecuente: string | null;
 }
 
-// --- Componente Principal ---
-
 export default function Dashboard({ user, estadisticas, totalTareas, completadasSemana, ultimaTarea, estadoFrecuente }: DashboardProps) {
-    const theme = useTheme();
+    const breadcrumbs = [{ title: 'Panel de Control', href: '/dashboard' }];
+
     const completionRate = totalTareas > 0 ? (estadisticas.completado / totalTareas) * 100 : 0;
-    const pendienteRate = totalTareas > 0 ? (estadisticas.pendiente / totalTareas) * 100 : 0;
-
-    // Colores y datos adaptados a tus métricas originales
-    const statsCards = [
-        {
-            title: 'Grabaciones Pendientes',
-            value: estadisticas.pendiente,
-            icon: <PendingActionsIcon fontSize="large" />,
-            color: '#FF5F6D', // Rojo Suave
-            gradient: 'linear-gradient(135deg, #FF5F6D, #FFC371)',
-            description: 'Requieren tu atención',
-        },
-        {
-            title: 'Completadas',
-            value: estadisticas.completado,
-            icon: <CheckCircleIcon fontSize="large" />,
-            color: '#36D1DC', // Azul Cian
-            gradient: 'linear-gradient(135deg, #36D1DC, #5B86E5)',
-            description: 'Finalizadas con éxito',
-        },
-        {
-            title: 'Total De Grabaciones',
-            value: totalTareas,
-            icon: <FormatListNumberedIcon fontSize="large" />,
-            color: '#764ba2', // Púrpura
-            gradient: 'linear-gradient(135deg, #A8C0FF, #3F2B96)',
-            description: 'Total gestionado',
-        },
-    ];
-
-    // Animaciones de Framer Motion
-    const containerVariants = {
-        hidden: { opacity: 0 },
-        visible: {
-            opacity: 1,
-            transition: {
-                staggerChildren: 0.15,
-            },
-        },
-    };
-
-    const itemVariants = {
-        hidden: { opacity: 0, y: 30 },
-        visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100, damping: 12 } },
-        hover: {
-            scale: 1.05,
-            boxShadow: '0 15px 30px rgba(0,0,0,0.25)',
-            transition: { duration: 0.3 },
-        },
-    };
-
-    // Estilo de papel Glassmorphism
-    const glassPaperStyle = {
-        p: 4,
-        borderRadius: 4,
-        background: 'rgba(255,255,255,0.7)', // Menor opacidad para más "vidrio"
-        backdropFilter: 'blur(15px)',
-        border: '1px solid rgba(255,255,255,0.4)',
-        boxShadow: theme.shadows[10],
-    };
+    const progressTrend = completadasSemana > 0 ? `+${completadasSemana} esta semana` : 'Sin actividad esta semana';
 
     return (
-        <AppLayout breadcrumbs={[{ title: 'Panel de control', href: '/dashboard' }]}>
-            <Head title="Panel de Control" />
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title="Panel de Camarógrafo | Admus Productions" />
 
-            <Box
-                sx={{
-                    // Fondo de Gradiente y Estilos de la Muestra
-                    minHeight: 'calc(100vh - 64px)',
-                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', // Fondo degradado
-                    padding: { xs: '2rem 1rem', sm: '3rem 2rem', md: '4rem 3rem' },
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    position: 'relative',
-                    overflow: 'hidden',
-                }}
-            >
-                {/* Elementos Decorativos de Fondo (como en la muestra) */}
-                <Box
-                    sx={{
-                        position: 'absolute',
-                        top: '10%',
-                        left: '10%',
-                        width: 120,
-                        height: 120,
-                        borderRadius: '50%',
-                        background: 'rgba(255,255,255,0.15)',
-                        animation: 'float 6s ease-in-out infinite',
-                        zIndex: 0,
-                    }}
-                />
-                <Box
-                    sx={{
-                        position: 'absolute',
-                        top: '60%',
-                        right: '15%',
-                        width: 80,
-                        height: 80,
-                        borderRadius: '50%',
-                        background: 'rgba(255,255,255,0.1)',
-                        animation: 'float 8s ease-in-out infinite reverse',
-                        zIndex: 0,
-                    }}
-                />
+            <div className="min-h-screen bg-slate-50 p-6 md:p-10 dark:bg-slate-950">
+                <div className="mx-auto max-w-7xl space-y-10">
+                    {/* Cinematic Welcome Section */}
+                    <div className="relative overflow-hidden rounded-[3rem] border border-slate-800 bg-slate-900 p-8 text-white shadow-2xl md:p-16 dark:bg-slate-900">
+                        <div className="relative z-10 flex flex-col items-center gap-8 text-center md:flex-row md:text-left">
+                            <div className="animate-in zoom-in flex h-24 w-24 items-center justify-center rounded-[2rem] bg-gradient-to-br from-red-600 to-red-800 shadow-2xl duration-500 md:h-32 md:w-32">
+                                <Film className="h-12 w-12 text-white md:h-16 md:w-16" />
+                            </div>
+                            <div className="space-y-4">
+                                <h1 className="font-orbitron text-4xl font-black tracking-tight uppercase md:text-6xl">
+                                    ¡HOLA, <span className="text-red-600">{user.name.split(' ')[0]}</span>!
+                                </h1>
+                                <p className="max-w-2xl text-lg font-medium text-slate-400">
+                                    Panel de Control - Resumen Ejecutivo de tus Grabaciones. <br />
+                                    Capturando momentos, creando historias.
+                                </p>
+                                {totalTareas > 0 && (
+                                    <div className="flex flex-wrap items-center justify-center gap-3 md:justify-start">
+                                        <Badge className="border-white/10 bg-white/10 px-4 py-1.5 text-xs font-black tracking-widest text-white uppercase backdrop-blur-md">
+                                            <Target className="mr-2 h-4 w-4 text-red-500" />
+                                            EFICACIA: {completionRate.toFixed(1)}%
+                                        </Badge>
+                                        <Badge className="border-white/10 bg-white/10 px-4 py-1.5 text-xs font-black tracking-widest text-white uppercase backdrop-blur-md">
+                                            <TrendingUp className="mr-2 h-4 w-4 text-emerald-500" />
+                                            {progressTrend}
+                                        </Badge>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
 
-                {/* --- SECCIÓN DE BIENVENIDA --- */}
-                <motion.div
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8 }}
-                    style={{ textAlign: 'center', marginBottom: '3rem', zIndex: 1, width: '100%', maxWidth: 1000 }}
-                >
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
-                        <Typography
-                            variant="h3"
-                            component="h1"
-                            sx={{
-                                fontWeight: 800,
-                                color: 'white',
-                                textShadow: '0 2px 4px rgba(0,0,0,0.3)',
-                                mr: 2,
-                                fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
-                            }}
-                        >
-                            ¡ Holaaa, {user.name} !
-                        </Typography>
+                        {/* Background visual flair */}
+                        <div className="absolute top-0 right-0 h-full w-1/3 bg-gradient-to-l from-red-600/10 to-transparent blur-3xl" />
+                    </div>
 
-                        <Box sx={{ color: 'white', animation: 'bounce 2s infinite' }}>
-                            <RocketIcon fontSize="large" />
-                        </Box>
-                    </Box>
+                    {/* Stats Grid */}
+                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+                        <MetricCard
+                            label="Pendientes"
+                            value={estadisticas.pendiente}
+                            icon={<Clock className="h-6 w-6" />}
+                            color="bg-rose-600"
+                            desc="Grabaciones por realizar"
+                        />
+                        <MetricCard
+                            label="Completadas"
+                            value={estadisticas.completado}
+                            icon={<CheckCircle2 className="h-6 w-6" />}
+                            color="bg-emerald-600"
+                            desc="Material finalizado"
+                        />
+                        <MetricCard
+                            label="Total Proyectos"
+                            value={totalTareas}
+                            icon={<Activity className="h-6 w-6" />}
+                            color="bg-indigo-600"
+                            desc="Volumen histórico"
+                        />
+                    </div>
 
-                    <Typography
-                        variant="h6"
-                        sx={{
-                            color: 'rgba(255,255,255,0.9)',
-                            mb: 3,
-                            textShadow: '0 1px 2px rgba(0,0,0,0.2)',
-                            fontWeight: 500,
-                        }}
-                    >
-                        Panel de Control - Resumen de tus Grabaciones
-                    </Typography>
+                    {/* Secondary Data Sections */}
+                    <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+                        {/* Rendimiento Column */}
+                        <div className="space-y-6">
+                            <h2 className="flex items-center gap-2 text-xl font-black tracking-widest text-slate-900 uppercase dark:text-white">
+                                <TrendingUp className="h-5 w-5 text-red-600" />
+                                Rendimiento Semanal
+                            </h2>
+                            <Card className="rounded-[2rem] border-0 shadow-lg dark:bg-slate-900/50">
+                                <CardContent className="space-y-6 p-8">
+                                    <div className="flex items-center justify-between rounded-2xl bg-slate-50 p-4 dark:bg-slate-800/50">
+                                        <div className="flex items-center gap-3 font-bold text-slate-700 dark:text-slate-300">
+                                            <Calendar className="h-5 w-5 text-indigo-600" />
+                                            <span>Semanal (Output):</span>
+                                        </div>
+                                        <Badge className="bg-indigo-600 px-4 font-black">{completadasSemana}</Badge>
+                                    </div>
+                                    <div className="flex items-center justify-between rounded-2xl bg-slate-50 p-4 dark:bg-slate-800/50">
+                                        <div className="flex items-center gap-3 font-bold text-slate-700 dark:text-slate-300">
+                                            <Star className="h-5 w-5 text-amber-500" />
+                                            <span>Estado Frecuente:</span>
+                                        </div>
+                                        <Badge variant="outline" className="border-amber-500 px-4 font-black text-amber-600 uppercase">
+                                            {estadoFrecuente || 'N/A'}
+                                        </Badge>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </div>
 
-                    {totalTareas > 0 && (
-                        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.5, type: 'spring', stiffness: 200 }}>
-                            <Chip
-                                icon={<BarChartIcon />}
-                                label={`Tasa de Completado: ${completionRate.toFixed(1)}%`}
-                                sx={{
-                                    bgcolor: 'rgba(255,255,255,0.2)',
-                                    color: 'white',
-                                    fontWeight: 'bold',
-                                    backdropFilter: 'blur(10px)',
-                                    fontSize: '1rem',
-                                    height: 40,
-                                    '& .MuiChip-icon': { color: 'white' },
-                                }}
-                            />
-                        </motion.div>
-                    )}
-                </motion.div>
-
-                {/* --- TARJETAS PRINCIPALES (STATS CARDS) --- */}
-                <motion.div
-                    variants={containerVariants}
-                    initial="hidden"
-                    animate="visible"
-                    style={{ width: '100%', maxWidth: 1200, marginBottom: '3rem', zIndex: 1 }}
-                >
-                    <Grid container spacing={3} justifyContent="center">
-                        {statsCards.map((stat, index) => (
-                            <Grid item xs={12} sm={6} md={4} key={index}>
-                                <motion.div variants={itemVariants} whileHover="hover">
-                                    <Paper
-                                        elevation={12}
-                                        sx={{
-                                            ...glassPaperStyle,
-                                            p: 3,
-                                            textAlign: 'center',
-                                            position: 'relative',
-                                            overflow: 'hidden',
-                                        }}
-                                    >
-                                        {/* Barra superior de color */}
-                                        <Box
-                                            sx={{
-                                                position: 'absolute',
-                                                top: 0,
-                                                left: 0,
-                                                right: 0,
-                                                height: 5,
-                                                background: stat.gradient,
-                                            }}
+                        {/* Progreso General Column */}
+                        <div className="space-y-6">
+                            <h2 className="flex items-center gap-2 text-xl font-black tracking-widest text-slate-900 uppercase dark:text-white">
+                                <Target className="h-5 w-5 text-red-600" />
+                                Progreso General
+                            </h2>
+                            <Card className="rounded-[2rem] border-0 shadow-lg dark:bg-slate-900/50">
+                                <CardContent className="space-y-8 p-8">
+                                    <div className="space-y-3">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-sm font-black tracking-[0.1em] text-slate-500 uppercase">Tasa de Finalización</span>
+                                            <span className="text-lg font-black text-emerald-600">{completionRate.toFixed(1)}%</span>
+                                        </div>
+                                        <Progress
+                                            value={completionRate}
+                                            className="h-4 bg-slate-100 dark:bg-slate-800"
+                                            indicatorClassName="bg-gradient-to-r from-emerald-500 to-indigo-600"
                                         />
+                                    </div>
 
-                                        <Box
-                                            sx={{
-                                                color: stat.color,
-                                                mb: 2,
-                                                p: 2,
-                                                borderRadius: '50%',
-                                                background: `${stat.color}20`,
-                                                display: 'inline-flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                mt: 2,
-                                            }}
-                                        >
-                                            {stat.icon}
-                                        </Box>
-
-                                        <Typography
-                                            variant="h2"
-                                            sx={{
-                                                fontWeight: 'bold',
-                                                color: stat.color,
-                                                mb: 1,
-                                                textShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                                            }}
-                                        >
-                                            {stat.value}
-                                        </Typography>
-
-                                        <Typography
-                                            variant="h6"
-                                            sx={{
-                                                fontWeight: 600,
-                                                color: 'text.primary',
-                                                mb: 1,
-                                            }}
-                                        >
-                                            {stat.title}
-                                        </Typography>
-
-                                        <Typography
-                                            variant="body2"
-                                            sx={{
-                                                color: 'text.secondary',
-                                                fontStyle: 'italic',
-                                            }}
-                                        >
-                                            {stat.description}
-                                        </Typography>
-                                    </Paper>
-                                </motion.div>
-                            </Grid>
-                        ))}
-                    </Grid>
-                </motion.div>
-
-                {/* --- MÉTRICAS ADICIONALES Y PROGRESO --- */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5, duration: 0.8 }}
-                    style={{ width: '100%', maxWidth: 1200, marginBottom: '3rem', zIndex: 1 }}
-                >
-                    <Grid container spacing={3}>
-                        {/* Tareas Semanales y Frecuencia */}
-                        <Grid item xs={12} md={6}>
-                            <Paper sx={glassPaperStyle}>
-                                <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, color: theme.palette.primary.main }}>
-                                    Rendimiento
-                                </Typography>
-                                {/* Tareas Completadas Semana */}
-                                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                                    <TrendingUpIcon color="primary" sx={{ mr: 1 }} />
-                                    <Typography variant="body1" sx={{ fontWeight: 600, flex: 1 }}>
-                                        Grabaciones completadas esta semana:
-                                    </Typography>
-                                    <Chip label={completadasSemana} color="primary" size="small" sx={{ fontWeight: 'bold' }} />
-                                </Box>
-                                {/* Estado Frecuente */}
-                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                    <StarIcon color="warning" sx={{ mr: 1 }} />
-                                    <Typography variant="body1" sx={{ fontWeight: 600, flex: 1 }}>
-                                        Estado más frecuente:
-                                    </Typography>
-                                    <Chip label={estadoFrecuente ?? 'N/A'} color="warning" size="small" sx={{ fontWeight: 'bold' }} />
-                                </Box>
-                            </Paper>
-                        </Grid>
-
-                        {/* Última Tarea y Tasa de Finalización */}
-                        <Grid item xs={12} md={6}>
-                            <Paper sx={glassPaperStyle}>
-                                <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, color: theme.palette.secondary.main }}>
-                                    Progreso General
-                                </Typography>
-
-                                {/* Tasa de Finalización (Barra de progreso) */}
-                                <Box sx={{ mb: 2 }}>
-                                    <Typography variant="body1" sx={{ fontWeight: 600, mb: 1 }}>
-                                        Tasa de Finalización: **{completionRate.toFixed(1)}%**
-                                    </Typography>
-                                    <LinearProgress
-                                        variant="determinate"
-                                        value={completionRate}
-                                        sx={{
-                                            height: 12,
-                                            borderRadius: 6,
-                                            bgcolor: '#eee',
-                                            '& .MuiLinearProgress-bar': {
-                                                background: 'linear-gradient(90deg, #36D1DC, #5B86E5)',
-                                            },
-                                        }}
-                                    />
-                                </Box>
-
-                                {/* Última Tarea Completada */}
-                                <Box>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                                        <AccessTimeIcon color="action" sx={{ mr: 1 }} />
-                                        <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                                            Última grabacion completada:
-                                        </Typography>
-                                    </Box>
-                                    {ultimaTarea ? (
-                                        <>
-                                            <Typography variant="body2" sx={{ ml: 3, fontWeight: 500 }}>
-                                                {ultimaTarea.titulo}
-                                            </Typography>
-                                            <Typography variant="caption" color="text.secondary" sx={{ ml: 3 }}>
-                                                {new Date(ultimaTarea.fecha).toLocaleDateString()}
-                                            </Typography>
-                                        </>
-                                    ) : (
-                                        <Typography variant="body2" color="text.secondary" sx={{ ml: 3 }}>
-                                            Ninguna completada aún
-                                        </Typography>
-                                    )}
-                                </Box>
-                            </Paper>
-                        </Grid>
-                    </Grid>
-                </motion.div>
-
-                {/* Action Button (Añadido para completar el estilo de la muestra) */}
-                <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-                    style={{ zIndex: 1, marginTop: '2rem' }}
-                >
-                </motion.div>
-
-                {/* CSS Animations (necesarias para 'float' y 'bounce') */}
-                <style jsx global>{`
-                    @keyframes float {
-                        0%,
-                        100% {
-                            transform: translateY(0px);
-                        }
-                        50% {
-                            transform: translateY(-20px);
-                        }
-                    }
-                    @keyframes bounce {
-                        0%,
-                        20%,
-                        50%,
-                        80%,
-                        100% {
-                            transform: translateY(0);
-                        }
-                        40% {
-                            transform: translateY(-10px);
-                        }
-                        60% {
-                            transform: translateY(-5px);
-                        }
-                    }
-                `}</style>
-            </Box>
+                                    <div className="border-t border-slate-100 pt-6 dark:border-slate-800">
+                                        <div className="mb-4 flex items-center gap-2 text-sm font-black tracking-widest text-slate-400 uppercase">
+                                            <History className="h-4 w-4" />
+                                            Último material entregado
+                                        </div>
+                                        {ultimaTarea ? (
+                                            <div className="space-y-1 rounded-2xl bg-slate-900 p-4 text-white shadow-xl">
+                                                <h4 className="line-clamp-1 font-black tracking-tight text-red-500 uppercase">
+                                                    {ultimaTarea.titulo}
+                                                </h4>
+                                                <p className="text-[11px] font-bold text-slate-400">
+                                                    {new Date(ultimaTarea.fecha).toLocaleDateString()}
+                                                </p>
+                                            </div>
+                                        ) : (
+                                            <div className="py-4 text-center font-medium text-slate-400 italic">
+                                                No se han registrado entregas aún.
+                                            </div>
+                                        )}
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </AppLayout>
+    );
+}
+
+function MetricCard({ label, value, icon, color, desc }: any) {
+    return (
+        <Card className="overflow-hidden border-0 shadow-lg transition-all hover:translate-y-[-4px] hover:shadow-2xl">
+            <CardContent className="flex items-center gap-5 p-6 md:p-8">
+                <div className={`flex h-16 w-16 items-center justify-center rounded-[1.5rem] text-white shadow-xl ${color}`}>{icon}</div>
+                <div>
+                    <p className="mb-1 text-[10px] leading-none font-black tracking-[0.2em] text-slate-400 uppercase">{label}</p>
+                    <p className="text-4xl leading-none font-black text-slate-900 dark:text-white">{value}</p>
+                    <p className="mt-2 text-[10px] leading-none font-bold tracking-tighter text-slate-400 uppercase opacity-80">{desc}</p>
+                </div>
+            </CardContent>
+        </Card>
     );
 }

@@ -1,0 +1,115 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Contact;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Illuminate\Support\Facades\Validator;
+
+class ContactController extends Controller
+{
+    public function index()
+    {
+        $contacts = Contact::latest()->get()->map(function ($contact) {
+            return [
+                'id' => $contact->id,
+                'nombrecompleto' => $contact->nombrecompleto,
+                'correoelectronico' => $contact->correoelectronico,
+                'presupuesto' => number_format($contact->presupuesto, 2, ',', '.'),
+                'celular' => $contact->celular,
+                'descripcion' => $contact->descripcion,
+                'empresa' => $contact->empresa,
+                'estado' => $contact->estado,
+                'estado_label' => $contact->estado_label,
+                'estado_color' => $contact->estado_color,
+                'created_at' => $contact->created_at->format('d/m/Y H:i'),
+            ];
+        });
+
+        return Inertia::render('Contacts/Index', [
+            'contacts' => $contacts
+        ]);
+    }
+
+    public function create()
+    {
+        return Inertia::render('Contacts/Create');
+    }
+
+    public function store(Request $request)
+    {
+        $messages = [
+            'nombrecompleto.required' => 'El nombre completo es obligatorio.',
+            'correoelectronico.required' => 'El correo electrónico es obligatorio.',
+            'correoelectronico.email' => 'Debes ingresar un correo electrónico válido.',
+            'presupuesto.required' => 'El presupuesto es obligatorio.',
+            'presupuesto.numeric' => 'El presupuesto debe ser un número.',
+            'celular.required' => 'El número de celular es obligatorio.',
+            'descripcion.required' => 'La descripción es obligatoria.',
+            'empresa.required' => 'El nombre de la empresa es obligatorio.',
+        ];
+
+        Validator::make($request->all(), [
+            'nombrecompleto' => 'required|string|max:255',
+            'correoelectronico' => 'required|email',
+            'presupuesto' => 'required|numeric|min:0',
+            'celular' => 'required|string|max:20',
+            'descripcion' => 'required|string',
+            'empresa' => 'required|string|max:255',
+        ], $messages)->validate();
+
+        Contact::create($request->all());
+
+        return back()->with('success', '¡Gracias! Nos pondremos en contacto contigo pronto.');
+    }
+
+    public function edit(Contact $contact)
+    {
+        return Inertia::render('Contacts/Edit', [
+            'contact' => $contact
+        ]);
+    }
+
+    public function update(Request $request, Contact $contact)
+    {
+        $messages = [
+            'nombrecompleto.required' => 'El nombre completo es obligatorio.',
+            'correoelectronico.required' => 'El correo electrónico es obligatorio.',
+            'correoelectronico.email' => 'Debes ingresar un correo electrónico válido.',
+            'presupuesto.required' => 'El presupuesto es obligatorio.',
+            'presupuesto.numeric' => 'El presupuesto debe ser un número.',
+            'celular.required' => 'El número de celular es obligatorio.',
+            'descripcion.required' => 'La descripción es obligatoria.',
+            'empresa.required' => 'El nombre de la empresa es obligatorio.',
+        ];
+
+        Validator::make($request->all(), [
+            'nombrecompleto' => 'required|string|max:255',
+            'correoelectronico' => 'required|email',
+            'presupuesto' => 'required|numeric|min:0',
+            'celular' => 'required|string|max:20',
+            'descripcion' => 'required|string',
+            'empresa' => 'required|string|max:255',
+            'estado' => 'boolean'
+        ], $messages)->validate();
+
+        $contact->update($request->all());
+
+        return redirect()->route('contacts.index')->with('success', 'Contacto actualizado exitosamente');
+    }
+
+    public function destroy(Contact $contact)
+    {
+        $contact->delete();
+
+        return redirect()->route('contacts.index')->with('success', 'Contacto eliminado exitosamente');
+    }
+
+    public function toggleEstado(Contact $contact)
+    {
+        $contact->update(['estado' => !$contact->estado]);
+
+        return back()->with('success', $contact->estado ? 'Marcado como revisado' : 'Marcado como pendiente');
+    }
+}

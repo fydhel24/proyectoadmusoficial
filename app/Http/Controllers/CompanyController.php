@@ -124,20 +124,12 @@ class CompanyController extends Controller
 
         // Guardar contrato
         if ($request->hasFile('contrato')) {
-            $filename = time() . '_' . uniqid() . '.' . $request->file('contrato')->getClientOriginalExtension();
-            $destination = $_SERVER['DOCUMENT_ROOT'] . '/contratos';
-            if (!file_exists($destination)) mkdir($destination, 0755, true);
-            $request->file('contrato')->move($destination, $filename);
-            $validated['contrato'] = 'contratos/' . $filename;
+            $validated['contrato'] = $request->file('contrato')->store('contratos', 'public');
         }
 
         // Guardar logo
         if ($request->hasFile('logo')) {
-            $filename = time() . '_' . uniqid() . '.' . $request->file('logo')->getClientOriginalExtension();
-            $destination = $_SERVER['DOCUMENT_ROOT'] . '/logos';
-            if (!file_exists($destination)) mkdir($destination, 0755, true);
-            $request->file('logo')->move($destination, $filename);
-            $validated['logo'] = 'logos/' . $filename;
+            $validated['logo'] = $request->file('logo')->store('logos', 'public');
         }
 
         $company = Company::create($validated);
@@ -149,7 +141,7 @@ class CompanyController extends Controller
         }
 
         if ($request->boolean('crear_usuario')) {
-            $email = Str::slug($company->name, '') . 'admusproductions.com';
+            $email = Str::slug($company->name, '') . '@admusproductions.com';
             $password = $email;
 
             $user = User::create([
@@ -257,30 +249,20 @@ class CompanyController extends Controller
 
         // Contrato
         if ($request->hasFile('contrato')) {
-            if ($company->contrato && file_exists($_SERVER['DOCUMENT_ROOT'] . '/' . $company->contrato)) {
-                unlink($_SERVER['DOCUMENT_ROOT'] . '/' . $company->contrato);
+            if ($company->contrato) {
+                Storage::disk('public')->delete($company->contrato);
             }
-
-            $filename = time() . '_' . uniqid() . '.' . $request->file('contrato')->getClientOriginalExtension();
-            $destination = $_SERVER['DOCUMENT_ROOT'] . '/contratos';
-            if (!file_exists($destination)) mkdir($destination, 0755, true);
-            $request->file('contrato')->move($destination, $filename);
-            $validated['contrato'] = 'contratos/' . $filename;
+            $validated['contrato'] = $request->file('contrato')->store('contratos', 'public');
         } else {
             unset($validated['contrato']);
         }
 
         // Logo
         if ($request->hasFile('logo')) {
-            if ($company->logo && file_exists($_SERVER['DOCUMENT_ROOT'] . '/' . $company->logo)) {
-                unlink($_SERVER['DOCUMENT_ROOT'] . '/' . $company->logo);
+            if ($company->logo) {
+                Storage::disk('public')->delete($company->logo);
             }
-
-            $filename = time() . '_' . uniqid() . '.' . $request->file('logo')->getClientOriginalExtension();
-            $destination = $_SERVER['DOCUMENT_ROOT'] . '/logos';
-            if (!file_exists($destination)) mkdir($destination, 0755, true);
-            $request->file('logo')->move($destination, $filename);
-            $validated['logo'] = 'logos/' . $filename;
+            $validated['logo'] = $request->file('logo')->store('logos', 'public');
         } else {
             unset($validated['logo']);
         }
@@ -295,7 +277,7 @@ class CompanyController extends Controller
         }
 
         if ($request->boolean('crear_usuario')) {
-            $email = Str::slug($company->name, '') . 'admusproductions.com';
+            $email = Str::slug($company->name, '') . '@admusproductions.com';
             $password = $email;
 
             $user = User::create([
@@ -369,7 +351,7 @@ class CompanyController extends Controller
             'paquetes' => $paquetes, // Agrega esto
         ]);
     }
-     // Almacenar una nueva compañía
+    // Almacenar una nueva compañía
     public function storemark(Request $request)
     {
         $availability = $request->input('availability', []);
@@ -427,20 +409,12 @@ class CompanyController extends Controller
 
         // Guardar contrato
         if ($request->hasFile('contrato')) {
-            $filename = time() . '_' . uniqid() . '.' . $request->file('contrato')->getClientOriginalExtension();
-            $destination = $_SERVER['DOCUMENT_ROOT'] . '/contratos';
-            if (!file_exists($destination)) mkdir($destination, 0755, true);
-            $request->file('contrato')->move($destination, $filename);
-            $validated['contrato'] = 'contratos/' . $filename;
+            $validated['contrato'] = $request->file('contrato')->store('contratos', 'public');
         }
 
         // Guardar logo
         if ($request->hasFile('logo')) {
-            $filename = time() . '_' . uniqid() . '.' . $request->file('logo')->getClientOriginalExtension();
-            $destination = $_SERVER['DOCUMENT_ROOT'] . '/logos';
-            if (!file_exists($destination)) mkdir($destination, 0755, true);
-            $request->file('logo')->move($destination, $filename);
-            $validated['logo'] = 'logos/' . $filename;
+            $validated['logo'] = $request->file('logo')->store('logos', 'public');
         }
 
         $company = Company::create($validated);
@@ -452,7 +426,7 @@ class CompanyController extends Controller
         }
 
         if ($request->boolean('crear_usuario')) {
-            $email = Str::slug($company->name, '') . 'admusproductions.com';
+            $email = Str::slug($company->name, '') . '@admusproductions.com';
             $password = $email;
 
             $user = User::create([
@@ -526,7 +500,7 @@ class CompanyController extends Controller
             'has_user' => $hasUser,
         ]);
     }
-     public function updatemark(Request $request, $id)
+    public function updatemark(Request $request, $id)
     {
         $company = Company::findOrFail($id);
 
@@ -559,30 +533,20 @@ class CompanyController extends Controller
 
         // Contrato
         if ($request->hasFile('contrato')) {
-            if ($company->contrato && file_exists($_SERVER['DOCUMENT_ROOT'] . '/' . $company->contrato)) {
-                unlink($_SERVER['DOCUMENT_ROOT'] . '/' . $company->contrato);
+            if ($company->contrato) {
+                Storage::disk('public')->delete($company->contrato);
             }
-
-            $filename = time() . '_' . uniqid() . '.' . $request->file('contrato')->getClientOriginalExtension();
-            $destination = $_SERVER['DOCUMENT_ROOT'] . '/contratos';
-            if (!file_exists($destination)) mkdir($destination, 0755, true);
-            $request->file('contrato')->move($destination, $filename);
-            $validated['contrato'] = 'contratos/' . $filename;
+            $validated['contrato'] = $request->file('contrato')->store('contratos', 'public');
         } else {
             unset($validated['contrato']);
         }
 
         // Logo
         if ($request->hasFile('logo')) {
-            if ($company->logo && file_exists($_SERVER['DOCUMENT_ROOT'] . '/' . $company->logo)) {
-                unlink($_SERVER['DOCUMENT_ROOT'] . '/' . $company->logo);
+            if ($company->logo) {
+                Storage::disk('public')->delete($company->logo);
             }
-
-            $filename = time() . '_' . uniqid() . '.' . $request->file('logo')->getClientOriginalExtension();
-            $destination = $_SERVER['DOCUMENT_ROOT'] . '/logos';
-            if (!file_exists($destination)) mkdir($destination, 0755, true);
-            $request->file('logo')->move($destination, $filename);
-            $validated['logo'] = 'logos/' . $filename;
+            $validated['logo'] = $request->file('logo')->store('logos', 'public');
         } else {
             unset($validated['logo']);
         }
@@ -597,7 +561,7 @@ class CompanyController extends Controller
         }
 
         if ($request->boolean('crear_usuario')) {
-            $email = Str::slug($company->name, '') . 'admusproductions.com';
+            $email = Str::slug($company->name, '') . '@admusproductions.com';
             $password = $email;
 
             $user = User::create([

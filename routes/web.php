@@ -43,9 +43,23 @@ use App\Http\Controllers\TipoController;
 use App\Http\Controllers\VideosController;
 use App\Http\Controllers\WeekController;
 use App\Models\Company;
+use App\Http\Controllers\ContactController;
 
 Route::get('/', function () {
-    return Inertia::render('welcome');
+    $companies = Company::select('id', 'name', 'logo')
+        ->whereNotNull('logo')
+        ->get()
+        ->map(function ($company) {
+            return [
+                'id' => $company->id,
+                'name' => $company->name,
+                'logo' => $company->logo ? asset('storage/' . $company->logo) : null
+            ];
+        });
+
+    return Inertia::render('welcome', [
+        'companies' => $companies
+    ]);
 })->name('home');
 
 Route::get('/fotografias', fn() => Inertia::render('fotografias/fotografia'))
@@ -61,6 +75,12 @@ Route::get('/consultorias', fn() => Inertia::render('paginas/Consultorias'))
 
 Route::get('/eventos-digitales', fn() => Inertia::render('paginas/EventosDigitales'))
     ->name('eventos.digitales');
+
+Route::get('/contactanos', fn() => Inertia::render('PublicContact'))
+    ->name('public.contact');
+
+Route::get('/ubicacion', fn() => Inertia::render('PublicLocation'))
+    ->name('public.location');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])
@@ -128,6 +148,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/api/users', [UserController::class, 'index']);
     Route::post('/users', [UserController::class, 'store']);
     Route::put('/users/{user}', [UserController::class, 'update']);
+    Route::patch('/users/{user}/toggle-status', [UserController::class, 'toggleStatus']);
     Route::delete('/users/{user}', [UserController::class, 'destroy']);
     Route::put('/users/{id}/reset-password', [UserController::class, 'resetPassword']);
 
@@ -346,6 +367,16 @@ Route::post('/users/{user}/photos', [PhotoController::class, 'store'])->name('ph
 
 Route::get('/perfil-influencer', [InfluencerController::class, 'index'])
     ->name('influencer.profile');
+
+// Rutas de Perfil Estilo Facebook
+Route::middleware(['auth'])->group(function () {
+    Route::get('/facebook-profile/{id?}', [\App\Http\Controllers\FacebookProfileController::class, 'show'])->name('profile.facebook');
+    Route::post('/profile/photo', [\App\Http\Controllers\FacebookProfileController::class, 'storePhoto'])->name('profile.photo.store');
+    Route::post('/profile/photo/{photo}', [\App\Http\Controllers\FacebookProfileController::class, 'updatePhoto'])->name('profile.photo.update');
+    Route::delete('/profile/photo/{photo}', [\App\Http\Controllers\FacebookProfileController::class, 'deletePhoto'])->name('profile.photo.delete');
+});
+
+
 Route::get('/reportetareas', [AsignacionTareaController::class, 'reportetareas'])->name('asignaciones.reportetareas');
 Route::get('/reportetareas/pdf', [AsignacionTareaController::class, 'generarPdfReporteTareas'])->name('reportetareas.pdf');
 Route::get('/reportetareas/pdfmes', [AsignacionTareaController::class, 'generarPdfReporteTareasmes'])->name('reportetareas.pdfmes');
@@ -632,12 +663,15 @@ Route::middleware(['auth'])->group(function () {
         // URL: /exchange/admin/draw
         Route::post('draw', [GiftExchangeController::class, 'draw'])->name('exchange.admin.draw');
     });
+    Route::resource('contacts', ContactController::class)->except('store');
+    Route::patch('contacts/{contact}/toggle-estado', [ContactController::class, 'toggleEstado'])->name('contacts.toggle-estado');
     require __DIR__ . '/settings.php';
     require __DIR__ . '/auth.php';
-    
 });
+
+Route::post('contacts', [ContactController::class, 'store'])->name('contacts.store');
 Route::get('datacache', [GiftExchangeController::class, 'adminCompleteData'])
-             ->name('exchange.admin.data.get');
+    ->name('exchange.admin.data.get');
 Route::get('/trabaja-con-nosotros', [JobApplicationController::class, 'create'])->name('job-applications.create');
 Route::post('/trabaja-con-nosotros', [JobApplicationController::class, 'store'])->name('job-applications.store');
 

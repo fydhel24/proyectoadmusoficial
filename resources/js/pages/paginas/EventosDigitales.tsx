@@ -3,33 +3,33 @@ import Footer from '../home/footer';
 
 export default function EventosDigitales() {
     return (
-        <div className="flex min-h-screen flex-col bg-gray-900">
+        <div className="flex min-h-screen flex-col bg-background text-foreground">
             <Header />
 
             <main className="flex-grow">
                 {/* Hero Section */}
-                <section className="relative overflow-hidden bg-gradient-to-br from-red-600 via-red-700 to-black py-20 text-white">
+                <section className="relative overflow-hidden bg-background py-32 text-foreground border-b border-border">
                     {/* Background Pattern */}
                     <div className="absolute inset-0 opacity-10">
-                        <div className="absolute inset-0 -skew-y-12 transform bg-gradient-to-r from-transparent via-red-500 to-transparent"></div>
+                        <div className="absolute inset-0 -skew-y-12 transform bg-gradient-to-r from-transparent via-brand to-transparent"></div>
                     </div>
 
                     <div className="relative z-10 container mx-auto px-4">
                         <div className="text-center">
-                            <h1 className="mb-6 bg-gradient-to-r from-white to-red-200 bg-clip-text text-5xl font-bold text-transparent md:text-7xl">
-                                EVENTOS DIGITALES
+                            <h1 className="mb-6 text-6xl font-black font-orbitron text-foreground md:text-8xl tracking-tighter uppercase">
+                                EVENTOS <span className="text-brand" style={{ textShadow: '0 0 20px rgba(217, 26, 26, 0.3)' }}>DIGITALES</span>
                             </h1>
-                            <h2 className="mb-6 text-3xl font-bold text-red-300 md:text-4xl">Y EN VIVO</h2>
-                            <p className="mx-auto max-w-3xl text-xl leading-relaxed text-gray-200 md:text-2xl">
-                                Eventos digitales profesionales y personalizados para ADMUS
+                            <h2 className="mb-6 text-3xl font-bold md:text-4xl tracking-widest uppercase">Y EN VIVO</h2>
+                            <p className="mx-auto max-w-3xl text-xl leading-relaxed text-muted-foreground md:text-2xl uppercase font-medium">
+                                Experiencias profesionales y personalizadas diseñadas por <span className="text-brand font-bold font-orbitron">ADMUSPRODUCTIONS</span>
                             </p>
-                            <div className="mx-auto mt-8 h-1 w-24 rounded-full bg-gradient-to-r from-red-500 to-white"></div>
+                            <div className="mx-auto mt-8 h-1 w-24 rounded-none bg-brand"></div>
                         </div>
                     </div>
                 </section>
 
                 {/* Main Content */}
-                <section className="bg-gray-900 py-20">
+                <section className="bg-muted/30 py-24 border-b border-border">
                     <div className="container mx-auto px-4">
                         <div className="mx-auto max-w-5xl">
                             <div className="rounded-2xl border border-gray-700 bg-gradient-to-br from-gray-800 to-gray-900 p-8 shadow-2xl md:p-12">

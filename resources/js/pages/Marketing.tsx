@@ -43,8 +43,8 @@ const HeroSection = () => {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Dynamic Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-red-900 to-slate-900">
-        <div className="absolute inset-0 bg-gradient-to-r from-red-600/20 via-red-600/20 to-blue-600/20 animate-pulse"></div>
+      <div className="absolute inset-0 bg-background">
+        <div className="absolute inset-0 bg-gradient-to-r from-brand/10 via-brand/5 to-blue-500/5 animate-pulse" />
       </div>
 
       {/* Animated Grid Background */}
@@ -56,8 +56,8 @@ const HeroSection = () => {
       >
         <div className="grid grid-cols-20 grid-rows-20 h-full w-full">
           {[...Array(400)].map((_, i) => (
-            <motion.div 
-              key={i} 
+            <motion.div
+              key={i}
               className="border border-red-500/30"
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
@@ -70,7 +70,7 @@ const HeroSection = () => {
       {/* Floating Orbs */}
       <motion.div
         className="absolute top-1/4 left-1/4 w-32 h-32 rounded-full bg-gradient-to-r from-red-500  opacity-30 blur-xl"
-        animate={{ 
+        animate={{
           scale: [1, 1.5, 1],
           x: [0, 100, 0],
           y: [0, -50, 0]
@@ -79,7 +79,7 @@ const HeroSection = () => {
       />
       <motion.div
         className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-gradient-to-r from-red-500 to-blue-500 opacity-25 blur-xl"
-        animate={{ 
+        animate={{
           scale: [1, 1.3, 1],
           x: [0, -80, 0],
           y: [0, 80, 0]
@@ -106,11 +106,11 @@ const HeroSection = () => {
           >
             <div className="relative">
               <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-red-500 rounded-2xl blur-xl opacity-50"
+                className="absolute inset-0 bg-brand/30 rounded-2xl blur-xl opacity-30"
                 animate={{ scale: [1, 1.1, 1] }}
                 transition={{ duration: 3, repeat: Infinity }}
               />
-              <div className="relative bg-black/50 backdrop-blur-sm rounded-2xl p-6 border border-red-500/20">
+              <div className="relative bg-background/50 backdrop-blur-sm rounded-2xl p-6 border border-border">
                 <svg width="280" height="100" viewBox="0 0 300 120" className="mx-auto lg:mx-0">
                   <defs>
                     <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -119,22 +119,23 @@ const HeroSection = () => {
                       <stop offset="100%" stopColor="#cc0044" />
                     </linearGradient>
                     <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-                      <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+                      <feGaussianBlur stdDeviation="8" result="coloredBlur" />
                       <feMerge>
-                        <feMergeNode in="coloredBlur"/>
-                        <feMergeNode in="SourceGraphic"/>
+                        <feMergeNode in="coloredBlur" />
+                        <feMergeNode in="SourceGraphic" />
                       </feMerge>
                     </filter>
                   </defs>
                   <text
                     x="150"
                     y="70"
-                    fontFamily="Arial, sans-serif"
+                    fontFamily="Orbitron"
                     fontSize="48"
                     fontWeight="900"
-                    fill="url(#logoGradient)"
+                    fill="currentColor"
                     textAnchor="middle"
                     filter="url(#glow)"
+                    className="text-foreground"
                   >
                     ADMUS
                   </text>
@@ -148,14 +149,14 @@ const HeroSection = () => {
             variants={staggerContainer}
           >
             <motion.h1
-              className="text-6xl lg:text-8xl font-black mb-8 leading-tight"
+              className="text-6xl lg:text-8xl font-black mb-8 leading-tight font-orbitron"
               variants={fadeIn}
             >
-              <span className="bg-gradient-to-r from-white via-red-200 to-white bg-clip-text text-transparent">
+              <span className="text-foreground uppercase tracking-tighter">
                 MARKETING
               </span>
               <br />
-              <span className="bg-gradient-to-r from-red-400 via-red-500 to-red-600 bg-clip-text text-transparent">
+              <span className="text-brand uppercase tracking-tighter" style={{ textShadow: '0 0 20px rgba(217, 26, 26, 0.3)' }}>
                 DIGITAL
               </span>
             </motion.h1>
@@ -164,20 +165,20 @@ const HeroSection = () => {
               className="flex items-center space-x-4 mb-6"
               variants={fadeIn}
             >
-              <motion.div 
-                className="flex items-center space-x-2 bg-red-500/20 backdrop-blur-sm rounded-full px-4 py-2 border border-red-500/30"
+              <motion.div
+                className="flex items-center space-x-2 bg-brand/10 backdrop-blur-sm rounded-full px-4 py-2 border border-brand/20"
                 whileHover={{ scale: 1.05 }}
               >
-                <Sparkles className="w-5 h-5 text-red-400" />
-                <span className="text-red-200 font-semibold">ADMUS Production</span>
+                <Sparkles className="w-5 h-5 text-brand" />
+                <span className="text-foreground font-bold font-orbitron uppercase tracking-widest">ADMUSPRODUCTIONS</span>
               </motion.div>
             </motion.div>
 
             <motion.p
-              className="text-xl lg:text-2xl mb-12 text-gray-300 max-w-2xl leading-relaxed"
+              className="text-xl lg:text-2xl mb-12 text-muted-foreground max-w-2xl leading-relaxed uppercase font-medium"
               variants={fadeIn}
             >
-              Transformamos ideas en <span className="text-red-400 font-semibold">experiencias digitales extraordinarias</span> que conectan, inspiran y convierten a tu audiencia.
+              Transformamos ideas en <span className="text-brand font-bold">experiencias digitales extraordinarias</span> que conectan, inspiran y convierten a tu audiencia.
             </motion.p>
 
             <motion.div
@@ -185,19 +186,19 @@ const HeroSection = () => {
               variants={fadeIn}
             >
               <motion.button
-                className="group relative px-8 py-4 text-lg font-bold text-white rounded-full bg-gradient-to-r from-red-600 to-red-500 overflow-hidden"
+                className="group relative px-8 py-5 text-lg font-bold text-white rounded-none bg-brand overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)]"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
               >
                 <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-red-500 to-pink-500"
+                  className="absolute inset-0 bg-brand/80"
                   initial={{ x: '-100%' }}
                   whileHover={{ x: '0%' }}
                   transition={{ duration: 0.3 }}
                 />
-                <span className="relative flex items-center justify-center space-x-2">
+                <span className="relative flex items-center justify-center space-x-2 uppercase">
                   <span>Comenzar Ahora</span>
                   <ArrowRight className="w-5 h-5" />
                 </span>
@@ -238,7 +239,7 @@ const HeroSection = () => {
                 alt="Marketing Digital"
                 className="w-full max-w-lg rounded-2xl shadow-2xl"
               />
-              
+
               {/* Floating Stats */}
               <motion.div
                 className="absolute -top-4 -left-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-xl"
@@ -272,7 +273,7 @@ const HeroSection = () => {
 const AboutSection = () => (
   <section id="quienes-somos" className="py-32 px-6 relative overflow-hidden">
     <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-gray-100 to-slate-50" />
-    
+
     <motion.div
       className="container mx-auto max-w-7xl relative z-10"
       initial="hidden"
@@ -475,7 +476,7 @@ const ServicesSection = () => {
                 <p className="text-gray-400 leading-relaxed group-hover:text-gray-300 transition-colors">
                   {service.description}
                 </p>
-                
+
                 <motion.div
                   className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity"
                   whileHover={{ x: 5 }}
@@ -559,7 +560,7 @@ const WorkSection = () => {
                   className="w-full h-72 object-cover group-hover:scale-110 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                
+
                 <motion.div
                   className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-semibold"
                   initial={{ opacity: 0, y: -20 }}
@@ -582,7 +583,7 @@ const WorkSection = () => {
                 <p className="text-gray-600 leading-relaxed mb-6">
                   {project.description}
                 </p>
-                
+
                 <motion.button
                   className="flex items-center space-x-2 text-red-600 font-semibold group-hover:text-red-700 transition-colors"
                   whileHover={{ x: 5 }}
@@ -610,7 +611,12 @@ const WorkSection = () => {
 };
 
 const CTASection = () => {
-  const [companies, setCompanies] = useState([]);
+  interface Company {
+    id: number;
+    name: string;
+    logo: string;
+  }
+  const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -651,18 +657,18 @@ const CTASection = () => {
           <motion.div
             key={i}
             className="absolute w-1 h-1 bg-white rounded-full opacity-30"
-            initial={{ 
-              x: Math.random() * window.innerWidth, 
-              y: Math.random() * window.innerHeight 
+            initial={{
+              x: Math.random() * window.innerWidth,
+              y: Math.random() * window.innerHeight
             }}
-            animate={{ 
+            animate={{
               y: [null, Math.random() * -100 - 100],
-              opacity: [0.3, 0.7, 0.3] 
+              opacity: [0.3, 0.7, 0.3]
             }}
-            transition={{ 
+            transition={{
               duration: Math.random() * 3 + 2,
               repeat: Infinity,
-              delay: Math.random() * 2 
+              delay: Math.random() * 2
             }}
           />
         ))}
@@ -703,7 +709,7 @@ const CTASection = () => {
             className="text-xl lg:text-2xl text-gray-300 mb-12 leading-relaxed max-w-4xl mx-auto"
             variants={fadeIn}
           >
-            Estamos listos para <span className="text-red-400 font-semibold">transformar tu presencia digital</span>. 
+            Estamos listos para <span className="text-red-400 font-semibold">transformar tu presencia digital</span>.
             Agenda una consulta gratuita y descubre cómo podemos llevar tu proyecto al siguiente nivel.
           </motion.p>
 
@@ -779,13 +785,14 @@ const CTASection = () => {
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-red-500/20 to-red-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   <div className="relative w-24 h-24 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 group-hover:border-red-500/50 transition-all duration-300 overflow-hidden flex items-center justify-center">
-                    <img 
-                      src={company.logo} 
+                    <img
+                      src={company.logo}
                       alt={company.name}
                       className="max-w-full max-h-full object-contain p-2 filter grayscale group-hover:grayscale-0 transition-all duration-300"
                       onError={(e) => {
                         // Fallback si la imagen no carga
-                        e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(company.name)}&background=ef4444&color=fff&size=96`;
+                        const target = e.target as HTMLImageElement;
+                        target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(company.name)}&background=ef4444&color=fff&size=96`;
                       }}
                     />
                   </div>
@@ -827,7 +834,7 @@ const CTASection = () => {
 const Footer = () => (
   <footer className="py-20 px-6 bg-black relative overflow-hidden">
     <div className="absolute inset-0 bg-gradient-to-r from-red-900/10 to-red-900/10" />
-    
+
     <motion.div
       className="container mx-auto relative z-10"
       initial="hidden"
@@ -850,7 +857,7 @@ const Footer = () => (
             </div>
           </div>
           <p className="text-gray-400 text-lg leading-relaxed max-w-md">
-            Tu aliado estratégico en marketing digital y crecimiento empresarial. 
+            Tu aliado estratégico en marketing digital y crecimiento empresarial.
             Transformamos ideas en experiencias digitales extraordinarias.
           </p>
         </motion.div>

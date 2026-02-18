@@ -23,19 +23,16 @@ interface LoginProps {
 }
 
 export default function Login({ status, canResetPassword }: LoginProps) {
-    // Inicialización del formulario con Inertia.js
     const { data, setData, post, processing, errors, reset } = useForm<Required<LoginForm>>({
         email: '',
         password: '',
         remember: false,
     });
 
-    // Manejador para el envío del formulario
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
         post(route('login'), {
             onSuccess: () => {
-                // ✅ Fuerza una recarga completa al redirigir al dashboard
                 window.location.reload();
             },
             onFinish: () => reset('password'),
@@ -43,135 +40,119 @@ export default function Login({ status, canResetPassword }: LoginProps) {
     };
 
     return (
-        // El AuthLayout debe tener un fondo que complemente los colores beige.
-        // Podrías establecer el fondo en AuthLayout o directamente en el body de tu CSS global.
-        <AuthLayout title="Admus Production" description="">
-            {/* Título de la página para SEO */}
+        <AuthLayout title="Iniciar Sesión" description="Bienvenido de nuevo a Admus Production">
             <Head title="Iniciar Sesión" />
 
-            {/* Contenedor principal del formulario con animaciones de Framer Motion */}
-            <motion.div
-                initial={{ opacity: 0, y: -50, scale: 0.9 }} // Animación de entrada más pronunciada
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ duration: 0.7, ease: 'easeOut' }} // Transición más suave y duradera
-                className="mx-auto max-w-md rounded-xl border border-[#C0C0C0]/50 bg-[#FDF5E6] p-8 shadow-2xl backdrop-blur-sm" // Fondo beige claro, borde suave
-            >
-                {/* Sección del avatar central */}
-                <div className="mb-6 flex justify-center">
-                    <motion.div
-                        whileHover={{ scale: 1.1, rotate: 5 }} // Animación al pasar el ratón más sutil
-                        whileTap={{ scale: 0.95 }} // Animación al hacer click
-                        transition={{ type: 'spring', stiffness: 400, damping: 10 }} // Transición tipo muelle para el avatar
-                        className="cursor-pointer"
-                    ></motion.div>
+            <div className="flex flex-col md:flex-row min-h-[500px]">
+                {/* Lado Izquierdo: Video de Marca */}
+                <div className="hidden md:block w-1/2 relative overflow-hidden bg-brand">
+                    <video
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        className="absolute inset-0 h-full w-full object-cover"
+                    >
+                        <source src="/assets/auth/ladologinadmus.mp4" type="video/mp4" />
+                    </video>
+                    <div className="absolute inset-0 bg-gradient-to-r from-brand/20 to-transparent" />
+                    <div className="absolute bottom-8 left-8 z-10">
+                        <h2 className="text-3xl font-black text-white uppercase tracking-tighter">
+                            Admus <span className="text-white/70">Production</span>
+                        </h2>
+                        <p className="text-sm font-medium text-white/80 uppercase tracking-widest mt-1">
+                            Agencia de Influencers & Marketing
+                        </p>
+                    </div>
                 </div>
 
-                {/* Formulario de inicio de sesión */}
-                <form className="space-y-6" onSubmit={submit} noValidate>
-                    <div className="space-y-5">
-                        {/* Campo de correo electrónico */}
-                        <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.2, duration: 0.5 }}>
-                            <Label htmlFor="email" className="mb-1 block font-semibold text-[#6B5B4C]">
-                                ingrese Correo Electrónico
-                            </Label>
-                            <Input
-                                id="email"
-                                type="email"
-                                required
-                                autoFocus
-                                tabIndex={1}
-                                autoComplete="email"
-                                value={data.email}
-                                onChange={(e) => setData('email', e.target.value)}
-                                placeholder="correo@ejemplo.com"
-                                className="w-full rounded-lg border border-[#C0C0C0] bg-white/70 p-3 text-[#6B5B4C] transition-colors duration-200 placeholder:text-[#A9A9A9] focus:ring-2 focus:ring-[#D2B48C] focus:outline-none" // Colores actualizados y transición
-                            />
-                            <InputError message={errors.email} />
-                        </motion.div>
-
-                        {/* Campo de contraseña */}
-                        <motion.div initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.3, duration: 0.5 }}>
-                            <div className="mb-1 flex items-center justify-between">
-                                <Label htmlFor="password" className="font-semibold text-[#6B5B4C]">
-                                    Contraseña
-                                </Label>
-                                {canResetPassword && (
-                                    <a
-                                        href={route('password.request')}
-                                        className="text-sm text-[#D2B48C] transition-colors duration-200 hover:underline focus:ring-1 focus:ring-[#D2B48C] focus:outline-none" // Color de enlace actualizado
-                                        tabIndex={5}
-                                    >
-                                        ¿Olvidaste tu contraseña?
-                                    </a>
-                                )}
-                            </div>
-                            <Input
-                                id="password"
-                                type="password"
-                                required
-                                tabIndex={2}
-                                autoComplete="current-password"
-                                value={data.password}
-                                onChange={(e) => setData('password', e.target.value)}
-                                placeholder="Contraseña"
-                                className="w-full rounded-lg border border-[#C0C0C0] bg-white/70 p-3 text-[#6B5B4C] transition-colors duration-200 placeholder:text-[#A9A9A9] focus:ring-2 focus:ring-[#D2B48C] focus:outline-none" // Colores actualizados y transición
-                            />
-                            <InputError message={errors.password} />
-                        </motion.div>
-
-                        {/* Opción "Recordarme" */}
-                        <motion.div
-                            initial={{ y: 20, opacity: 0 }}
-                            animate={{ y: 0, opacity: 1 }}
-                            transition={{ delay: 0.4, duration: 0.5 }}
-                            className="flex items-center space-x-3"
-                        >
-                            <Checkbox
-                                id="remember"
-                                name="remember"
-                                checked={data.remember}
-                                onClick={() => setData('remember', !data.remember)}
-                                tabIndex={3}
-                                className="border-[#C0C0C0] text-[#D2B48C] transition-colors duration-200 focus:ring-2 focus:ring-[#D2B48C]" // Colores de checkbox actualizados
-                            />
-                            <Label htmlFor="remember" className="cursor-pointer text-[#6B5B4C] select-none">
-                                Recordarme
-                            </Label>
-                        </motion.div>
-
-                        {/* Botón de envío del formulario */}
-                        <motion.div
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            transition={{ delay: 0.5, duration: 0.5, type: 'spring', stiffness: 300 }}
-                        >
-                            <Button
-                                type="submit"
-                                className="w-full rounded-lg bg-[#D2B48C] p-3 font-semibold text-white shadow-md transition-all duration-300 hover:scale-[1.02] hover:bg-[#A9A9A9] focus:ring-2 focus:ring-[#6B5B4C] focus:outline-none" // Colores del botón actualizados
-                                tabIndex={4}
-                                disabled={processing}
-                                aria-busy={processing}
-                            >
-                                {processing && <LoaderCircle className="mr-2 inline h-5 w-5 animate-spin text-white" />}
-                                Iniciar Sesión
-                            </Button>
-                        </motion.div>
+                {/* Lado Derecho: Formulario de Login */}
+                <div className="flex-1 p-8 md:p-12 flex flex-col justify-center bg-white/5 backdrop-blur-sm">
+                    <div className="mb-8">
+                        <h1 className="text-3xl font-bold text-white tracking-tight">Iniciar Sesión</h1>
+                        <p className="text-slate-400 text-sm mt-2">Ingresa tus credenciales para acceder al panel.</p>
                     </div>
-                </form>
 
-                {/* Mensaje de estado (por ejemplo, de éxito o error) */}
-                {status && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="mt-4 text-center text-sm text-[#D2B48C]" // Color del mensaje de estado actualizado
-                        role="alert"
-                    >
-                        {status}
-                    </motion.div>
-                )}
-            </motion.div>
+                    <form className="space-y-6" onSubmit={submit} noValidate>
+                        <div className="space-y-4">
+                            <div>
+                                <Label htmlFor="email" className="text-slate-200 font-bold text-xs uppercase tracking-widest mb-2 block">
+                                    Correo Electrónico
+                                </Label>
+                                <div className="relative">
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        required
+                                        autoFocus
+                                        tabIndex={1}
+                                        autoComplete="email"
+                                        value={data.email}
+                                        onChange={(e) => setData('email', e.target.value)}
+                                        placeholder="admin@admus.com"
+                                        className="bg-white/10 border-white/20 text-white placeholder:text-slate-500 focus:border-brand focus:ring-brand h-12"
+                                    />
+                                </div>
+                                <InputError message={errors.email} />
+                            </div>
+
+                            <div>
+                                <div className="flex items-center justify-between mb-2">
+                                    <Label htmlFor="password" className="text-slate-200 font-bold text-xs uppercase tracking-widest block">
+                                        Contraseña
+                                    </Label>
+
+                                </div>
+                                <Input
+                                    id="password"
+                                    type="password"
+                                    required
+                                    tabIndex={2}
+                                    autoComplete="current-password"
+                                    value={data.password}
+                                    onChange={(e) => setData('password', e.target.value)}
+                                    placeholder="••••••••"
+                                    className="bg-white/10 border-white/20 text-white placeholder:text-slate-500 focus:border-brand focus:ring-brand h-12"
+                                />
+                                <InputError message={errors.password} />
+                            </div>
+
+                            <div className="flex items-center space-x-2">
+                                <Checkbox
+                                    id="remember"
+                                    name="remember"
+                                    checked={data.remember}
+                                    onCheckedChange={(checked) => setData('remember', checked as boolean)}
+                                    tabIndex={3}
+                                    className="border-white/20 data-[state=checked]:bg-brand data-[state=checked]:border-brand"
+                                />
+                                <Label htmlFor="remember" className="text-sm text-slate-400 cursor-pointer select-none font-medium">
+                                    Recordarme en este equipo
+                                </Label>
+                            </div>
+                        </div>
+
+                        <Button
+                            type="submit"
+                            className="w-full bg-brand hover:bg-brand/90 text-white font-black uppercase tracking-widest h-12 text-sm shadow-[0_0_20px_rgba(217,26,26,0.3)]"
+                            tabIndex={4}
+                            disabled={processing}
+                        >
+                            {processing ? (
+                                <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                            ) : (
+                                "Acceder al Panel"
+                            )}
+                        </Button>
+                    </form>
+
+                    {status && (
+                        <div className="mt-6 p-4 rounded-lg bg-green-500/10 border border-green-500/20 text-green-500 text-sm font-medium text-center">
+                            {status}
+                        </div>
+                    )}
+                </div>
+            </div>
         </AuthLayout>
     );
 }

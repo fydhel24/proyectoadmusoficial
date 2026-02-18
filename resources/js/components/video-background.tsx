@@ -10,7 +10,7 @@ interface VideoBackgroundProps {
 
 export default function VideoBackground({
     src,
-    type = '../../../public/Gflores/video1.mp4', // Tipo por defecto para videos mp4
+    type = '../../../public/Gflores/admus.mp4', // Tipo por defecto para videos mp4
     fallbackImage = '../../../public/Gflores/imagen1.jpg', // Ruta de imagen en 'public'
 }: VideoBackgroundProps) {
     const videoRef = useRef<HTMLVideoElement>(null);

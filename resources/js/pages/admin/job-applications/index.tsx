@@ -146,7 +146,13 @@ export default function Index({ applications, filters }: Props) {
 
         setIsSendingWhatsApp(true);
         try {
-            const cleanPhone = selectedPhone.replace(/\D/g, '');
+            let cleanPhone = selectedPhone.replace(/\D/g, '');
+
+            // Validate and prepend 591 if not present
+            if (!cleanPhone.startsWith('591')) {
+                cleanPhone = '591' + cleanPhone;
+            }
+
             const sessionId = import.meta.env.VITE_WHATSAPP_SESSION_ID || '3';
 
             // Function to perform the send request

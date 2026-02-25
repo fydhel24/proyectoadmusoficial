@@ -66,7 +66,8 @@ import {
     Store,
     Clock,
     UserCircle,
-    Mail
+    Mail,
+    QrCode
 } from 'lucide-react';
 
 // 6. Props que trae Inertia
@@ -467,6 +468,22 @@ export function AppSidebar({ className }: { className?: string }) {
                 )}
 
                 <NavMain sections={menuSections} currentPath={currentPath} />
+
+                {isAdmin && (
+                    <SidebarGroup>
+                         <SidebarMenu>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild tooltip="Whatsapp">
+                                    <Link href="/whatsapp-miranda">
+                                        <QrCode className="h-4 w-4" />
+                                        <span>Whatsapp</span>
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                        </SidebarMenu>
+                    </SidebarGroup>
+                )}
+
             </SidebarContent>
 
             <SidebarFooter />

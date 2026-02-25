@@ -149,28 +149,73 @@ export default function Index({ applications, filters }: Props) {
             const cleanPhone = selectedPhone.replace(/\D/g, '');
             const sessionId = import.meta.env.VITE_WHATSAPP_SESSION_ID || '3';
 
-            const response = await fetch('https://boot.miracode.tech/whatsapp/send-text', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbXVzQG1pcmFjb2RlLnRlY2giLCJzdWIiOjMsImlhdCI6MTc3MjAzNTg3OSwiZXhwIjoxNzcyMDM5NDc5fQ.mcs9cCVjSiiFgXTxvApnqTf3JlbOKJis2rWp7cuWZ4o'
-                },
-                body: JSON.stringify({
+            // Function to perform the send request
+            const sendRequest = async (authToken: string) => {
+                const body = {
                     sessionId: sessionId,
                     to: `${cleanPhone}@s.whatsapp.net`,
                     content: whatsappMessage
-                })
-            });
+                };
+
+                console.log('--- WhatsApp API Request ---');
+                console.log('URL: https://boot.miracode.tech/whatsapp/send-text');
+                console.log('Headers:', { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` });
+                console.log('Body:', body);
+
+                return await fetch('https://boot.miracode.tech/whatsapp/send-text', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(body)
+                });
+            };
+
+            let currentToken = localStorage.getItem('whatsapp_token') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbXVzQG1pcmFjb2RlLnRlY2giLCJzdWIiOjMsImlhdCI6MTc3MjAzNTg3OSwiZXhwIjoxNzcyMDM5NDc5fQ.mcs9cCVjSiiFgXTxvApnqTf3JlbOKJis2rWp7cuWZ4o';
+
+            let response = await sendRequest(currentToken);
+
+            // Handle 401 Unauthorized by attempting login
+            if (response.status === 401) {
+                console.warn('--- 401 Unauthorized: Attempting automatic login ---');
+                const loginResponse = await fetch('https://boot.miracode.tech/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: import.meta.env.VITE_WHATSAPP_TEST_EMAIL || 'admus@miracode.tech',
+                        password: import.meta.env.VITE_WHATSAPP_TEST_PASSWORD || 'admus@miracode.tech'
+                    })
+                });
+
+                if (loginResponse.ok) {
+                    const loginData = await loginResponse.json();
+                    currentToken = loginData.token;
+                    localStorage.setItem('whatsapp_token', currentToken);
+                    console.log('--- Login Successful, new token obtained ---');
+                    // Retry original request with new token
+                    response = await sendRequest(currentToken);
+                } else {
+                    console.error('--- Login Failed ---');
+                    const loginError = await loginResponse.text();
+                    console.error('Login Error Response:', loginError);
+                }
+            }
 
             const data = await response.json();
+            console.log('--- WhatsApp API Response ---');
+            console.log('Status:', response.status);
+            console.log('Data:', data);
 
-            if (data.status === 'Enviado') {
+            if (data.status === 'Enviado' || response.ok) {
                 toast.success('WhatsApp enviado con éxito');
                 setIsWhatsAppOpen(false);
             } else {
                 toast.error('Error al enviar WhatsApp: ' + (data.message || 'Desconocido'));
             }
         } catch (error) {
+            console.error('--- WhatsApp Integration Error ---');
+            console.error(error);
             toast.error('Error de conexión con la API de WhatsApp');
         } finally {
             setIsSendingWhatsApp(false);

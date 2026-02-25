@@ -121,7 +121,7 @@ const HelpSection = ({ isConnected }: { isConnected: boolean }) => (
             <div className="text-center md:text-left">
                 <h4 className="font-black text-foreground mb-2 text-2xl">Integración Laravel</h4>
                 <p className="text-muted-foreground font-bold text-lg mb-4">
-                    Base URL: <code className="bg-background px-3 py-1 rounded-lg text-primary font-black border border-primary/20">{import.meta.env.VITE_WHATSAPP_API_URL || 'http://localhost:3000'}</code>
+                    Base URL: <code className="bg-background px-3 py-1 rounded-lg text-primary font-black border border-primary/20">{import.meta.env.VITE_WHATSAPP_API_URL || 'https://boot.miracode.tech'}</code>
                 </p>
                 <div className="flex flex-wrap gap-3">
                     <Badge variant="outline" className="rounded-full px-4 py-1 font-bold">JWT Auth Required</Badge>
@@ -534,7 +534,7 @@ export default function WhatsAppMiranda() {
                                 <form onSubmit={handleUpdateSettings} className="space-y-6">
                                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                                         <div className="lg:col-span-2 space-y-8">
-                                           
+
                                             <Card className="shadow-lg border-none rounded-3xl overflow-hidden bg-card">
                                                 <CardHeader className="pb-4">
                                                     <CardTitle className="text-xl font-black flex items-center gap-3 text-foreground">

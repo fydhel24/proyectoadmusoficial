@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const whatsappClient = axios.create({
-    baseURL: import.meta.env.VITE_WHATSAPP_API_URL || 'http://localhost:3000',
+    baseURL: import.meta.env.VITE_WHATSAPP_API_URL || 'https://boot.miracode.tech',
     headers: {
         'Content-Type': 'application/json',
     },

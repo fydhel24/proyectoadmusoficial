@@ -667,6 +667,11 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('contacts/{contact}/toggle-estado', [ContactController::class, 'toggleEstado'])->name('contacts.toggle-estado');
     require __DIR__ . '/settings.php';
     require __DIR__ . '/auth.php';
+
+    Route::get('/whatsapp-miranda', function () {
+        return Inertia::render('whatsapp-miranda');
+    })->name('whatsapp-miranda');
+
 });
 
 Route::post('contacts', [ContactController::class, 'store'])->name('contacts.store');

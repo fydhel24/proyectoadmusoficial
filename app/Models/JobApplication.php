@@ -16,6 +16,7 @@ class JobApplication extends Model
         'phone',
         'cv',
         'extra_documents',
+        'status',
     ];
 
     protected $casts = [

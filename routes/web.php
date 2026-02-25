@@ -632,6 +632,8 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('admin/job-applications', JobApplicationController::class, [
             'as' => 'admin'
         ]);
+        Route::patch('admin/job-applications/{job_application}/status', [JobApplicationController::class, 'updateStatus'])
+            ->name('admin.job-applications.update-status');
         Route::get('admin/influencer-history', function () {
             return Inertia::render('InfluencerHistory/Index');
         })->name('admin.influencer.history');

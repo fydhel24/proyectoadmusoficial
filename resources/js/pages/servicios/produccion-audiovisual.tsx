@@ -28,7 +28,7 @@ export default function ProduccionAudiovisual() {
                 <Header />
                 {/* Video de fondo */}
                 <video ref={videoRef} autoPlay muted loop playsInline className="absolute inset-0 z-0 h-full w-full object-cover">
-                    <source src="/Gflores/video1.mp4" type="video/mp4" />
+                    <source src="/Gflores/admus.mp4" type="video/mp4" />
                     Tu navegador no soporta el video.
                 </video>
 

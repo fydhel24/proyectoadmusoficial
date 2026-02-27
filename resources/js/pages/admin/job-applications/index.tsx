@@ -1,30 +1,16 @@
 import AppLayout from '@/layouts/app-layout';
-import { Head, Link, router, useForm } from '@inertiajs/react';
-import React, { useState, useEffect, useRef } from 'react';
-
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
-
-import { Toaster, toast } from 'sonner';
-
-import { Download, Edit, Eye, FileText, Phone, Search, Trash2, User, Loader2 } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { Head, Link, router, useForm } from '@inertiajs/react';
+import { Edit, Eye, FileText, Loader2, Phone, Search, Trash2, User, Download } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { toast, Toaster } from 'sonner';
 
 interface JobApplication {
     id: number;
@@ -34,6 +20,7 @@ interface JobApplication {
     phone: string;
     cv: string | null;
     extra_documents: string[] | null;
+    status: 'PENDIENTE' | 'ACEPTADO' | 'RECHAZADO';
     created_at: string;
 }
 
@@ -50,21 +37,30 @@ interface Props {
     filters: {
         search?: string;
         area?: string;
+        status?: string;
     };
 }
 
 export default function Index({ applications, filters }: Props) {
     const [search, setSearch] = useState(filters.search || '');
     const [area, setArea] = useState(filters.area || '');
+    const [statusFilter, setStatusFilter] = useState(filters.status || '');
     const [isLoading, setIsLoading] = useState(false);
     const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-    const { delete: destroy, processing } = useForm();
+    const { delete: destroy, patch, processing } = useForm();
+
+    // WhatsApp Dialog State
+    const [isWhatsAppOpen, setIsWhatsAppOpen] = useState(false);
+    const [selectedPhone, setSelectedPhone] = useState('');
+    const [whatsappMessage, setWhatsappMessage] = useState('');
+    const [isSendingWhatsApp, setIsSendingWhatsApp] = useState(false);
 
     // Sincronizar estado local con props del backend
     React.useEffect(() => {
         setSearch(filters.search || '');
         setArea(filters.area || '');
-    }, [filters.search, filters.area]);
+        setStatusFilter(filters.status || '');
+    }, [filters.search, filters.area, filters.status]);
 
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleDateString('es-ES', {
@@ -84,15 +80,16 @@ export default function Index({ applications, filters }: Props) {
     };
 
     // Función para aplicar filtros
-    const applyFilters = (newSearch?: string, newArea?: string) => {
+    const applyFilters = (newSearch?: string, newArea?: string, newStatus?: string) => {
         setIsLoading(true);
-        
+
         router.get(route('admin.job-applications.index'), {
             search: (newSearch ?? search) || '',
-            area: (newArea ?? area) || ''
+            area: (newArea ?? area) || '',
+            status: (newStatus ?? statusFilter) || ''
         }, {
             preserveState: true,
-            only: ['applications'],
+            only: ['applications', 'filters'],
             onFinish: () => setIsLoading(false)
         });
     };
@@ -100,22 +97,135 @@ export default function Index({ applications, filters }: Props) {
     // Función con debounce para búsqueda automática
     const handleSearchChange = (value: string) => {
         setSearch(value);
-        
+
         // Cancelar timeout anterior si existe
         if (searchTimeoutRef.current) {
             clearTimeout(searchTimeoutRef.current);
         }
-        
+
         // Aplicar debounce de 500ms
         searchTimeoutRef.current = setTimeout(() => {
-            applyFilters(value, area);
+            applyFilters(value, area, statusFilter);
         }, 500);
     };
 
     // Función para filtro de área
     const handleAreaChange = (selectedArea: string) => {
         setArea(selectedArea);
-        applyFilters(search, selectedArea);
+        applyFilters(search, selectedArea, statusFilter);
+    };
+
+    // Función para filtro de estado
+    const handleStatusFilterChange = (selectedStatus: string) => {
+        setStatusFilter(selectedStatus);
+        applyFilters(search, area, selectedStatus);
+    };
+
+    const handleUpdateStatus = (applicationId: number, nextStatus: string) => {
+        router.patch(route('admin.job-applications.update-status', applicationId), {
+            status: nextStatus
+        }, {
+            preserveScroll: true,
+            preserveState: false,
+            onSuccess: () => toast.success('Estado actualizado'),
+            onError: () => toast.error('Error al actualizar estado')
+        });
+    };
+
+    const openWhatsAppDialog = (phone: string) => {
+        setSelectedPhone(phone);
+        setWhatsappMessage('');
+        setIsWhatsAppOpen(true);
+    };
+
+    const handleSendWhatsApp = async () => {
+        if (!whatsappMessage.trim()) {
+            toast.error('El mensaje no puede estar vacío');
+            return;
+        }
+
+        setIsSendingWhatsApp(true);
+        try {
+            let cleanPhone = selectedPhone.replace(/\D/g, '');
+
+            // Validate and prepend 591 if not present
+            if (!cleanPhone.startsWith('591')) {
+                cleanPhone = '591' + cleanPhone;
+            }
+
+            const sessionId = import.meta.env.VITE_WHATSAPP_SESSION_ID || '3';
+
+            // Function to perform the send request
+            const sendRequest = async (authToken: string) => {
+                const body = {
+                    sessionId: sessionId,
+                    to: `${cleanPhone}@s.whatsapp.net`,
+                    content: whatsappMessage
+                };
+
+                console.log('--- WhatsApp API Request ---');
+                console.log('URL: https://boot.miracode.tech/whatsapp/send-text');
+                console.log('Headers:', { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` });
+                console.log('Body:', body);
+
+                return await fetch('https://boot.miracode.tech/whatsapp/send-text', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(body)
+                });
+            };
+
+            let currentToken = localStorage.getItem('whatsapp_token') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbXVzQG1pcmFjb2RlLnRlY2giLCJzdWIiOjMsImlhdCI6MTc3MjAzNTg3OSwiZXhwIjoxNzcyMDM5NDc5fQ.mcs9cCVjSiiFgXTxvApnqTf3JlbOKJis2rWp7cuWZ4o';
+
+            let response = await sendRequest(currentToken);
+
+            // Handle 401 Unauthorized by attempting login
+            if (response.status === 401) {
+                console.warn('--- 401 Unauthorized: Attempting automatic login ---');
+                const loginResponse = await fetch('https://boot.miracode.tech/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: import.meta.env.VITE_WHATSAPP_TEST_EMAIL || 'admus@miracode.tech',
+                        password: import.meta.env.VITE_WHATSAPP_TEST_PASSWORD || 'admus@miracode.tech'
+                    })
+                });
+
+                if (loginResponse.ok) {
+                    const loginData = await loginResponse.json();
+                    currentToken = loginData.token;
+                    localStorage.setItem('whatsapp_token', currentToken);
+                    console.log('--- Login Successful, new token obtained ---');
+                    // Retry original request with new token
+                    response = await sendRequest(currentToken);
+                } else {
+                    console.error('--- Login Failed ---');
+                    const loginError = await loginResponse.text();
+                    console.error('Login Error Response:', loginError);
+                }
+            }
+
+            const data = await response.json();
+            console.log('--- WhatsApp API Response ---');
+            console.log('Status:', response.status);
+            console.log('Data:', data);
+
+            if (data.status === 'Enviado' || response.ok) {
+                toast.success('WhatsApp enviado con éxito');
+                setIsWhatsAppOpen(false);
+            } else {
+                toast.error('Error al enviar WhatsApp: ' + (data.message || 'Desconocido'));
+            }
+        } catch (error) {
+            console.error('--- WhatsApp Integration Error ---');
+            console.error(error);
+            toast.error('Error de conexión con la API de WhatsApp');
+        } finally {
+            setIsSendingWhatsApp(false);
+        }
     };
 
     // Cleanup timeouts al desmontar
@@ -142,8 +252,26 @@ export default function Index({ applications, filters }: Props) {
     const clearSearch = () => {
         setSearch('');
         setArea('');
+        setStatusFilter('');
         router.get(route('admin.job-applications.index'), {}, { replace: true });
     };
+
+    const StatusToggles = ({ application }: { application: JobApplication }) => (
+        <div className="flex gap-1 bg-gray-100 p-1 rounded-lg w-fit">
+            {(['PENDIENTE', 'ACEPTADO', 'RECHAZADO'] as const).map((s) => (
+                <button
+                    key={s}
+                    onClick={() => handleUpdateStatus(application.id, s)}
+                    className={`px-2 py-1 text-[10px] font-bold rounded-md transition-all ${application.status === s
+                        ? (s === 'PENDIENTE' ? 'bg-yellow-500 text-white shadow-sm' : s === 'ACEPTADO' ? 'bg-green-500 text-white shadow-sm' : 'bg-red-500 text-white shadow-sm')
+                        : 'text-gray-400 hover:text-gray-600'
+                        }`}
+                >
+                    {s}
+                </button>
+            ))}
+        </div>
+    );
 
     return (
         <AppLayout
@@ -164,9 +292,19 @@ export default function Index({ applications, filters }: Props) {
                         <p className="text-muted-foreground mt-1">Gestiona las postulaciones recibidas de forma clara y ordenada.</p>
                     </div>
 
-                    <Badge variant="destructive" className="px-4 py-1 text-sm bg-red-600 hover:bg-red-700 w-fit">
-                        {applications.total} Postulantes
-                    </Badge>
+                    <div className="flex gap-2">
+                        <Button
+                            variant={statusFilter === 'PENDIENTE' ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => handleStatusFilterChange(statusFilter === 'PENDIENTE' ? '' : 'PENDIENTE')}
+                            className={statusFilter === 'PENDIENTE' ? 'bg-yellow-600 hover:bg-yellow-700' : 'border-yellow-200 text-yellow-700'}
+                        >
+                            Pendientes
+                        </Button>
+                        <Badge variant="destructive" className="px-4 py-1 text-sm bg-red-600 hover:bg-red-700 w-fit">
+                            {applications.total} Postulantes
+                        </Badge>
+                    </div>
                 </div>
 
                 {/* SEARCH AND FILTER */}
@@ -190,11 +328,11 @@ export default function Index({ applications, filters }: Props) {
                                     </div>
                                 </div>
 
-                                {(search || area) && (
-                                    <Button 
-                                        type="button" 
-                                        variant="outline" 
-                                        onClick={clearSearch} 
+                                {(search || area || statusFilter) && (
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        onClick={clearSearch}
                                         className="border-red-300 text-red-600 hover:bg-red-50 w-full sm:w-auto"
                                         disabled={isLoading}
                                     >
@@ -203,38 +341,40 @@ export default function Index({ applications, filters }: Props) {
                                 )}
                             </div>
 
-                            {/* FILTRO POR ÁREA */}
-                            <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-end">
-                                <div className="flex-1 w-full">
-                                    <label className="block text-sm font-medium text-red-700 mb-2">
-                                        Filtrar por Área
-                                        {area && (
-                                            <span className="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs bg-red-100 text-red-800">
-                                                Activo: {area}
-                                            </span>
-                                        )}
-                                    </label>
-                                    <div className="relative">
-                                        <select
-                                            value={area}
-                                            onChange={(e) => handleAreaChange(e.target.value)}
-                                            className="w-full rounded-md border border-red-200 bg-white p-3 focus:ring-2 focus:ring-red-400 focus:border-red-400"
-                                            disabled={isLoading}
-                                        >
-                                            <option value="">Todas las áreas</option>
-                                            <option value="PRODUCCION">Producción</option>
-                                            <option value="EDICION">Edición</option>
-                                            <option value="CAMAROGRAFO">Camarógrafo</option>
-                                            <option value="MARKETING">Marketing</option>
-                                            <option value="VENTAS">Ejecutivo de Ventas</option>
-                                            <option value="CREATIVO">Creativo</option>
-                                            <option value="TALENTO">Talentos(Influencer)</option>
-                                            <option value="PASANTE">Pasante</option>
-                                        </select>
-                                        {isLoading && area && (
-                                            <Loader2 className="text-red-600 absolute top-1/2 right-8 h-4 w-4 -translate-y-1/2 animate-spin" />
-                                        )}
-                                    </div>
+                            {/* FILTROS SECUNDARIOS */}
+                            <div className="flex flex-col sm:flex-row gap-4">
+                                <div className="flex-1">
+                                    <label className="block text-sm font-medium text-red-700 mb-2">Área</label>
+                                    <select
+                                        value={area}
+                                        onChange={(e) => handleAreaChange(e.target.value)}
+                                        className="w-full rounded-md border border-red-200 bg-white p-2.5 focus:ring-2 focus:ring-red-400 focus:border-red-400 text-sm"
+                                        disabled={isLoading}
+                                    >
+                                        <option value="">Todas las áreas</option>
+                                        <option value="PRODUCCION">Producción</option>
+                                        <option value="EDICION">Edición</option>
+                                        <option value="CAMAROGRAFO">Camarógrafo</option>
+                                        <option value="MARKETING">Marketing</option>
+                                        <option value="VENTAS">Ejecutivo de Ventas</option>
+                                        <option value="CREATIVO">Creativo</option>
+                                        <option value="TALENTO">Talentos(Influencer)</option>
+                                        <option value="PASANTE">Pasante</option>
+                                    </select>
+                                </div>
+                                <div className="flex-1">
+                                    <label className="block text-sm font-medium text-red-700 mb-2">Estado</label>
+                                    <select
+                                        value={statusFilter}
+                                        onChange={(e) => handleStatusFilterChange(e.target.value)}
+                                        className="w-full rounded-md border border-red-200 bg-white p-2.5 focus:ring-2 focus:ring-red-400 focus:border-red-400 text-sm"
+                                        disabled={isLoading}
+                                    >
+                                        <option value="">Todos los estados</option>
+                                        <option value="PENDIENTE">Pendiente</option>
+                                        <option value="ACEPTADO">Aceptado</option>
+                                        <option value="RECHAZADO">Rechazado</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -249,7 +389,7 @@ export default function Index({ applications, filters }: Props) {
                             Lista de Postulantes
                             {isLoading && <Loader2 className="h-4 w-4 animate-spin ml-2" />}
                         </CardTitle>
-                        <CardDescription className="text-red-600">Revisa, edita y descarga documentos de los postulantes.</CardDescription>
+                        <CardDescription className="text-red-600">Revisa, edita y gestiona las postulaciones.</CardDescription>
                     </CardHeader>
 
                     <CardContent>
@@ -259,7 +399,7 @@ export default function Index({ applications, filters }: Props) {
                                 <FileText className="text-red-400 mx-auto mb-4 h-14 w-14" />
                                 <h3 className="text-red-700 mb-1 text-lg font-medium">No hay aplicaciones</h3>
                                 <p className="text-red-600 text-sm">
-                                    {search || area ? 'No se encontraron resultados con los filtros aplicados.' : 'Aún no se han recibido postulaciones.'}
+                                    {search || area || statusFilter ? 'No se encontraron resultados con los filtros aplicados.' : 'Aún no se han recibido postulaciones.'}
                                 </p>
                             </div>
                         ) : (
@@ -270,10 +410,9 @@ export default function Index({ applications, filters }: Props) {
                                         <TableHeader>
                                             <TableRow>
                                                 <TableHead>Nombre</TableHead>
-                                                <TableHead>Cédula</TableHead>
                                                 <TableHead>Área</TableHead>
                                                 <TableHead>Celular</TableHead>
-                                                <TableHead>Fecha</TableHead>
+                                                <TableHead>Estado</TableHead>
                                                 <TableHead>Documentos</TableHead>
                                                 <TableHead className="text-right">Acciones</TableHead>
                                             </TableRow>
@@ -282,14 +421,16 @@ export default function Index({ applications, filters }: Props) {
                                         <TableBody>
                                             {applications.data.map((application) => (
                                                 <TableRow key={application.id} className="hover:bg-gray-50">
-                                                    <TableCell className="font-medium">
-                                                        <div className="flex items-center gap-2">
-                                                            <User className="text-muted-foreground h-4 w-4" />
-                                                            {application.full_name}
+                                                    <TableCell className="font-medium whitespace-nowrap">
+                                                        <div className="flex flex-col">
+                                                            <span className="flex items-center gap-2">
+                                                                <User className="text-muted-foreground h-4 w-4" />
+                                                                {application.full_name}
+                                                            </span>
+                                                            <span className="text-[10px] text-muted-foreground ml-6">{application.ci}</span>
                                                         </div>
                                                     </TableCell>
 
-                                                    <TableCell>{application.ci}</TableCell>
                                                     <TableCell>
                                                         <Badge className="bg-red-100 text-red-800 border-red-300 hover:bg-red-200">
                                                             {application.area}
@@ -303,102 +444,60 @@ export default function Index({ applications, filters }: Props) {
                                                         </div>
                                                     </TableCell>
 
-                                                    <TableCell className="text-muted-foreground text-sm">{formatDate(application.created_at)}</TableCell>
+                                                    <TableCell>
+                                                        <StatusToggles application={application} />
+                                                    </TableCell>
 
                                                     <TableCell>
                                                         <div className="flex gap-1">
                                                             {application.cv && (
-                                                                <Badge className="text-xs bg-red-600 hover:bg-red-700 text-white">
-                                                                    CV
-                                                                </Badge>
+                                                                <Badge className="text-[10px] bg-red-600 text-white cursor-pointer" onClick={() => handleDownload(application.cv!, `CV_${application.full_name}.pdf`)}>CV</Badge>
                                                             )}
-
                                                             {application.extra_documents && application.extra_documents.length > 0 && (
-                                                                <Badge className="text-xs bg-red-500 hover:bg-red-600 text-white">
-                                                                    +{application.extra_documents.length} docs
-                                                                </Badge>
+                                                                <Badge className="text-[10px] bg-gray-500 text-white cursor-pointer" onClick={() => {
+                                                                    application.extra_documents!.forEach((doc, i) => handleDownload(doc, `Doc_${application.full_name}_${i + 1}.pdf`));
+                                                                }}>+{application.extra_documents.length}</Badge>
                                                             )}
                                                         </div>
                                                     </TableCell>
 
                                                     <TableCell className="text-right">
-                                                        <div className="flex justify-end gap-2">
-                                                            <Button variant="outline" size="sm" asChild>
+                                                        <div className="flex justify-end gap-1">
+                                                            <Button
+                                                                variant="outline"
+                                                                size="sm"
+                                                                className="h-8 w-8 p-0 text-green-600 border-green-200 hover:bg-green-50"
+                                                                onClick={() => openWhatsAppDialog(application.phone)}
+                                                            >
+                                                                <Phone className="h-4 w-4" />
+                                                            </Button>
+
+                                                            <Button variant="outline" size="sm" asChild className="h-8 w-8 p-0">
                                                                 <Link href={route('admin.job-applications.show', application.id)}>
-                                                                    <Eye className="mr-1 h-4 w-4" />
-                                                                    Ver
+                                                                    <Eye className="h-4 w-4" />
                                                                 </Link>
                                                             </Button>
 
-                                                            <Button variant="outline" size="sm" asChild>
+                                                            <Button variant="outline" size="sm" asChild className="h-8 w-8 p-0">
                                                                 <Link href={route('admin.job-applications.edit', application.id)}>
-                                                                    <Edit className="mr-1 h-4 w-4" />
-                                                                    Editar
+                                                                    <Edit className="h-4 w-4" />
                                                                 </Link>
                                                             </Button>
-
-                                                            {application.cv && (
-                                                                <Button
-                                                                    variant="outline"
-                                                                    size="sm"
-                                                                    onClick={() =>
-                                                                        handleDownload(
-                                                                            application.cv!,
-                                                                            `CV_${application.full_name.replace(/\s+/g, '_')}.pdf`,
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    <Download className="mr-1 h-4 w-4" />
-                                                                    CV
-                                                                </Button>
-                                                            )}
-
-                                                            {application.extra_documents && application.extra_documents.length > 0 && (
-                                                                <Button
-                                                                    variant="outline"
-                                                                    size="sm"
-                                                                    onClick={() => {
-                                                                        application.extra_documents!.forEach((doc, index) => {
-                                                                            handleDownload(
-                                                                                doc,
-                                                                                `Doc_${application.full_name.replace(/\s+/g, '_')}_${index + 1}.pdf`,
-                                                                            );
-                                                                        });
-                                                                    }}
-                                                                >
-                                                                    <Download className="mr-1 h-4 w-4" />
-                                                                    Docs
-                                                                </Button>
-                                                            )}
 
                                                             <AlertDialog>
                                                                 <AlertDialogTrigger asChild>
-                                                                    <Button variant="outline" size="sm" className="text-red-700 border-red-300 hover:bg-red-50 hover:border-red-400 hover:text-red-800">
-                                                                        <Trash2 className="mr-1 h-4 w-4" />
-                                                                        Eliminar
+                                                                    <Button variant="outline" size="sm" className="h-8 w-8 p-0 text-red-700 border-red-200 hover:bg-red-50">
+                                                                        <Trash2 className="h-4 w-4" />
                                                                     </Button>
                                                                 </AlertDialogTrigger>
-
                                                                 <AlertDialogContent>
                                                                     <AlertDialogHeader>
-                                                                        <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
-
-                                                                        <AlertDialogDescription>
-                                                                            Esta acción eliminará permanentemente la Postulacion de {application.full_name}{' '}
-                                                                            y sus documentos.
-                                                                        </AlertDialogDescription>
+                                                                        <AlertDialogTitle>¿Está seguro?</AlertDialogTitle>
+                                                                        <AlertDialogDescription>Eliminar postulante: {application.full_name}</AlertDialogDescription>
                                                                     </AlertDialogHeader>
-
                                                                     <AlertDialogFooter>
-                                                                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
-
-                                                                        <AlertDialogAction
-                                                                            onClick={() => handleDelete(application)}
-                                                                            className="bg-red-600 hover:bg-red-700 text-white font-medium"
-                                                                            disabled={processing}
-                                                                        >
-                                                                            Eliminar
-                                                                        </AlertDialogAction>
+                                                                        <AlertDialogCancel>No</AlertDialogCancel>
+                                                                        <AlertDialogAction onClick={() => handleDelete(application)} className="bg-red-600">Sí, eliminar</AlertDialogAction>
                                                                     </AlertDialogFooter>
                                                                 </AlertDialogContent>
                                                             </AlertDialog>
@@ -414,127 +513,36 @@ export default function Index({ applications, filters }: Props) {
                                 <div className="lg:hidden space-y-4">
                                     {applications.data.map((application) => (
                                         <Card key={application.id} className="border border-gray-200">
-                                            <CardContent className="pt-4">
-                                                <div className="space-y-3">
-                                                    <div className="flex items-center justify-between">
-                                                        <h3 className="font-semibold text-lg">{application.full_name}</h3>
-                                                        <Badge className="bg-red-100 text-red-800 border-red-300">
-                                                            {application.area}
-                                                        </Badge>
+                                            <CardContent className="pt-4 space-y-3">
+                                                <div className="flex items-start justify-between">
+                                                    <div>
+                                                        <h3 className="font-bold text-lg leading-tight">{application.full_name}</h3>
+                                                        <p className="text-xs text-muted-foreground">{application.ci}</p>
                                                     </div>
-                                                    
-                                                    <div className="grid grid-cols-2 gap-2 text-sm">
-                                                        <div>
-                                                            <span className="text-muted-foreground">Cédula:</span>
-                                                            <span className="ml-1 font-medium">{application.ci}</span>
-                                                        </div>
-                                                        <div>
-                                                            <span className="text-muted-foreground">Teléfono:</span>
-                                                            <span className="ml-1 font-medium">{application.phone}</span>
-                                                        </div>
-                                                    </div>
-                                                    
-                                                    <div className="text-sm">
-                                                        <span className="text-muted-foreground">Fecha:</span>
-                                                        <span className="ml-1">{formatDate(application.created_at)}</span>
-                                                    </div>
-                                                    
-                                                    <div className="flex gap-1">
-                                                        {application.cv && (
-                                                            <Badge className="text-xs bg-red-600 hover:bg-red-700 text-white">
-                                                                CV
-                                                            </Badge>
-                                                        )}
-                                                        {application.extra_documents && application.extra_documents.length > 0 && (
-                                                            <Badge className="text-xs bg-red-500 hover:bg-red-600 text-white">
-                                                                +{application.extra_documents.length} docs
-                                                            </Badge>
-                                                        )}
-                                                    </div>
-                                                    
-                                                    <div className="flex flex-wrap gap-2 pt-2">
-                                                        <Button variant="outline" size="sm" asChild className="flex-1 min-w-0">
-                                                            <Link href={route('admin.job-applications.show', application.id)}>
-                                                                <Eye className="mr-1 h-4 w-4" />
-                                                                Ver
-                                                            </Link>
-                                                        </Button>
+                                                    <Badge className="bg-red-100 text-red-800 border-red-300">{application.area}</Badge>
+                                                </div>
 
-                                                        <Button variant="outline" size="sm" asChild className="flex-1 min-w-0">
-                                                            <Link href={route('admin.job-applications.edit', application.id)}>
-                                                                <Edit className="mr-1 h-4 w-4" />
-                                                                Editar
-                                                            </Link>
-                                                        </Button>
+                                                <div className="flex items-center gap-2 text-sm font-medium">
+                                                    <Phone className="h-3 w-3" /> {application.phone}
+                                                </div>
 
-                                                        {application.cv && (
-                                                            <Button
-                                                                variant="outline"
-                                                                size="sm"
-                                                                onClick={() =>
-                                                                    handleDownload(
-                                                                        application.cv!,
-                                                                        `CV_${application.full_name.replace(/\s+/g, '_')}.pdf`,
-                                                                    )
-                                                                }
-                                                                className="flex-1 min-w-0"
-                                                            >
-                                                                <Download className="mr-1 h-4 w-4" />
-                                                                CV
-                                                            </Button>
-                                                        )}
+                                                <div className="py-2 border-y border-gray-50">
+                                                    <p className="text-[10px] font-black uppercase text-gray-400 mb-1.5">Cambiar Estado</p>
+                                                    <StatusToggles application={application} />
+                                                </div>
 
-                                                        {application.extra_documents && application.extra_documents.length > 0 && (
-                                                            <Button
-                                                                variant="outline"
-                                                                size="sm"
-                                                                onClick={() => {
-                                                                    application.extra_documents!.forEach((doc, index) => {
-                                                                        handleDownload(
-                                                                            doc,
-                                                                            `Doc_${application.full_name.replace(/\s+/g, '_')}_${index + 1}.pdf`,
-                                                                        );
-                                                                    });
-                                                                }}
-                                                                className="flex-1 min-w-0"
-                                                            >
-                                                                <Download className="mr-1 h-4 w-4" />
-                                                                Docs
-                                                            </Button>
-                                                        )}
-
-                                                        <AlertDialog>
-                                                            <AlertDialogTrigger asChild>
-                                                                <Button variant="outline" size="sm" className="text-red-700 border-red-300 hover:bg-red-50 hover:border-red-400 hover:text-red-800 flex-1 min-w-0">
-                                                                    <Trash2 className="mr-1 h-4 w-4" />
-                                                                    Eliminar
-                                                                </Button>
-                                                            </AlertDialogTrigger>
-
-                                                            <AlertDialogContent>
-                                                                <AlertDialogHeader>
-                                                                    <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
-
-                                                                    <AlertDialogDescription>
-                                                                        Esta acción eliminará permanentemente la Postulacion de {application.full_name}{' '}
-                                                                        y sus documentos.
-                                                                    </AlertDialogDescription>
-                                                                </AlertDialogHeader>
-
-                                                                <AlertDialogFooter>
-                                                                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
-
-                                                                    <AlertDialogAction
-                                                                        onClick={() => handleDelete(application)}
-                                                                        className="bg-red-600 hover:bg-red-700 text-white font-medium"
-                                                                        disabled={processing}
-                                                                    >
-                                                                        Eliminar
-                                                                    </AlertDialogAction>
-                                                                </AlertDialogFooter>
-                                                            </AlertDialogContent>
-                                                        </AlertDialog>
-                                                    </div>
+                                                <div className="flex gap-2 pt-1">
+                                                    <Button variant="outline" size="sm" className="flex-1 text-green-600 bg-green-50" onClick={() => openWhatsAppDialog(application.phone)}>
+                                                        <Phone className="mr-1.5 h-4 w-4" /> WhatsApp
+                                                    </Button>
+                                                    <Button variant="outline" size="sm" asChild className="flex-1">
+                                                        <Link href={route('admin.job-applications.show', application.id)}>
+                                                            <Eye className="mr-1.5 h-4 w-4" /> Ver
+                                                        </Link>
+                                                    </Button>
+                                                    <Button variant="outline" size="sm" className="text-red-700 bg-red-50" onClick={() => handleDelete(application)}>
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
                                                 </div>
                                             </CardContent>
                                         </Card>
@@ -543,78 +551,22 @@ export default function Index({ applications, filters }: Props) {
 
                                 {/* PAGINATION */}
                                 {applications.last_page > 1 && (
-                                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-6">
-                                        <div className="text-red-600 text-sm font-medium">
-                                            Mostrando {applications.from} a {applications.to} de {applications.total} resultados
+                                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t mt-6">
+                                        <div className="text-xs text-gray-400 font-medium">
+                                            {applications.from}-{applications.to} de {applications.total}
                                         </div>
-
-                                        <div className="flex flex-wrap gap-2">
-                                            {applications.current_page > 1 && (
+                                        <div className="flex gap-1 overflow-x-auto pb-2 sm:pb-0">
+                                            {Array.from({ length: applications.last_page }, (_, i) => i + 1).map((page) => (
                                                 <Button
-                                                    variant="outline"
+                                                    key={page}
+                                                    variant={page === applications.current_page ? 'default' : 'outline'}
                                                     size="sm"
-                                                    onClick={() =>
-                                                        router.get(
-                                                            route('admin.job-applications.index'),
-                                                            {
-                                                                page: applications.current_page - 1,
-                                                                search: search || '',
-                                                                area: area || '',
-                                                            },
-                                                            { replace: true },
-                                                        )
-                                                    }
-                                                    disabled={isLoading}
+                                                    onClick={() => router.get(route('admin.job-applications.index'), { ...filters, page })}
+                                                    className="h-8 w-8 p-0"
                                                 >
-                                                    Anterior
+                                                    {page}
                                                 </Button>
-                                            )}
-
-                                            {Array.from({ length: Math.min(5, applications.last_page) }, (_, i) => {
-                                                const page = i + 1;
-                                                return (
-                                                    <Button
-                                                        key={page}
-                                                        variant={page === applications.current_page ? 'default' : 'outline'}
-                                                        size="sm"
-                                                        onClick={() =>
-                                                            router.get(
-                                                                route('admin.job-applications.index'),
-                                                                {
-                                                                    page,
-                                                                    search: search || '',
-                                                                    area: area || ''
-                                                                },
-                                                                { replace: true },
-                                                            )
-                                                        }
-                                                        disabled={isLoading}
-                                                    >
-                                                        {page}
-                                                    </Button>
-                                                );
-                                            })}
-
-                                            {applications.current_page < applications.last_page && (
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    onClick={() =>
-                                                        router.get(
-                                                            route('admin.job-applications.index'),
-                                                            {
-                                                                page: applications.current_page + 1,
-                                                                search: search || '',
-                                                                area: area || '',
-                                                            },
-                                                            { replace: true },
-                                                        )
-                                                    }
-                                                    disabled={isLoading}
-                                                >
-                                                    Siguiente
-                                                </Button>
-                                            )}
+                                            ))}
                                         </div>
                                     </div>
                                 )}
@@ -623,6 +575,43 @@ export default function Index({ applications, filters }: Props) {
                     </CardContent>
                 </Card>
             </div>
+
+            {/* WhatsApp Dialog */}
+            <Dialog open={isWhatsAppOpen} onOpenChange={setIsWhatsAppOpen}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <span className="p-2 bg-green-100 rounded-lg"><Phone className="h-5 w-5 text-green-600" /></span>
+                            Enviar WhatsApp
+                        </DialogTitle>
+                        <DialogDescription>
+                            Enviar un mensaje directo al número: <span className="font-bold text-foreground">{selectedPhone}</span>
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                            <label className="text-xs font-black uppercase text-muted-foreground mr-1">Mensaje</label>
+                            <Textarea
+                                placeholder="Escribe el mensaje aquí..."
+                                value={whatsappMessage}
+                                onChange={(e) => setWhatsappMessage(e.target.value)}
+                                className="min-h-[120px] resize-none border-green-100 focus:border-green-400 focus:ring-green-400"
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsWhatsAppOpen(false)} disabled={isSendingWhatsApp}>Cancelar</Button>
+                        <Button
+                            onClick={handleSendWhatsApp}
+                            disabled={isSendingWhatsApp}
+                            className="bg-green-600 hover:bg-green-700 text-white font-bold"
+                        >
+                            {isSendingWhatsApp ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Phone className="h-4 w-4 mr-2" />}
+                            Enviar Ahora
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
             <Toaster richColors position="top-right" />
         </AppLayout>

@@ -81,7 +81,7 @@ export default function Welcome({ companies = [] }: { companies?: any[] }) {
                             playsInline
                             className="h-full w-full object-cover grayscale-[20%] transition-all duration-700 hover:grayscale-0"
                         >
-                            <source src="/Gflores/video1.mp4" type="video/mp4" />
+                            <source src="/Gflores/admus.mp4" type="video/mp4" />
                         </video>
                         <div className="bg-brand/10 absolute inset-0 mix-blend-overlay" />
                     </div>

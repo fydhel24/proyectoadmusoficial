@@ -28,11 +28,16 @@ class JobApplicationController extends Controller
             $query->where('area', $request->area);
         }
 
+        // Status filter functionality
+        if ($request->has('status') && !empty($request->status)) {
+            $query->where('status', $request->status);
+        }
+
         $applications = $query->latest()->paginate(10);
 
         return Inertia::render('admin/job-applications/index', [
             'applications' => $applications,
-            'filters' => $request->only(['search', 'area']),
+            'filters' => $request->only(['search', 'area', 'status']),
         ]);
     }
 
@@ -156,5 +161,18 @@ class JobApplicationController extends Controller
         $jobApplication->delete();
 
         return redirect()->route('admin.job-applications.index')->with('success', 'Aplicación eliminada exitosamente.');
+    }
+
+    public function updateStatus(Request $request, JobApplication $job_application)
+    {
+        $request->validate([
+            'status' => 'required|string|in:PENDIENTE,ACEPTADO,RECHAZADO',
+        ]);
+
+        $job_application->update([
+            'status' => $request->status,
+        ]);
+
+        return redirect()->back()->with('success', 'Estado actualizado exitosamente.');
     }
 }

@@ -140,7 +140,7 @@ class SemanaController extends Controller
             // Semana actual por defecto
             $hoy = Carbon::now();
             $inicioSemana = $hoy->copy()->startOfWeek(Carbon::MONDAY);
-            $finSemana = $hoy->copy()->endOfWeek(Carbon::SUNDAY);
+            $finSemana = $hoy->copy()->endOfWeek(Carbon::SATURDAY);
 
             $week = Week::firstOrCreate(
                 ['start_date' => $inicioSemana->toDateString(), 'end_date' => $finSemana->toDateString()],
@@ -259,7 +259,7 @@ class SemanaController extends Controller
 
         // Calcular inicio y fin de la semana actual
         $startOfWeek = Carbon::now()->startOfWeek(Carbon::MONDAY);
-        $endOfWeek = Carbon::now()->endOfWeek(Carbon::SUNDAY);
+        $endOfWeek = Carbon::now()->endOfWeek(Carbon::SATURDAY);
 
         // Buscar o crear la semana actual
         $week = Week::where('start_date', $startOfWeek->toDateString())

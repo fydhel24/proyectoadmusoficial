@@ -670,6 +670,14 @@ Route::middleware(['auth'])->group(function () {
     require __DIR__ . '/settings.php';
     require __DIR__ . '/auth.php';
 
+    // Rutas de Asistencia (Biometría + GPS)
+    Route::get('/asistencia', [App\Http\Controllers\AsistenciaController::class, 'index'])->name('asistencia.index');
+    Route::post('/asistencia', [App\Http\Controllers\AsistenciaController::class, 'store'])->name('asistencia.store');
+    Route::delete('/asistencia/dispositivo', [App\Http\Controllers\AsistenciaController::class, 'revoke'])->name('asistencia.revoke');
+    
+    // Rutas para enrolamiento de WebAuthn
+    \Laragear\WebAuthn\Http\Routes::routes();
+
     Route::get('/whatsapp-miranda', function () {
         return Inertia::render('whatsapp-miranda');
     })->name('whatsapp-miranda');

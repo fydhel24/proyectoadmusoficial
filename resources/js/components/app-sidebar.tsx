@@ -304,7 +304,7 @@ export function AppSidebar({ className }: { className?: string }) {
                 items: [
                     { title: 'Influencers', href: '/influencers', icon: Users },
                     { title: 'Ver Calendario', href: '/bookings', icon: CalendarCheck },
-                     { title: 'Mi Perfil', href: '/facebook-profile', icon: User },
+                    { title: 'Mi Perfil', href: '/facebook-profile', icon: User },
                 ],
                 isCollapsible: false,
             });
@@ -446,6 +446,19 @@ export function AppSidebar({ className }: { className?: string }) {
                             </SidebarMenuButton>
                         </SidebarMenuItem>
 
+                        <SidebarMenuItem>
+                            <SidebarMenuButton
+                                asChild
+                                isActive={currentPath === '/asistencia'}
+                                tooltip="Asistencia"
+                            >
+                                <Link href="/asistencia" prefetch>
+                                    <Clock className="h-5 w-5" />
+                                    <span>Asistencia</span>
+                                </Link>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+
                     </SidebarMenu>
                 </SidebarGroup>
 
@@ -471,7 +484,7 @@ export function AppSidebar({ className }: { className?: string }) {
 
                 {isAdmin && (
                     <SidebarGroup>
-                         <SidebarMenu>
+                        <SidebarMenu>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild tooltip="Whatsapp">
                                     <Link href="/whatsapp-miranda">

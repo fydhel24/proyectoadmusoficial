@@ -3,7 +3,7 @@ import axios from 'axios';
 import { startAuthentication } from '@simplewebauthn/browser';
 import { router } from '@inertiajs/react';
 import {
-    Clock, MapPin, Building2, Trash2, AlertTriangle, Fingerprint, Loader2
+    Clock, MapPin, Building2, Trash2, AlertTriangle, Fingerprint, Loader2, CheckCircle2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -35,8 +35,18 @@ interface MainPanelProps {
 export function MainPanel({ asistencias, empresas }: MainPanelProps) {
     const [loading, setLoading] = useState(false);
     const [companyId, setCompanyId] = useState<string>('');
+    const [successModalOpen, setSuccessModalOpen] = useState(false);
 
     const handleMarkAttendance = async () => {
+        // VALIDACIÓN: Si hay empresas en la lista, obligar a seleccionar una.
+        if (empresas.length > 0 && (!companyId || companyId === 'none' || companyId === '')) {
+            toast.warning("Por favor, selecciona la empresa para la cual estás marcando asistencia.", {
+                id: 'attendance-warning',
+                icon: <AlertTriangle className="w-5 h-5 text-amber-500" />
+            });
+            return;
+        }
+
         setLoading(true);
         toast.loading("Obteniendo tu ubicación GPS...", { id: 'attendance' });
 
@@ -54,8 +64,12 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
                 // 1. Pedir opciones de aserción (login options de WebAuthn)
                 const optionsResp = await axios.post('/webauthn/login/options');
 
+                // Forzar biometría y no usar PIN/Contraseña como respaldo
+                const authOptions = optionsResp.data;
+                authOptions.userVerification = 'required';
+
                 // 2. Ejecutar la aserción biométrica del dispositivo
-                const asseResp = await startAuthentication(optionsResp.data);
+                const asseResp = await startAuthentication(authOptions);
 
                 // 3. Enviar al Endpoint de Asistencia con los datos GPS + ID Empresa + Firma
                 const payload = {
@@ -67,9 +81,14 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
 
                 await axios.post('/asistencia', payload);
 
-                toast.success("Asistencia marcada correctamente.", { id: 'attendance' });
+                // Mostrar Modal de Éxito en lugar de solo el toast
+                toast.dismiss('attendance');
+                setSuccessModalOpen(true);
+
                 setCompanyId('');
-                router.reload();
+
+                // Opcional: Recargar en background o al cerrar el modal
+                // router.reload();
 
             } catch (error: any) {
                 console.error(error);
@@ -98,6 +117,11 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
         });
     };
 
+    const closeSuccessModal = () => {
+        setSuccessModalOpen(false);
+        router.reload();
+    };
+
     return (
         <div className="flex flex-col gap-6 max-w-4xl mx-auto w-full">
             <Card className="shadow-lg border-l-4 border-l-primary/60">
@@ -119,11 +143,11 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
                         <div className="flex-1 w-full">
                             <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1 mb-2">
                                 <Building2 className="w-3 h-3" />
-                                Empresa (Opcional)
+                                Empresa (Obligatorio)
                             </label>
                             <Select value={companyId} onValueChange={setCompanyId} disabled={loading}>
-                                <SelectTrigger className="w-full bg-background">
-                                    <SelectValue placeholder="Selecciona si es para una empresa en específico" />
+                                <SelectTrigger className={`w-full bg-background ${empresas.length > 0 && !companyId ? 'border-amber-500/50 focus:ring-amber-500/20' : ''}`}>
+                                    <SelectValue placeholder="Selecciona la empresa..." />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="none" className="text-muted-foreground italic">Ninguna (oficina general)</SelectItem>
@@ -172,7 +196,7 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
                                 <tr>
                                     <th className="px-4 py-3 border-b">Fecha y Hora</th>
                                     <th className="px-4 py-3 border-b">Empresa</th>
-                                    <th className="px-4 py-3 border-b">Ubicación (Coordenadas)</th>
+
                                 </tr>
                             </thead>
                             <tbody>
@@ -194,9 +218,7 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
                                                 <span className="text-muted-foreground text-xs italic">Oficina general</span>
                                             )}
                                         </td>
-                                        <td className="px-4 py-3 text-xs font-mono text-muted-foreground">
-                                            {item.latitud}, {item.longitud}
-                                        </td>
+
                                     </tr>
                                 ))}
                             </tbody>
@@ -204,6 +226,29 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
                     </div>
                 )}
             </div>
+
+            {/* MODAL DE ÉXITO VISUAL */}
+            <AlertDialog open={successModalOpen} onOpenChange={setSuccessModalOpen}>
+                <AlertDialogContent className="max-w-md text-center">
+                    <AlertDialogHeader className="flex flex-col items-center">
+                        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                            <CheckCircle2 className="w-12 h-12 text-green-600" />
+                        </div>
+                        <AlertDialogTitle className="text-2xl font-bold text-center">¡Asistencia Registrada!</AlertDialogTitle>
+                        <AlertDialogDescription className="text-center text-base mt-2">
+                            Gracias por marcar tu asistencia de hoy. Tu registro biométrico y ubicación han sido guardados exitosamente.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter className="sm:justify-center mt-6">
+                        <Button
+                            className="w-full sm:w-auto min-w-[150px] bg-green-600 hover:bg-green-700"
+                            onClick={closeSuccessModal}
+                        >
+                            De acuerdo, continuar
+                        </Button>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }

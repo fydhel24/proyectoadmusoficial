@@ -18,8 +18,16 @@ export function RegisterDevice() {
             // 1. Pedir las opciones de creación al Backend
             const optionsResp = await axios.post('/webauthn/register/options');
 
+            // Forzar que el autenticador sea el propio celular/computadora (no llaves USB) y verificar biometría
+            const registerOptions = optionsResp.data;
+            registerOptions.authenticatorSelection = {
+                ...registerOptions.authenticatorSelection,
+                authenticatorAttachment: 'platform',
+                userVerification: 'required'
+            };
+
             // 2. Ejecutar la ventana biométrica del navegador
-            const attResp = await startRegistration(optionsResp.data);
+            const attResp = await startRegistration(registerOptions);
 
             // 3. Mandar la firma al backend para guardarla
             await axios.post('/webauthn/register', attResp);

@@ -82,4 +82,29 @@ class AsistenciaController extends Controller
         $request->user()->webAuthnCredentials()->delete();
         return back()->with('success', 'Dispositivo reiniciado. Registra uno nuevo.');
     }
+
+    public function history(Request $request)
+    {
+        if (!$request->user()->hasRole('admin')) {
+            abort(403, 'No tienes permiso para ver el historial de asistencias.');
+        }
+
+        $query = Asistencia::with(['user', 'company']);
+
+        if ($request->has('search')) {
+            $search = $request->query('search');
+            $query->whereHas('user', function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%");
+            })->orWhereHas('company', function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%");
+            });
+        }
+
+        $asistencias = $query->orderBy('fecha_marcacion', 'desc')
+                             ->paginate($request->query('per_page', 15));
+
+        return Inertia::render('asistencia/AdminHistory', [
+            'asistencias' => $asistencias
+        ]);
+    }
 }

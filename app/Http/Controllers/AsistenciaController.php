@@ -24,13 +24,15 @@ class AsistenciaController extends Controller
         $empresas = collect();
 
         if ($user->hasRole('camarografo')) {
-            $empresas = \App\Models\TareaSeguimiento::with('empresa')
-                ->where('user_produccion_id', $user->id)
-                ->whereDate('fecha_produccion', now()->toDateString())
-                ->get()
-                ->pluck('empresa')
-                ->unique('id')
-                ->values();
+            // Camarógrafos ven TODAS las empresas que tienen grabación hoy
+            $companyIds = \App\Models\TareaSeguimiento::whereDate('fecha_produccion', now()->toDateString())
+                ->whereNotNull('empresa_id')
+                ->distinct()
+                ->pluck('empresa_id');
+
+            $empresas = Company::whereIn('id', $companyIds)
+                ->select('id', 'name')
+                ->get();
         } elseif ($user->hasRole('influencer')) {
             $empresas = \App\Models\Booking::with('company')
                 ->where('user_id', $user->id)

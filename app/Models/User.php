@@ -7,11 +7,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
+use Laragear\WebAuthn\Contracts\WebAuthnAuthenticatable;
+use Laragear\WebAuthn\WebAuthnAuthentication;
 
-class User extends Authenticatable
+class User extends Authenticatable implements WebAuthnAuthenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, Notifiable, HasRoles, WebAuthnAuthentication;
 
     /**
      * The attributes that are mass assignable.
@@ -112,5 +114,10 @@ class User extends Authenticatable
     public function reportesVentas()
     {
         return $this->hasMany(ReporteVenta::class, 'jefe_ventas_id');
+    }
+
+    public function asistencias()
+    {
+        return $this->hasMany(Asistencia::class);
     }
 }

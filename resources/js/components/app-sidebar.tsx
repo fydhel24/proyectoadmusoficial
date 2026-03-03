@@ -215,6 +215,7 @@ export function AppSidebar({ className }: { className?: string }) {
                     { title: 'Roles', href: '/roles', icon: ShieldCheck },
                     { title: 'Gestion de tipos', href: '/tipos', icon: Settings },
                     { title: 'Postulaciones de Trabajo', href: '/admin/job-applications', icon: Briefcase },
+                    { title: 'Historial Asistencia', href: '/admin/asistencias', icon: Clock },
                 ],
                 isCollapsible: true,
             },
@@ -304,7 +305,8 @@ export function AppSidebar({ className }: { className?: string }) {
                 items: [
                     { title: 'Influencers', href: '/influencers', icon: Users },
                     { title: 'Ver Calendario', href: '/bookings', icon: CalendarCheck },
-                     { title: 'Mi Perfil', href: '/facebook-profile', icon: User },
+                    { title: 'Mi Perfil', href: '/facebook-profile', icon: User },
+                    { title: 'Asistencia', href: '/asistencia', icon: Clock },
                 ],
                 isCollapsible: false,
             });
@@ -330,6 +332,7 @@ export function AppSidebar({ className }: { className?: string }) {
                 items: [
                     { title: 'Grabaciones de HOY', href: '/camarografo/tareas-hoy', icon: CalendarCheck },
                     { title: 'Grabaciones Semana ', href: '/tareas-camarografo', icon: CalendarRange },
+                    { title: 'Asistencia', href: '/asistencia', icon: Clock },
                 ],
                 isCollapsible: true,
             });
@@ -471,7 +474,7 @@ export function AppSidebar({ className }: { className?: string }) {
 
                 {isAdmin && (
                     <SidebarGroup>
-                         <SidebarMenu>
+                        <SidebarMenu>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild tooltip="Whatsapp">
                                     <Link href="/whatsapp-miranda">

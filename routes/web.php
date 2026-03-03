@@ -674,6 +674,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/asistencia', [App\Http\Controllers\AsistenciaController::class, 'index'])->name('asistencia.index');
     Route::post('/asistencia', [App\Http\Controllers\AsistenciaController::class, 'store'])->name('asistencia.store');
     Route::delete('/asistencia/dispositivo', [App\Http\Controllers\AsistenciaController::class, 'revoke'])->name('asistencia.revoke');
+    Route::delete('/users/{id}/reset-webauthn', [App\Http\Controllers\UserController::class, 'resetDeviceWebAuthn'])->name('users.reset-webauthn');
     
     // Rutas de Historial Admin
     Route::get('/admin/asistencias', [App\Http\Controllers\AsistenciaController::class, 'history'])->name('admin.asistencia.history');

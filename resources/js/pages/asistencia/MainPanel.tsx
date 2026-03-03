@@ -172,7 +172,7 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
                             ) : (
                                 <>
                                     <MapPin className="w-5 h-5 mr-2" />
-                                    Escanear Huella
+                                   Marcar Asistencia
                                 </>
                             )}
                         </Button>

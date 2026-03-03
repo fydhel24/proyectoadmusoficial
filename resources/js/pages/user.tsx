@@ -56,7 +56,17 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { toast } from "sonner";
 import axios from 'axios';
 import { useEffect, useState, useCallback } from 'react';
-import { useDebounce } from '@/hooks/use-debounce'; // I'll check if this exists or implement a simple one
+import { useDebounce } from '@/hooks/use-debounce';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -88,10 +98,13 @@ interface PaginationData {
 export default function UsersPermissions() {
     const [users, setUsers] = useState<User[]>([]);
     const [pagination, setPagination] = useState<PaginationData | null>(null);
+    const [loading, setLoading] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
     const debouncedSearch = useDebounce(searchTerm, 500);
+    const [resetWebAuthnUser, setResetWebAuthnUser] = useState<User | null>(null);
+    const [confirmingWebAuthnReset, setConfirmingWebAuthnReset] = useState(false);
 
     const [newUserName, setNewUserName] = useState('');
     const [newUserEmail, setNewUserEmail] = useState('');
@@ -100,7 +113,6 @@ export default function UsersPermissions() {
     const [userIsActive, setUserIsActive] = useState(true);
 
     const [roles, setRoles] = useState<Role[]>([]);
-    const [loading, setLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
     const [editUserId, setEditUserId] = useState<number | null>(null);
 
@@ -244,19 +256,25 @@ export default function UsersPermissions() {
     };
 
     const handleResetWebAuthn = (user: User) => {
-        if (!confirm(`¿Seguro que deseas BORRAR el dispositivo biométrico de ${user.name}? Tendrá que registrar su huella nuevamente al entrar a Asistencia.`)) {
-            return;
-        }
+        setResetWebAuthnUser(user);
+    };
 
+    const executeResetWebAuthn = () => {
+        if (!resetWebAuthnUser) return;
+        setConfirmingWebAuthnReset(true);
         toast.loading("Desvinculando dispositivo...", { id: 'webauthn-reset' });
         axios
-            .delete(`/users/${user.id}/reset-webauthn`)
+            .delete(`/users/${resetWebAuthnUser.id}/reset-webauthn`)
             .then((response) => {
-                toast.success(response.data.message || 'Dispositivo biométrico reiniciado.', { id: 'webauthn-reset' });
+                toast.success(response.data.message || 'Dispositivo biométrico reiniciado. El usuario puede registrar uno nuevo.', { id: 'webauthn-reset' });
+                setResetWebAuthnUser(null);
             })
             .catch((error) => {
                 console.error('Error resetting WebAuthn:', error);
-                toast.error('Error al reiniciar el dispositivo biométrico', { id: 'webauthn-reset' });
+                toast.error('Error al reiniciar el dispositivo biómetrico', { id: 'webauthn-reset' });
+            })
+            .finally(() => {
+                setConfirmingWebAuthnReset(false);
             });
     };
 
@@ -517,6 +535,41 @@ export default function UsersPermissions() {
                     </form>
                 </DialogContent>
             </Dialog>
+
+            {/* AlertDialog: Confirmar reset biométrico */}
+            <AlertDialog open={!!resetWebAuthnUser} onOpenChange={(open) => !open && setResetWebAuthnUser(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <div className="flex flex-col items-center text-center gap-3 mb-2">
+                            <div className="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center">
+                                <Shield className="w-9 h-9 text-orange-500" />
+                            </div>
+                            <AlertDialogTitle className="text-xl">¿Cambiar dispositivo registrado?</AlertDialogTitle>
+                        </div>
+                        <AlertDialogDescription className="text-center text-base">
+                            El usuario <span className="font-bold text-foreground">{resetWebAuthnUser?.name}</span> perderá acceso biométrico en su celular actual.
+                            <br /><br />
+                            La próxima vez que ingrese a <span className="font-semibold">Asistencia</span>, se le pedirá registrar su huella en el nuevo dispositivo.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter className="sm:justify-center gap-3 mt-4">
+                        <AlertDialogCancel disabled={confirmingWebAuthnReset}>
+                            Cancelar
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={executeResetWebAuthn}
+                            disabled={confirmingWebAuthnReset}
+                            className="bg-orange-500 hover:bg-orange-600 text-white"
+                        >
+                            {confirmingWebAuthnReset ? (
+                                <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Procesando...</>
+                            ) : (
+                                'Sí, cambiar dispositivo'
+                            )}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </AppLayout>
     );
 }

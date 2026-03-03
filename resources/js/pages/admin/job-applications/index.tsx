@@ -148,10 +148,9 @@ export default function Index({ applications, filters }: Props) {
             }
 
             const sessionId = import.meta.env.VITE_WHATSAPP_SESSION_ID || '3';
-            const userId = import.meta.env.VITE_WHATSAPP_USER_ID || '3';
 
-            // 🔐 PASO 1: Login para obtener token de usuario
-            console.log('🔐 [1/5] Autenticando usuario...');
+            // 🔐 PASO 1: Login para obtener token
+            console.log('🔐 [1/4] Autenticando...');
             const loginResponse = await fetch('https://boot.miracode.tech/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -168,21 +167,17 @@ export default function Index({ applications, filters }: Props) {
             }
 
             const loginData = await loginResponse.json();
-            const userToken = loginData.token?.trim();
 
-            if (!userToken) {
-                throw new Error('Token no encontrado en respuesta de login');
+            // 🔑 CORRECCIÓN PRINCIPAL: Usar access_token en lugar de token
+            const freshToken = loginData.access_token?.trim();
+
+            if (!freshToken) {
+                console.error('❌ Token no encontrado en respuesta:', loginData);
+                throw new Error('No se recibió un token válido del servidor');
             }
 
-            console.log('✅ [2/5] Token de usuario obtenido');
-            localStorage.setItem('whatsapp_token', userToken);
-
-            // 🔍 Debug: Verificar estructura del token
-            const tokenParts = userToken.split('.');
-            console.log('🔍 Token info:', {
-                parts: tokenParts.length,
-                isValidJWT: tokenParts.length === 3
-            });
+            console.log('✅ [2/4] Token obtenido:', freshToken.substring(0, 30) + '...');
+            localStorage.setItem('whatsapp_token', freshToken);
 
             // 📤 PASO 2: Preparar payload
             const body = {
@@ -191,108 +186,48 @@ export default function Index({ applications, filters }: Props) {
                 content: whatsappMessage
             };
 
-            console.log('📤 [3/5] Enviando petición:', {
-                url: 'https://boot.miracode.tech/whatsapp/send-text',
-                sessionId,
-                to: body.to,
-                contentPreview: whatsappMessage.substring(0, 50) + '...'
-            });
+            console.log('📤 [3/4] Enviando WhatsApp:', { to: body.to, sessionId });
 
-            // 📤 PASO 3: Enviar con headers EXPLÍCITOS y debugging
+            // 📤 PASO 3: Enviar con token correcto
             const sendResponse = await fetch('https://boot.miracode.tech/whatsapp/send-text', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${userToken}`,
-                    'Accept': 'application/json',
-                    'X-User-ID': userId // ← Header adicional por si la API lo necesita
+                    'Authorization': `Bearer ${freshToken}`, // ← Ahora sí tendrá valor
+                    'Accept': 'application/json'
                 },
                 body: JSON.stringify(body),
                 cache: 'no-store'
             });
 
-            // 🔍 Leer respuesta cruda para debugging
-            const responseText = await sendResponse.text();
-            console.log('📥 [4/5] Respuesta cruda:', {
+            const responseData = await sendResponse.json();
+            console.log('📥 [4/4] Respuesta:', {
                 status: sendResponse.status,
-                statusText: sendResponse.statusText,
-                headers: Object.fromEntries(sendResponse.headers.entries()),
-                bodyPreview: responseText.substring(0, 300)
+                data: responseData
             });
 
-            // Parsear JSON
-            let responseData;
-            try {
-                responseData = JSON.parse(responseText);
-            } catch {
-                responseData = { raw: responseText };
-            }
-
-            // ✅ PASO 5: Evaluar resultado
             if (sendResponse.ok || responseData?.status === 'Enviado' || responseData?.success === true) {
                 toast.success('✅ WhatsApp enviado con éxito');
                 setIsWhatsAppOpen(false);
             } else {
-                console.error('❌ Error en API WhatsApp:', responseData);
-
-                // Mensajes específicos según el tipo de error
-                if (responseData?.message?.toLowerCase().includes('unauthorized')) {
-                    // 🚨 POSIBLE CAUSA: Token de usuario ≠ Token de WhatsApp
-                    toast.error('🔐 Token inválido para WhatsApp API. Intentando alternativa...');
-
-                    // 🔄 FALLBACK: Intentar con whatsapp-client si está disponible
-                    try {
-                        console.log('🔄 [Fallback] Intentando con whatsapp-client...');
-                        // Si tienes importado whatsappClient, descomenta esto:
-                        /*
-                        const wcResponse = await whatsappClient.post('/whatsapp/send-text', {
-                            sessionId: sessionId,
-                            to: `${cleanPhone}@s.whatsapp.net`,
-                            content: whatsappMessage
-                        }, {
-                            headers: {
-                                'Authorization': `Bearer ${userToken}`,
-                                'X-User-ID': userId
-                            }
-                        });
-                        
-                        if (wcResponse.data?.status === 'Enviado' || wcResponse.status === 200) {
-                            toast.success('✅ WhatsApp enviado (vía fallback)');
-                            setIsWhatsAppOpen(false);
-                            return;
-                        }
-                        */
-                    } catch (fallbackError) {
-                        console.warn('⚠️ Fallback también falló:', fallbackError);
-                    }
-
-                    toast.error('🔐 Error de autenticación: Contacta al administrador para verificar permisos de WhatsApp API');
-                } else if (responseData?.message?.includes('session')) {
-                    toast.error('📱 Session ID no válida. Verifica el sessionId en configuración.');
-                } else if (responseData?.message?.includes('phone') || responseData?.message?.includes('to')) {
-                    toast.error('📞 Número de teléfono inválido. Formato esperado: 591XXXXXXXX');
-                } else {
-                    toast.error('❌ Error: ' + (responseData.message || 'Respuesta inesperada de la API'));
-                }
+                console.error('❌ Error en API:', responseData);
+                toast.error('❌ Error: ' + (responseData.message || 'Respuesta inesperada'));
             }
 
         } catch (error: any) {
             console.error('💥 Error fatal:', error);
 
             if (error.message?.includes('autenticar') || error.message?.includes('login')) {
-                toast.error('❌ Credenciales de WhatsApp inválidas');
-            } else if (error.name === 'TypeError' && error.message?.includes('fetch')) {
-                toast.error('🌐 Error de conexión. Verifica tu internet y que la API esté disponible');
-            } else if (error.message?.includes('Token')) {
-                toast.error('🔑 Error con el token. Intenta cerrar sesión y volver a iniciar');
+                toast.error('❌ Credenciales inválidas');
+            } else if (error.message?.includes('token')) {
+                toast.error('🔑 Error con el token. Verifica la respuesta de la API');
             } else {
-                toast.error('❌ Error: ' + (error.message || 'No se pudo enviar el WhatsApp'));
+                toast.error('❌ Error: ' + (error.message || 'No se pudo enviar'));
             }
         } finally {
             setIsSendingWhatsApp(false);
         }
     };
-
     useEffect(() => {
         return () => {
             if (searchTimeoutRef.current) {

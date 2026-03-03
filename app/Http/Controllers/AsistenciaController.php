@@ -24,15 +24,16 @@ class AsistenciaController extends Controller
         $empresas = collect();
 
         if ($user->hasRole('camarografo')) {
-            // Camarógrafos ven TODAS las empresas que tienen grabación hoy
-            $companyIds = \App\Models\TareaSeguimiento::whereDate('fecha_produccion', now()->toDateString())
-                ->whereNotNull('empresa_id')
-                ->distinct()
-                ->pluck('empresa_id');
-
-            $empresas = Company::whereIn('id', $companyIds)
-                ->select('id', 'name')
-                ->get();
+            // Camarógrafos ven TODAS las empresas con bookings hoy
+            // (son las mismas empresas a las que van los influencers a grabar)
+            $empresas = \App\Models\Booking::with('company')
+                ->whereDate('start_time', now()->toDateString())
+                ->whereHas('company')
+                ->get()
+                ->pluck('company')
+                ->unique('id')
+                ->filter()
+                ->values();
         } elseif ($user->hasRole('influencer')) {
             $empresas = \App\Models\Booking::with('company')
                 ->where('user_id', $user->id)

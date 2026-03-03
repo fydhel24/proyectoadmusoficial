@@ -675,6 +675,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/asistencia', [App\Http\Controllers\AsistenciaController::class, 'store'])->name('asistencia.store');
     Route::delete('/asistencia/dispositivo', [App\Http\Controllers\AsistenciaController::class, 'revoke'])->name('asistencia.revoke');
     
+    // Rutas de Historial Admin
+    Route::get('/admin/asistencias', [App\Http\Controllers\AsistenciaController::class, 'history'])->name('admin.asistencia.history');
+
+    
     // Rutas para enrolamiento de WebAuthn
     \Laragear\WebAuthn\Http\Routes::routes();
 

@@ -96,4 +96,12 @@ class UserController extends Controller
 
         return response()->json(['message' => 'Contraseña restablecida correctamente']);
     }
+
+    public function resetDeviceWebAuthn($id)
+    {
+        $user = User::findOrFail($id);
+        $user->webAuthnCredentials()->delete();
+
+        return response()->json(['message' => 'Dispositivo desenrolado correctamente. El usuario podrá registrar uno nuevo.']);
+    }
 }

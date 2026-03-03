@@ -243,6 +243,23 @@ export default function UsersPermissions() {
             });
     };
 
+    const handleResetWebAuthn = (user: User) => {
+        if (!confirm(`¿Seguro que deseas BORRAR el dispositivo biométrico de ${user.name}? Tendrá que registrar su huella nuevamente al entrar a Asistencia.`)) {
+            return;
+        }
+
+        toast.loading("Desvinculando dispositivo...", { id: 'webauthn-reset' });
+        axios
+            .delete(`/users/${user.id}/reset-webauthn`)
+            .then((response) => {
+                toast.success(response.data.message || 'Dispositivo biométrico reiniciado.', { id: 'webauthn-reset' });
+            })
+            .catch((error) => {
+                console.error('Error resetting WebAuthn:', error);
+                toast.error('Error al reiniciar el dispositivo biométrico', { id: 'webauthn-reset' });
+            });
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Usuarios y Roles" />
@@ -361,6 +378,10 @@ export default function UsersPermissions() {
                                                         <DropdownMenuItem onClick={() => handleResetPassword(user)} className="cursor-pointer">
                                                             <KeyRound className="mr-2 h-4 w-4" />
                                                             Reiniciar Pass
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => handleResetWebAuthn(user)} className="cursor-pointer text-orange-600 focus:text-orange-700">
+                                                            <Shield className="mr-2 h-4 w-4" />
+                                                            Cambiar Celular
                                                         </DropdownMenuItem>
                                                         <DropdownMenuSeparator />
                                                         <DropdownMenuItem

@@ -36,16 +36,6 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
     const [loading, setLoading] = useState(false);
     const [companyId, setCompanyId] = useState<string>('');
 
-    const handleRevoke = async () => {
-        try {
-            await axios.delete('/asistencia/dispositivo');
-            toast.success("Dispositivo borrado. Ahora debes registrarte otra vez.", { id: 'webauthn-revoke' });
-            router.reload();
-        } catch (e) {
-            toast.error("Error al borrar el dispositivo.", { id: 'webauthn-revoke' });
-        }
-    };
-
     const handleMarkAttendance = async () => {
         setLoading(true);
         toast.loading("Obteniendo tu ubicación GPS...", { id: 'attendance' });
@@ -122,32 +112,6 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
                                 Marca tu entrada o salida. Necesitaremos tu ubicación actual.
                             </p>
                         </div>
-
-                        <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                                <Button variant="ghost" size="sm" className="text-destructive hover:bg-destructive/10">
-                                    <Trash2 className="w-4 h-4 mr-2" />
-                                    Perdí mi celular / Borrar Dispositivo
-                                </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                                <AlertDialogHeader>
-                                    <AlertDialogTitle className="flex items-center gap-2">
-                                        <AlertTriangle className="text-destructive" />
-                                        ¿Estás seguro?
-                                    </AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                        Esto desenrolará tu dispositivo actual. Tendrás que volver a registrar tu huella o FaceID en tu próximo celular para poder marcar asistencia.
-                                    </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                    <AlertDialogAction onClick={handleRevoke} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                                        Sí, Borrar Dispositivo
-                                    </AlertDialogAction>
-                                </AlertDialogFooter>
-                            </AlertDialogContent>
-                        </AlertDialog>
                     </div>
                 </CardHeader>
                 <CardContent>

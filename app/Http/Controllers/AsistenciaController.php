@@ -12,7 +12,7 @@ class AsistenciaController extends Controller
 {
     public function index(Request $request)
     {
-        $user = $request->user();
+        $user = clone $request->user();
         $hasDevice = $user->webAuthnCredentials()->exists();
         
         $asistencias = Asistencia::with('company')
@@ -21,7 +21,31 @@ class AsistenciaController extends Controller
             ->take(30)
             ->get();
             
-        $empresas = Company::select('id', 'name')->get();
+        $empresas = collect();
+
+        if ($user->hasRole('camarografo')) {
+            $empresas = \App\Models\TareaSeguimiento::with('empresa')
+                ->where('user_produccion_id', $user->id)
+                ->whereDate('fecha_produccion', now()->toDateString())
+                ->get()
+                ->pluck('empresa')
+                ->unique('id')
+                ->values();
+        } elseif ($user->hasRole('influencer')) {
+            $empresas = \App\Models\Booking::with('company')
+                ->where('user_id', $user->id)
+                ->whereDate('start_time', now()->toDateString())
+                ->get()
+                ->pluck('company')
+                ->unique('id')
+                ->values();
+        } else {
+            // Admin u otros roles ven todas (opcional)
+            $empresas = Company::select('id', 'name')->get();
+        }
+
+        // Limpiamos nulos que puedan venir si no hay relación activa
+        $empresas = $empresas->filter()->values();
 
         return Inertia::render('asistencia/Index', [
             'hasDevice' => $hasDevice,

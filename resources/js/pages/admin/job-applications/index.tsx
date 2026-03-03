@@ -98,24 +98,20 @@ export default function Index({ applications, filters }: Props) {
     const handleSearchChange = (value: string) => {
         setSearch(value);
 
-        // Cancelar timeout anterior si existe
         if (searchTimeoutRef.current) {
             clearTimeout(searchTimeoutRef.current);
         }
 
-        // Aplicar debounce de 500ms
         searchTimeoutRef.current = setTimeout(() => {
             applyFilters(value, area, statusFilter);
         }, 500);
     };
 
-    // Función para filtro de área
     const handleAreaChange = (selectedArea: string) => {
         setArea(selectedArea);
         applyFilters(search, selectedArea, statusFilter);
     };
 
-    // Función para filtro de estado
     const handleStatusFilterChange = (selectedStatus: string) => {
         setStatusFilter(selectedStatus);
         applyFilters(search, area, selectedStatus);
@@ -148,25 +144,18 @@ export default function Index({ applications, filters }: Props) {
         try {
             let cleanPhone = selectedPhone.replace(/\D/g, '');
 
-            // Validate and prepend 591 if not present
             if (!cleanPhone.startsWith('591')) {
                 cleanPhone = '591' + cleanPhone;
             }
 
             const sessionId = import.meta.env.VITE_WHATSAPP_SESSION_ID || '3';
 
-            // Function to perform the send request
             const sendRequest = async (authToken: string) => {
                 const body = {
                     sessionId: sessionId,
                     to: `${cleanPhone}@s.whatsapp.net`,
                     content: whatsappMessage
                 };
-
-                console.log('--- WhatsApp API Request ---');
-                console.log('URL: https://boot.miracode.tech/whatsapp/send-text');
-                console.log('Headers:', { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` });
-                console.log('Body:', body);
 
                 return await fetch('https://boot.miracode.tech/whatsapp/send-text', {
                     method: 'POST',
@@ -182,9 +171,7 @@ export default function Index({ applications, filters }: Props) {
 
             let response = await sendRequest(currentToken);
 
-            // Handle 401 Unauthorized by attempting login
             if (response.status === 401) {
-                console.warn('--- 401 Unauthorized: Attempting automatic login ---');
                 const loginResponse = await fetch('https://boot.miracode.tech/auth/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -198,20 +185,11 @@ export default function Index({ applications, filters }: Props) {
                     const loginData = await loginResponse.json();
                     currentToken = loginData.token;
                     localStorage.setItem('whatsapp_token', currentToken);
-                    console.log('--- Login Successful, new token obtained ---');
-                    // Retry original request with new token
                     response = await sendRequest(currentToken);
-                } else {
-                    console.error('--- Login Failed ---');
-                    const loginError = await loginResponse.text();
-                    console.error('Login Error Response:', loginError);
                 }
             }
 
             const data = await response.json();
-            console.log('--- WhatsApp API Response ---');
-            console.log('Status:', response.status);
-            console.log('Data:', data);
 
             if (data.status === 'Enviado' || response.ok) {
                 toast.success('WhatsApp enviado con éxito');
@@ -220,15 +198,13 @@ export default function Index({ applications, filters }: Props) {
                 toast.error('Error al enviar WhatsApp: ' + (data.message || 'Desconocido'));
             }
         } catch (error) {
-            console.error('--- WhatsApp Integration Error ---');
-            console.error(error);
+            console.error('WhatsApp Integration Error:', error);
             toast.error('Error de conexión con la API de WhatsApp');
         } finally {
             setIsSendingWhatsApp(false);
         }
     };
 
-    // Cleanup timeouts al desmontar
     useEffect(() => {
         return () => {
             if (searchTimeoutRef.current) {
@@ -240,12 +216,8 @@ export default function Index({ applications, filters }: Props) {
     const handleDelete = (application: JobApplication) => {
         destroy(route('admin.job-applications.destroy', application.id), {
             preserveScroll: true,
-            onSuccess: () => {
-                toast.success('✅ Postulacion eliminada exitosamente');
-            },
-            onError: () => {
-                toast.error('❌ Error al eliminar la Postulacion');
-            },
+            onSuccess: () => toast.success('✅ Postulacion eliminada exitosamente'),
+            onError: () => toast.error('❌ Error al eliminar la Postulacion'),
         });
     };
 
@@ -257,15 +229,20 @@ export default function Index({ applications, filters }: Props) {
     };
 
     const StatusToggles = ({ application }: { application: JobApplication }) => (
-        <div className="flex gap-1 bg-gray-100 p-1 rounded-lg w-fit">
+        <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg w-fit">
             {(['PENDIENTE', 'ACEPTADO', 'RECHAZADO'] as const).map((s) => (
                 <button
                     key={s}
                     onClick={() => handleUpdateStatus(application.id, s)}
-                    className={`px-2 py-1 text-[10px] font-bold rounded-md transition-all ${application.status === s
-                        ? (s === 'PENDIENTE' ? 'bg-yellow-500 text-white shadow-sm' : s === 'ACEPTADO' ? 'bg-green-500 text-white shadow-sm' : 'bg-red-500 text-white shadow-sm')
-                        : 'text-gray-400 hover:text-gray-600'
-                        }`}
+                    className={`px-2 py-1 text-[10px] font-bold rounded-md transition-all ${
+                        application.status === s
+                            ? s === 'PENDIENTE'
+                                ? 'bg-yellow-500 text-white shadow-sm'
+                                : s === 'ACEPTADO'
+                                ? 'bg-green-500 text-white shadow-sm'
+                                : 'bg-red-500 text-white shadow-sm'
+                            : 'text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300'
+                    }`}
                 >
                     {s}
                 </button>
@@ -308,22 +285,22 @@ export default function Index({ applications, filters }: Props) {
                 </div>
 
                 {/* SEARCH AND FILTER */}
-                <Card className="border border-red-200 shadow-lg bg-red-50/30">
+                <Card className="border border-red-200 dark:border-red-900 shadow-lg bg-red-50/30 dark:bg-red-950/30">
                     <CardContent className="pt-6">
                         <div className="space-y-4">
                             {/* BÚSQUEDA POR TEXTO */}
                             <div className="flex flex-col sm:flex-row gap-3">
                                 <div className="flex-1">
                                     <div className="relative">
-                                        <Search className="text-red-600 absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+                                        <Search className="text-red-600 dark:text-red-400 absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
                                         <Input
                                             placeholder="Buscar por nombre, cédula o teléfono..."
                                             value={search}
                                             onChange={(e) => handleSearchChange(e.target.value)}
-                                            className="pl-9 border-red-200 focus:border-red-400 focus:ring-red-400"
+                                            className="pl-9 border-red-200 dark:border-red-800 focus:border-red-400 focus:ring-red-400 dark:bg-input dark:text-foreground"
                                         />
                                         {isLoading && search && (
-                                            <Loader2 className="text-red-600 absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 animate-spin" />
+                                            <Loader2 className="text-red-600 dark:text-red-400 absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 animate-spin" />
                                         )}
                                     </div>
                                 </div>
@@ -333,7 +310,7 @@ export default function Index({ applications, filters }: Props) {
                                         type="button"
                                         variant="outline"
                                         onClick={clearSearch}
-                                        className="border-red-300 text-red-600 hover:bg-red-50 w-full sm:w-auto"
+                                        className="border-red-300 dark:border-red-700 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 w-full sm:w-auto"
                                         disabled={isLoading}
                                     >
                                         Limpiar
@@ -344,11 +321,11 @@ export default function Index({ applications, filters }: Props) {
                             {/* FILTROS SECUNDARIOS */}
                             <div className="flex flex-col sm:flex-row gap-4">
                                 <div className="flex-1">
-                                    <label className="block text-sm font-medium text-red-700 mb-2">Área</label>
+                                    <label className="block text-sm font-medium text-red-700 dark:text-red-400 mb-2">Área</label>
                                     <select
                                         value={area}
                                         onChange={(e) => handleAreaChange(e.target.value)}
-                                        className="w-full rounded-md border border-red-200 bg-white p-2.5 focus:ring-2 focus:ring-red-400 focus:border-red-400 text-sm"
+                                        className="w-full rounded-md border border-red-200 dark:border-red-800 bg-white dark:bg-input text-foreground dark:text-foreground p-2.5 focus:ring-2 focus:ring-red-400 focus:border-red-400 text-sm"
                                         disabled={isLoading}
                                     >
                                         <option value="">Todas las áreas</option>
@@ -363,11 +340,11 @@ export default function Index({ applications, filters }: Props) {
                                     </select>
                                 </div>
                                 <div className="flex-1">
-                                    <label className="block text-sm font-medium text-red-700 mb-2">Estado</label>
+                                    <label className="block text-sm font-medium text-red-700 dark:text-red-400 mb-2">Estado</label>
                                     <select
                                         value={statusFilter}
                                         onChange={(e) => handleStatusFilterChange(e.target.value)}
-                                        className="w-full rounded-md border border-red-200 bg-white p-2.5 focus:ring-2 focus:ring-red-400 focus:border-red-400 text-sm"
+                                        className="w-full rounded-md border border-red-200 dark:border-red-800 bg-white dark:bg-input text-foreground dark:text-foreground p-2.5 focus:ring-2 focus:ring-red-400 focus:border-red-400 text-sm"
                                         disabled={isLoading}
                                     >
                                         <option value="">Todos los estados</option>
@@ -382,23 +359,22 @@ export default function Index({ applications, filters }: Props) {
                 </Card>
 
                 {/* LISTA */}
-                <Card className="border border-gray-200 shadow-sm">
+                <Card className="border border-gray-200 dark:border-gray-800 shadow-sm">
                     <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-red-700">
-                            <FileText className="h-5 w-5 text-red-600" />
+                        <CardTitle className="flex items-center gap-2 text-red-700 dark:text-red-400">
+                            <FileText className="h-5 w-5 text-red-600 dark:text-red-400" />
                             Lista de Postulantes
                             {isLoading && <Loader2 className="h-4 w-4 animate-spin ml-2" />}
                         </CardTitle>
-                        <CardDescription className="text-red-600">Revisa, edita y gestiona las postulaciones.</CardDescription>
+                        <CardDescription className="text-red-600 dark:text-red-400">Revisa, edita y gestiona las postulaciones.</CardDescription>
                     </CardHeader>
 
                     <CardContent>
-                        {/* EMPTY STATE */}
                         {applications.data.length === 0 ? (
                             <div className="py-12 text-center">
-                                <FileText className="text-red-400 mx-auto mb-4 h-14 w-14" />
-                                <h3 className="text-red-700 mb-1 text-lg font-medium">No hay aplicaciones</h3>
-                                <p className="text-red-600 text-sm">
+                                <FileText className="text-red-400 dark:text-red-500 mx-auto mb-4 h-14 w-14" />
+                                <h3 className="text-red-700 dark:text-red-400 mb-1 text-lg font-medium">No hay aplicaciones</h3>
+                                <p className="text-red-600 dark:text-red-400 text-sm">
                                     {search || area || statusFilter ? 'No se encontraron resultados con los filtros aplicados.' : 'Aún no se han recibido postulaciones.'}
                                 </p>
                             </div>
@@ -409,9 +385,10 @@ export default function Index({ applications, filters }: Props) {
                                     <Table>
                                         <TableHeader>
                                             <TableRow>
-                                                <TableHead>Nombre</TableHead>
+                                                <TableHead className="w-[200px]">Nombre</TableHead>
                                                 <TableHead>Área</TableHead>
                                                 <TableHead>Celular</TableHead>
+                                                <TableHead>Fecha de postulación</TableHead>
                                                 <TableHead>Estado</TableHead>
                                                 <TableHead>Documentos</TableHead>
                                                 <TableHead className="text-right">Acciones</TableHead>
@@ -420,19 +397,19 @@ export default function Index({ applications, filters }: Props) {
 
                                         <TableBody>
                                             {applications.data.map((application) => (
-                                                <TableRow key={application.id} className="hover:bg-gray-50">
-                                                    <TableCell className="font-medium whitespace-nowrap">
-                                                        <div className="flex flex-col">
-                                                            <span className="flex items-center gap-2">
-                                                                <User className="text-muted-foreground h-4 w-4" />
-                                                                {application.full_name}
+                                                <TableRow key={application.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                                                    <TableCell className="font-medium align-top">
+                                                        <div className="flex flex-col min-w-[180px] max-w-[200px]">
+                                                            <span className="flex items-start gap-2 break-words whitespace-normal">
+                                                                <User className="text-muted-foreground h-4 w-4 mt-0.5 flex-shrink-0" />
+                                                                <span className="break-words">{application.full_name}</span>
                                                             </span>
-                                                            <span className="text-[10px] text-muted-foreground ml-6">{application.ci}</span>
+                                                            <span className="text-[10px] text-muted-foreground ml-6 break-words">{application.ci}</span>
                                                         </div>
                                                     </TableCell>
 
                                                     <TableCell>
-                                                        <Badge className="bg-red-100 text-red-800 border-red-300 hover:bg-red-200">
+                                                        <Badge className="bg-red-100 text-red-800 border-red-300 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800">
                                                             {application.area}
                                                         </Badge>
                                                     </TableCell>
@@ -443,7 +420,11 @@ export default function Index({ applications, filters }: Props) {
                                                             {application.phone}
                                                         </div>
                                                     </TableCell>
-
+                                                    
+                                                    <TableCell className="whitespace-nowrap text-sm">
+                                                        {formatDate(application.created_at)}
+                                                    </TableCell>
+                                                    
                                                     <TableCell>
                                                         <StatusToggles application={application} />
                                                     </TableCell>
@@ -451,10 +432,10 @@ export default function Index({ applications, filters }: Props) {
                                                     <TableCell>
                                                         <div className="flex gap-1">
                                                             {application.cv && (
-                                                                <Badge className="text-[10px] bg-red-600 text-white cursor-pointer" onClick={() => handleDownload(application.cv!, `CV_${application.full_name}.pdf`)}>CV</Badge>
+                                                                <Badge className="text-[10px] bg-red-600 text-white cursor-pointer hover:bg-red-700" onClick={() => handleDownload(application.cv!, `CV_${application.full_name}.pdf`)}>CV</Badge>
                                                             )}
                                                             {application.extra_documents && application.extra_documents.length > 0 && (
-                                                                <Badge className="text-[10px] bg-gray-500 text-white cursor-pointer" onClick={() => {
+                                                                <Badge className="text-[10px] bg-gray-500 text-white cursor-pointer hover:bg-gray-600" onClick={() => {
                                                                     application.extra_documents!.forEach((doc, i) => handleDownload(doc, `Doc_${application.full_name}_${i + 1}.pdf`));
                                                                 }}>+{application.extra_documents.length}</Badge>
                                                             )}
@@ -466,7 +447,7 @@ export default function Index({ applications, filters }: Props) {
                                                             <Button
                                                                 variant="outline"
                                                                 size="sm"
-                                                                className="h-8 w-8 p-0 text-green-600 border-green-200 hover:bg-green-50"
+                                                                className="h-8 w-8 p-0 text-green-600 border-green-200 hover:bg-green-50 dark:border-green-800 dark:text-green-400 dark:hover:bg-green-950"
                                                                 onClick={() => openWhatsAppDialog(application.phone)}
                                                             >
                                                                 <Phone className="h-4 w-4" />
@@ -486,18 +467,18 @@ export default function Index({ applications, filters }: Props) {
 
                                                             <AlertDialog>
                                                                 <AlertDialogTrigger asChild>
-                                                                    <Button variant="outline" size="sm" className="h-8 w-8 p-0 text-red-700 border-red-200 hover:bg-red-50">
+                                                                    <Button variant="outline" size="sm" className="h-8 w-8 p-0 text-red-700 border-red-200 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950">
                                                                         <Trash2 className="h-4 w-4" />
                                                                     </Button>
                                                                 </AlertDialogTrigger>
-                                                                <AlertDialogContent>
+                                                                <AlertDialogContent className="dark:bg-gray-900 dark:border-gray-800">
                                                                     <AlertDialogHeader>
-                                                                        <AlertDialogTitle>¿Está seguro?</AlertDialogTitle>
-                                                                        <AlertDialogDescription>Eliminar postulante: {application.full_name}</AlertDialogDescription>
+                                                                        <AlertDialogTitle className="dark:text-foreground">¿Está seguro?</AlertDialogTitle>
+                                                                        <AlertDialogDescription className="dark:text-muted-foreground">Eliminar postulante: {application.full_name}</AlertDialogDescription>
                                                                     </AlertDialogHeader>
                                                                     <AlertDialogFooter>
-                                                                        <AlertDialogCancel>No</AlertDialogCancel>
-                                                                        <AlertDialogAction onClick={() => handleDelete(application)} className="bg-red-600">Sí, eliminar</AlertDialogAction>
+                                                                        <AlertDialogCancel className="dark:bg-input dark:text-foreground dark:hover:bg-muted">No</AlertDialogCancel>
+                                                                        <AlertDialogAction onClick={() => handleDelete(application)} className="bg-red-600 hover:bg-red-700">Sí, eliminar</AlertDialogAction>
                                                                     </AlertDialogFooter>
                                                                 </AlertDialogContent>
                                                             </AlertDialog>
@@ -512,35 +493,35 @@ export default function Index({ applications, filters }: Props) {
                                 {/* MOBILE CARDS */}
                                 <div className="lg:hidden space-y-4">
                                     {applications.data.map((application) => (
-                                        <Card key={application.id} className="border border-gray-200">
+                                        <Card key={application.id} className="border border-gray-200 dark:border-gray-800">
                                             <CardContent className="pt-4 space-y-3">
                                                 <div className="flex items-start justify-between">
-                                                    <div>
-                                                        <h3 className="font-bold text-lg leading-tight">{application.full_name}</h3>
-                                                        <p className="text-xs text-muted-foreground">{application.ci}</p>
+                                                    <div className="min-w-0 flex-1">
+                                                        <h3 className="font-bold text-lg leading-tight break-words">{application.full_name}</h3>
+                                                        <p className="text-xs text-muted-foreground break-words">{application.ci}</p>
                                                     </div>
-                                                    <Badge className="bg-red-100 text-red-800 border-red-300">{application.area}</Badge>
+                                                    <Badge className="bg-red-100 text-red-800 border-red-300 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800 flex-shrink-0">{application.area}</Badge>
                                                 </div>
 
                                                 <div className="flex items-center gap-2 text-sm font-medium">
                                                     <Phone className="h-3 w-3" /> {application.phone}
                                                 </div>
 
-                                                <div className="py-2 border-y border-gray-50">
-                                                    <p className="text-[10px] font-black uppercase text-gray-400 mb-1.5">Cambiar Estado</p>
+                                                <div className="py-2 border-y border-gray-50 dark:border-gray-800">
+                                                    <p className="text-[10px] font-black uppercase text-gray-400 dark:text-gray-500 mb-1.5">Cambiar Estado</p>
                                                     <StatusToggles application={application} />
                                                 </div>
 
                                                 <div className="flex gap-2 pt-1">
-                                                    <Button variant="outline" size="sm" className="flex-1 text-green-600 bg-green-50" onClick={() => openWhatsAppDialog(application.phone)}>
+                                                    <Button variant="outline" size="sm" className="flex-1 text-green-600 bg-green-50 dark:bg-green-950/30 dark:text-green-400 dark:border-green-800" onClick={() => openWhatsAppDialog(application.phone)}>
                                                         <Phone className="mr-1.5 h-4 w-4" /> WhatsApp
                                                     </Button>
-                                                    <Button variant="outline" size="sm" asChild className="flex-1">
+                                                    <Button variant="outline" size="sm" asChild className="flex-1 dark:border-gray-700 dark:text-foreground">
                                                         <Link href={route('admin.job-applications.show', application.id)}>
                                                             <Eye className="mr-1.5 h-4 w-4" /> Ver
                                                         </Link>
                                                     </Button>
-                                                    <Button variant="outline" size="sm" className="text-red-700 bg-red-50" onClick={() => handleDelete(application)}>
+                                                    <Button variant="outline" size="sm" className="text-red-700 bg-red-50 dark:bg-red-950/30 dark:text-red-400 dark:border-red-800" onClick={() => handleDelete(application)}>
                                                         <Trash2 className="h-4 w-4" />
                                                     </Button>
                                                 </div>
@@ -551,8 +532,8 @@ export default function Index({ applications, filters }: Props) {
 
                                 {/* PAGINATION */}
                                 {applications.last_page > 1 && (
-                                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t mt-6">
-                                        <div className="text-xs text-gray-400 font-medium">
+                                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t mt-6 dark:border-gray-800">
+                                        <div className="text-xs text-gray-400 dark:text-gray-500 font-medium">
                                             {applications.from}-{applications.to} de {applications.total}
                                         </div>
                                         <div className="flex gap-1 overflow-x-auto pb-2 sm:pb-0">
@@ -578,29 +559,29 @@ export default function Index({ applications, filters }: Props) {
 
             {/* WhatsApp Dialog */}
             <Dialog open={isWhatsAppOpen} onOpenChange={setIsWhatsAppOpen}>
-                <DialogContent className="sm:max-w-[425px]">
+                <DialogContent className="sm:max-w-[425px] dark:bg-gray-900 dark:border-gray-800">
                     <DialogHeader>
-                        <DialogTitle className="flex items-center gap-2">
-                            <span className="p-2 bg-green-100 rounded-lg"><Phone className="h-5 w-5 text-green-600" /></span>
+                        <DialogTitle className="flex items-center gap-2 dark:text-foreground">
+                            <span className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg"><Phone className="h-5 w-5 text-green-600 dark:text-green-400" /></span>
                             Enviar WhatsApp
                         </DialogTitle>
-                        <DialogDescription>
-                            Enviar un mensaje directo al número: <span className="font-bold text-foreground">{selectedPhone}</span>
+                        <DialogDescription className="dark:text-muted-foreground">
+                            Enviar un mensaje directo al número: <span className="font-bold text-foreground dark:text-foreground">{selectedPhone}</span>
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                         <div className="space-y-2">
-                            <label className="text-xs font-black uppercase text-muted-foreground mr-1">Mensaje</label>
+                            <label className="text-xs font-black uppercase text-muted-foreground dark:text-muted-foreground mr-1">Mensaje</label>
                             <Textarea
                                 placeholder="Escribe el mensaje aquí..."
                                 value={whatsappMessage}
                                 onChange={(e) => setWhatsappMessage(e.target.value)}
-                                className="min-h-[120px] resize-none border-green-100 focus:border-green-400 focus:ring-green-400"
+                                className="min-h-[120px] resize-none border-green-100 dark:border-green-800 focus:border-green-400 focus:ring-green-400 dark:bg-input dark:text-foreground"
                             />
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsWhatsAppOpen(false)} disabled={isSendingWhatsApp}>Cancelar</Button>
+                        <Button variant="outline" onClick={() => setIsWhatsAppOpen(false)} disabled={isSendingWhatsApp} className="dark:border-gray-700 dark:text-foreground dark:hover:bg-muted">Cancelar</Button>
                         <Button
                             onClick={handleSendWhatsApp}
                             disabled={isSendingWhatsApp}

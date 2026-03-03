@@ -134,7 +134,7 @@ export default function Index({ applications, filters }: Props) {
         setIsWhatsAppOpen(true);
     };
 
-const handleSendWhatsApp = async () => {
+    const handleSendWhatsApp = async () => {
         if (!whatsappMessage.trim()) {
             toast.error('El mensaje no puede estar vacío');
             return;
@@ -143,15 +143,15 @@ const handleSendWhatsApp = async () => {
         setIsSendingWhatsApp(true);
         try {
             let cleanPhone = selectedPhone.replace(/\D/g, '');
-
             if (!cleanPhone.startsWith('591')) {
                 cleanPhone = '591' + cleanPhone;
             }
 
             const sessionId = import.meta.env.VITE_WHATSAPP_SESSION_ID || '3';
+            const userId = import.meta.env.VITE_WHATSAPP_USER_ID || '3';
 
-            // 🔐 PASO 1: Siempre hacer login primero para obtener token fresco
-            console.log('🔐 Intentando autenticar para obtener token...');
+            // 🔐 PASO 1: Login para obtener token de usuario
+            console.log('🔐 [1/5] Autenticando usuario...');
             const loginResponse = await fetch('https://boot.miracode.tech/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -162,55 +162,129 @@ const handleSendWhatsApp = async () => {
             });
 
             if (!loginResponse.ok) {
-                const errorData = await loginResponse.text();
-                console.error('❌ Error en login:', errorData);
-                throw new Error('No se pudo autenticar con la API de WhatsApp');
+                const errorText = await loginResponse.text();
+                console.error('❌ Login fallido:', loginResponse.status, errorText);
+                throw new Error(`Login fallido: ${loginResponse.status}`);
             }
 
             const loginData = await loginResponse.json();
-            const freshToken = loginData.token;
-            
-            // Guardar token para posibles usos futuros
-            localStorage.setItem('whatsapp_token', freshToken);
-            console.log('✅ Token obtenido exitosamente');
+            const userToken = loginData.token?.trim();
 
-            // 📤 PASO 2: Enviar el mensaje con el token fresco
+            if (!userToken) {
+                throw new Error('Token no encontrado en respuesta de login');
+            }
+
+            console.log('✅ [2/5] Token de usuario obtenido');
+            localStorage.setItem('whatsapp_token', userToken);
+
+            // 🔍 Debug: Verificar estructura del token
+            const tokenParts = userToken.split('.');
+            console.log('🔍 Token info:', {
+                parts: tokenParts.length,
+                isValidJWT: tokenParts.length === 3
+            });
+
+            // 📤 PASO 2: Preparar payload
             const body = {
                 sessionId: sessionId,
                 to: `${cleanPhone}@s.whatsapp.net`,
                 content: whatsappMessage
             };
 
-            console.log('📤 Enviando WhatsApp:', { to: body.to, sessionId: body.sessionId });
+            console.log('📤 [3/5] Enviando petición:', {
+                url: 'https://boot.miracode.tech/whatsapp/send-text',
+                sessionId,
+                to: body.to,
+                contentPreview: whatsappMessage.substring(0, 50) + '...'
+            });
 
+            // 📤 PASO 3: Enviar con headers EXPLÍCITOS y debugging
             const sendResponse = await fetch('https://boot.miracode.tech/whatsapp/send-text', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${freshToken}`
+                    'Authorization': `Bearer ${userToken}`,
+                    'Accept': 'application/json',
+                    'X-User-ID': userId // ← Header adicional por si la API lo necesita
                 },
-                body: JSON.stringify(body)
+                body: JSON.stringify(body),
+                cache: 'no-store'
             });
 
-            const responseData = await sendResponse.json();
-            console.log('📥 Respuesta de WhatsApp API:', responseData);
+            // 🔍 Leer respuesta cruda para debugging
+            const responseText = await sendResponse.text();
+            console.log('📥 [4/5] Respuesta cruda:', {
+                status: sendResponse.status,
+                statusText: sendResponse.statusText,
+                headers: Object.fromEntries(sendResponse.headers.entries()),
+                bodyPreview: responseText.substring(0, 300)
+            });
 
-            if (sendResponse.ok || responseData.status === 'Enviado' || responseData.success === true) {
+            // Parsear JSON
+            let responseData;
+            try {
+                responseData = JSON.parse(responseText);
+            } catch {
+                responseData = { raw: responseText };
+            }
+
+            // ✅ PASO 5: Evaluar resultado
+            if (sendResponse.ok || responseData?.status === 'Enviado' || responseData?.success === true) {
                 toast.success('✅ WhatsApp enviado con éxito');
                 setIsWhatsAppOpen(false);
             } else {
-                console.warn('⚠️ Respuesta no exitosa pero sin error HTTP:', responseData);
-                toast.warning('⚠️ Mensaje procesado: ' + (responseData.message || responseData.error || 'Verificar estado en el panel'));
+                console.error('❌ Error en API WhatsApp:', responseData);
+
+                // Mensajes específicos según el tipo de error
+                if (responseData?.message?.toLowerCase().includes('unauthorized')) {
+                    // 🚨 POSIBLE CAUSA: Token de usuario ≠ Token de WhatsApp
+                    toast.error('🔐 Token inválido para WhatsApp API. Intentando alternativa...');
+
+                    // 🔄 FALLBACK: Intentar con whatsapp-client si está disponible
+                    try {
+                        console.log('🔄 [Fallback] Intentando con whatsapp-client...');
+                        // Si tienes importado whatsappClient, descomenta esto:
+                        /*
+                        const wcResponse = await whatsappClient.post('/whatsapp/send-text', {
+                            sessionId: sessionId,
+                            to: `${cleanPhone}@s.whatsapp.net`,
+                            content: whatsappMessage
+                        }, {
+                            headers: {
+                                'Authorization': `Bearer ${userToken}`,
+                                'X-User-ID': userId
+                            }
+                        });
+                        
+                        if (wcResponse.data?.status === 'Enviado' || wcResponse.status === 200) {
+                            toast.success('✅ WhatsApp enviado (vía fallback)');
+                            setIsWhatsAppOpen(false);
+                            return;
+                        }
+                        */
+                    } catch (fallbackError) {
+                        console.warn('⚠️ Fallback también falló:', fallbackError);
+                    }
+
+                    toast.error('🔐 Error de autenticación: Contacta al administrador para verificar permisos de WhatsApp API');
+                } else if (responseData?.message?.includes('session')) {
+                    toast.error('📱 Session ID no válida. Verifica el sessionId en configuración.');
+                } else if (responseData?.message?.includes('phone') || responseData?.message?.includes('to')) {
+                    toast.error('📞 Número de teléfono inválido. Formato esperado: 591XXXXXXXX');
+                } else {
+                    toast.error('❌ Error: ' + (responseData.message || 'Respuesta inesperada de la API'));
+                }
             }
 
         } catch (error: any) {
-            console.error('❌ Error en integración WhatsApp:', error);
-            
-            // Mensajes más descriptivos según el tipo de error
-            if (error.message?.includes('autenticar')) {
+            console.error('💥 Error fatal:', error);
+
+            if (error.message?.includes('autenticar') || error.message?.includes('login')) {
                 toast.error('❌ Credenciales de WhatsApp inválidas');
             } else if (error.name === 'TypeError' && error.message?.includes('fetch')) {
-                toast.error('🌐 Error de conexión. Verifica tu internet');
+                toast.error('🌐 Error de conexión. Verifica tu internet y que la API esté disponible');
+            } else if (error.message?.includes('Token')) {
+                toast.error('🔑 Error con el token. Intenta cerrar sesión y volver a iniciar');
             } else {
                 toast.error('❌ Error: ' + (error.message || 'No se pudo enviar el WhatsApp'));
             }
@@ -218,7 +292,6 @@ const handleSendWhatsApp = async () => {
             setIsSendingWhatsApp(false);
         }
     };
-
 
     useEffect(() => {
         return () => {
@@ -249,15 +322,14 @@ const handleSendWhatsApp = async () => {
                 <button
                     key={s}
                     onClick={() => handleUpdateStatus(application.id, s)}
-                    className={`px-2 py-1 text-[10px] font-bold rounded-md transition-all ${
-                        application.status === s
-                            ? s === 'PENDIENTE'
-                                ? 'bg-yellow-500 text-white shadow-sm'
-                                : s === 'ACEPTADO'
+                    className={`px-2 py-1 text-[10px] font-bold rounded-md transition-all ${application.status === s
+                        ? s === 'PENDIENTE'
+                            ? 'bg-yellow-500 text-white shadow-sm'
+                            : s === 'ACEPTADO'
                                 ? 'bg-green-500 text-white shadow-sm'
                                 : 'bg-red-500 text-white shadow-sm'
-                            : 'text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300'
-                    }`}
+                        : 'text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300'
+                        }`}
                 >
                     {s}
                 </button>
@@ -435,11 +507,11 @@ const handleSendWhatsApp = async () => {
                                                             {application.phone}
                                                         </div>
                                                     </TableCell>
-                                                    
+
                                                     <TableCell className="whitespace-nowrap text-sm">
                                                         {formatDate(application.created_at)}
                                                     </TableCell>
-                                                    
+
                                                     <TableCell>
                                                         <StatusToggles application={application} />
                                                     </TableCell>

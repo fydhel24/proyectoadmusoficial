@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { startAuthentication } from '@simplewebauthn/browser';
 import { router } from '@inertiajs/react';
@@ -41,16 +41,13 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
     const [successModalOpen, setSuccessModalOpen] = useState(false);
     const [needsRefresh, setNeedsRefresh] = useState(false);
 
-    // Efecto para sincronizar companyId con las empresas disponibles
-    // Solo re-ejecutar cuando empresas cambia, no cuando companyId cambia (evita infinite loop)
-    // Advertencia de eslint ignorada: companyId NO debe estar en dependencias para evitar re-renders infinitos
-    useEffect(() => {
-        // Si companyId no está vacío y la empresa seleccionada no existe en la lista, reiniciar
-        if (companyId && companyId !== 'none' && !empresas.find(e => String(e.id) === companyId)) {
-            setCompanyId('');
+    const handleCompanyChange = (value: string) => {
+        try {
+            setCompanyId(value);
+        } catch (error) {
+            console.error('Error al cambiar empresa:', error);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [empresas]);
+    };
 
     const handleMarkAttendance = async () => {
         // VALIDACIÓN: Siempre debe seleccionar una empresa real (no vacío)
@@ -186,6 +183,7 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
     const closeSuccessModal = () => {
         setSuccessModalOpen(false);
         setNeedsRefresh(false);
+        setCompanyId('');
         // En lugar de recargar, simplemente navegar a la misma página para refrescar los datos
         // Esto evita problemas de navegación y es más eficiente
         router.visit('/asistencia');
@@ -215,11 +213,8 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
                                 Empresa (Obligatorio)
                             </label>
                             <Select
-                                value={companyId || ''}
-                                onValueChange={(value) => {
-                                    // Asegurar que el valor es un string válido
-                                    setCompanyId(value === '' ? '' : value);
-                                }}
+                                value={companyId}
+                                onValueChange={handleCompanyChange}
                                 disabled={loading}
                             >
                                 <SelectTrigger className={`w-full bg-background ${

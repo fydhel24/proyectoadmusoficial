@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { startAuthentication } from '@simplewebauthn/browser';
 import { router } from '@inertiajs/react';
 import {
-    Clock, MapPin, Building2, AlertTriangle, Fingerprint, Loader2, CheckCircle2, Lock, X
+    Clock, MapPin, Building2, AlertTriangle, Fingerprint, Loader2, CheckCircle2, Lock, X, ChevronDown
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -13,7 +13,6 @@ import {
     SelectContent,
     SelectItem,
     SelectTrigger,
-    SelectValue,
 } from "@/components/ui/select"
 import {
     AlertDialog,
@@ -41,15 +40,43 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
     const [successModalOpen, setSuccessModalOpen] = useState(false);
     const [needsRefresh, setNeedsRefresh] = useState(false);
     const [mobileModalOpen, setMobileModalOpen] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
 
-    // Detectar si es mobile (esta verificación es estática, no cambia)
-    const isMobile = typeof window !== 'undefined'
-        ? /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-        : false;
+    // Detectar si es mobile - Mejorado con viewport y userAgent
+    useEffect(() => {
+        const detectMobile = () => {
+            const isMobileDevice =
+                /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+                (typeof window !== 'undefined' && window.innerWidth <= 768) ||
+                (typeof window !== 'undefined' && window.matchMedia('(pointer:coarse)').matches);
+
+            setIsMobile(isMobileDevice);
+        };
+
+        detectMobile();
+
+        // Detectar cambios de tamaño de ventana (responsive)
+        const handleResize = () => detectMobile();
+        window.addEventListener('resize', handleResize);
+
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const handleCompanySelect = (id: string) => {
+        // Validar que el ID sea válido
+        if (!id || id === '') {
+            toast.warning("Selecciona una empresa válida.", {
+                id: 'company-select',
+                duration: 2000
+            });
+            return;
+        }
+
         setCompanyId(id);
-        setMobileModalOpen(false);
+        // Cerrar modal mobile con delay para permitir visual feedback
+        setTimeout(() => {
+            setMobileModalOpen(false);
+        }, 100);
     };
 
     const handleMarkAttendance = async () => {
@@ -184,12 +211,19 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
     };
 
     const closeSuccessModal = () => {
+        // Reset de estado
         setSuccessModalOpen(false);
+        setMobileModalOpen(false);
         setNeedsRefresh(false);
         setCompanyId('');
-        // En lugar de recargar, simplemente navegar a la misma página para refrescar los datos
-        // Esto evita problemas de navegación y es más eficiente
-        router.visit('/asistencia');
+
+        // Pequeño delay para permitir que los estados se actualicen antes de recargar
+        setTimeout(() => {
+            router.visit('/asistencia', {
+                method: 'get',
+                preserveScroll: true
+            });
+        }, 100);
     };
 
     return (
@@ -209,52 +243,79 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
                     </div>
                 </CardHeader>
                 <CardContent>
-                    <div className="flex flex-col md:flex-row gap-4 items-center p-4 bg-muted/30 rounded-lg border">
+                    <div className="flex flex-col md:flex-row gap-4 items-start md:items-end p-4 bg-muted/30 rounded-lg border">
                         <div className="flex-1 w-full">
                             <label htmlFor="company-select" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1 mb-2">
                                 <Building2 className="w-3 h-3" />
                                 Empresa (Obligatorio)
                             </label>
                             {isMobile ? (
-                                // Modal personalizado para mobile
-                                <>
-                                    <button
-                                        type="button"
-                                        onClick={() => setMobileModalOpen(true)}
-                                        disabled={loading}
-                                        className={`w-full px-3 py-2 rounded-md border text-left bg-background text-foreground ${
-                                            !companyId
-                                                ? 'border-red-500/50 text-muted-foreground'
-                                                : 'border-input'
-                                        } focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors`}
-                                    >
-                                        {companyId
-                                            ? empresas.find(e => String(e.id) === companyId)?.name
-                                            : 'Selecciona la empresa...'}
-                                    </button>
-                                </>
+                                // MÓVIL: Botón personalizado que abre modal
+                                <button
+                                    type="button"
+                                    onClick={() => setMobileModalOpen(true)}
+                                    disabled={loading}
+                                    className={`w-full px-4 py-3 rounded-lg border-2 text-left bg-background font-medium flex items-center justify-between transition-all duration-200 ${
+                                        companyId
+                                            ? 'border-primary text-foreground bg-primary/5'
+                                            : 'border-red-400/50 text-muted-foreground hover:border-red-400'
+                                    } disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary/50`}
+                                >
+                                    <span>
+                                        {companyId && empresas && empresas.length > 0
+                                            ? empresas.find(e => String(e.id) === companyId)?.name || 'Selecciona empresa...'
+                                            : 'Selecciona empresa...'}
+                                    </span>
+                                    <ChevronDown className={`w-4 h-4 transform transition-transform ${mobileModalOpen ? 'rotate-180' : ''}`} />
+                                </button>
                             ) : (
-                                // Select de shadcn para desktop
+                                // DESKTOP: Select shadcn mejorado
                                 <Select
                                     value={companyId}
                                     onValueChange={handleCompanySelect}
                                     disabled={loading}
                                 >
-                                    <SelectTrigger className={`w-full bg-background ${
-                                        !companyId ? 'border-red-500/50 focus:ring-red-500/20' : ''
-                                    }`}>
-                                        <SelectValue placeholder="Selecciona la empresa..." />
+                                    <SelectTrigger
+                                        id="company-select"
+                                        className={`w-full bg-background border-2 font-medium transition-all duration-200 ${
+                                            companyId
+                                                ? 'border-primary text-foreground'
+                                                : 'border-red-400/50 text-muted-foreground'
+                                        } disabled:opacity-50 disabled:cursor-not-allowed`}
+                                    >
+                                        {companyId && empresas && empresas.length > 0 ? (
+                                            <span className="flex items-center gap-2">
+                                                <Building2 className="w-4 h-4 text-primary" />
+                                                <span>{empresas.find(e => String(e.id) === companyId)?.name}</span>
+                                            </span>
+                                        ) : (
+                                            <span className="flex items-center gap-2">
+                                                <Building2 className="w-4 h-4 text-muted-foreground" />
+                                                <span>Selecciona la empresa...</span>
+                                            </span>
+                                        )}
                                     </SelectTrigger>
-                                    <SelectContent>
-                                        {empresas && Array.isArray(empresas) && empresas.length > 0 && empresas.map(emp => {
-                                            if (!emp || !emp.id || !emp.name) return null;
-                                            const empId = String(emp.id);
-                                            return (
-                                                <SelectItem key={`emp-${emp.id}`} value={empId}>
-                                                    {emp.name}
-                                                </SelectItem>
-                                            );
-                                        })}
+                                    <SelectContent className="min-w-[300px]">
+                                        {empresas && Array.isArray(empresas) && empresas.length > 0 ? (
+                                            empresas.map(emp => {
+                                                if (!emp || !emp.id || !emp.name) return null;
+                                                return (
+                                                    <SelectItem
+                                                        key={`emp-${emp.id}`}
+                                                        value={String(emp.id)}
+                                                    >
+                                                        <div className="flex items-center gap-2">
+                                                            <Building2 className="w-4 h-4" />
+                                                            <span>{emp.name}</span>
+                                                        </div>
+                                                    </SelectItem>
+                                                );
+                                            })
+                                        ) : (
+                                            <div className="px-2 py-1.5 text-sm text-muted-foreground">
+                                                No hay empresas disponibles
+                                            </div>
+                                        )}
                                     </SelectContent>
                                 </Select>
                             )}
@@ -263,7 +324,7 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
                             onClick={handleMarkAttendance}
                             disabled={loading || !companyId}
                             size="lg"
-                            className="w-full md:w-auto mt-4 md:mt-2 h-12 shadow-md relative overflow-hidden group disabled:opacity-60 disabled:cursor-not-allowed"
+                            className="w-full md:w-auto h-12 shadow-md relative overflow-hidden group disabled:opacity-60 disabled:cursor-not-allowed transition-all"
                             title={!companyId ? "Selecciona una empresa para marcar asistencia" : "Marcar asistencia"}
                         >
                             <span className="absolute inset-0 w-full h-full bg-white/20 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></span>
@@ -280,7 +341,7 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
                             ) : (
                                 <>
                                     <MapPin className="w-5 h-5 mr-2" />
-                                   Marcar Asistencia
+                                    Marcar Asistencia
                                 </>
                             )}
                         </Button>
@@ -343,87 +404,135 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
             <AlertDialog
                 open={successModalOpen}
                 onOpenChange={(open) => {
-                    if (!open) {
-                        // Si el usuario cierra el modal clickeando afuera, igual debe refrescar
-                        if (needsRefresh) {
-                            router.visit('/asistencia');
-                        } else {
-                            setSuccessModalOpen(false);
-                        }
+                    if (!open && needsRefresh) {
+                        closeSuccessModal();
+                    } else if (!open) {
+                        setSuccessModalOpen(false);
                     }
                 }}
             >
-                <AlertDialogContent className="max-w-md text-center">
-                    <AlertDialogHeader className="flex flex-col items-center">
-                        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                <AlertDialogContent className="max-w-md text-center rounded-2xl border-0 shadow-2xl animate-in fade-in scale-in-95 duration-200">
+                    <AlertDialogHeader className="flex flex-col items-center space-y-4">
+                        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center animate-bounce">
                             <CheckCircle2 className="w-12 h-12 text-green-600" />
                         </div>
-                        <AlertDialogTitle className="text-2xl font-bold text-center">¡Asistencia Registrada!</AlertDialogTitle>
-                        <AlertDialogDescription className="text-center text-base mt-2">
+                        <AlertDialogTitle className="text-2xl font-bold text-center text-green-600">
+                            ¡Asistencia Registrada!
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className="text-center text-base text-foreground/80 leading-relaxed">
                             Gracias por marcar tu asistencia de hoy. Tu registro biométrico y ubicación han sido guardados exitosamente.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
-                    <AlertDialogFooter className="sm:justify-center mt-6">
+                    <AlertDialogFooter className="sm:justify-center mt-6 flex-col gap-2 w-full">
                         <Button
-                            className="w-full sm:w-auto min-w-[150px] bg-green-600 hover:bg-green-700"
+                            className="w-full h-12 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-all active:scale-95"
                             onClick={closeSuccessModal}
                             disabled={loading}
                         >
-                            De acuerdo, continuar
+                            {loading ? (
+                                <>
+                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                    Cargando...
+                                </>
+                            ) : (
+                                'De acuerdo, continuar'
+                            )}
                         </Button>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
 
-            {/* Modal Mobile para seleccionar empresa - Fuera del Card*/}
+            {/* Modal Mobile para seleccionar empresa - Completamente mejorado */}
             {mobileModalOpen && isMobile && (
                 <div
-                    className="fixed inset-0 z-[9999] flex items-end bg-black/50"
+                    className="fixed inset-0 z-50 flex items-end justify-center"
                     onClick={() => setMobileModalOpen(false)}
-                    style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
                 >
+                    {/* Overlay semi-transparente */}
+                    <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+
+                    {/* Modal */}
                     <div
-                        className="w-full bg-background rounded-t-2xl p-4 flex flex-col max-h-[70vh] overflow-hidden"
+                        className="relative w-full max-h-[85vh] bg-background rounded-t-3xl p-6 flex flex-col shadow-2xl"
                         onClick={(e) => e.stopPropagation()}
-                        style={{ maxWidth: '100%' }}
                     >
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-lg font-bold">Selecciona una empresa</h3>
+                        {/* Header */}
+                        <div className="flex justify-between items-center mb-6">
+                            <div>
+                                <h3 className="text-xl font-bold text-foreground">Selecciona empresa</h3>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                    {empresas?.length || 0} opciones disponibles
+                                </p>
+                            </div>
                             <button
                                 type="button"
                                 onClick={() => setMobileModalOpen(false)}
-                                className="p-1 hover:bg-muted rounded-md transition-colors"
+                                className="p-2 hover:bg-muted rounded-full transition-colors"
+                                aria-label="Cerrar modal"
                             >
                                 <X className="w-5 h-5" />
                             </button>
                         </div>
-                        <div className="flex-1 overflow-y-auto space-y-2 pr-2">
-                            {empresas && Array.isArray(empresas) && empresas.length > 0 && empresas.map(emp => {
-                                if (!emp || !emp.id || !emp.name) return null;
-                                const isSelected = String(emp.id) === companyId;
-                                return (
-                                    <button
-                                        key={`emp-modal-${emp.id}`}
-                                        type="button"
-                                        onClick={() => handleCompanySelect(String(emp.id))}
-                                        className={`w-full px-4 py-3 rounded-lg text-left transition-colors font-medium ${
-                                            isSelected
-                                                ? 'bg-primary text-primary-foreground'
-                                                : 'bg-muted hover:bg-muted/80 text-foreground'
-                                        }`}
-                                    >
-                                        {emp.name}
-                                    </button>
-                                );
-                            })}
+
+                        {/* Lista de empresas */}
+                        <div className="flex-1 overflow-y-auto mb-4 pb-2">
+                            <div className="space-y-2">
+                                {empresas && Array.isArray(empresas) && empresas.length > 0 ? (
+                                    empresas.map(emp => {
+                                        if (!emp || !emp.id || !emp.name) return null;
+                                        const isSelected = String(emp.id) === companyId;
+                                        return (
+                                            <button
+                                                key={`emp-modal-${emp.id}`}
+                                                type="button"
+                                                onClick={() => handleCompanySelect(String(emp.id))}
+                                                className={`w-full px-4 py-4 rounded-2xl text-left transition-all duration-200 font-semibold flex items-center gap-3 active:scale-95 ${
+                                                    isSelected
+                                                        ? 'bg-primary text-primary-foreground shadow-lg'
+                                                        : 'bg-muted/50 text-foreground hover:bg-muted'
+                                                }`}
+                                            >
+                                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                                                    isSelected
+                                                        ? 'bg-primary-foreground border-primary-foreground'
+                                                        : 'border-muted-foreground'
+                                                }`}>
+                                                    {isSelected && (
+                                                        <div className="w-2 h-2 bg-primary rounded-full" />
+                                                    )}
+                                                </div>
+                                                <div className="flex-1">
+                                                    <p className="font-semibold">{emp.name}</p>
+                                                </div>
+                                                {isSelected && (
+                                                    <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
+                                                )}
+                                            </button>
+                                        );
+                                    })
+                                ) : (
+                                    <div className="text-center py-12">
+                                        <AlertTriangle className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                                        <p className="text-muted-foreground font-medium">
+                                            No hay empresas disponibles
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                        <button
-                            type="button"
-                            onClick={() => setMobileModalOpen(false)}
-                            className="w-full mt-4 px-4 py-2 rounded-lg bg-muted hover:bg-muted/80 text-foreground transition-colors font-medium"
-                        >
-                            Cerrar
-                        </button>
+
+                        {/* Footer */}
+                        <div className="flex gap-3 pt-4 border-t border-border">
+                            <Button
+                                type="button"
+                                onClick={() => setMobileModalOpen(false)}
+                                disabled={!companyId}
+                                className="flex-1 h-12 font-semibold"
+                                variant={companyId ? "default" : "secondary"}
+                            >
+                                {companyId ? 'Confirmar selección' : 'Selecciona una empresa'}
+                            </Button>
+                        </div>
                     </div>
                 </div>
             )}

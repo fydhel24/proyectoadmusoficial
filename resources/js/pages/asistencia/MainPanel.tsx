@@ -295,6 +295,12 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
             console.error('Error al recargar página:', e);
             router.visit('/asistencia');
         }
+    };
+
+    // Fallback while device is being detected (especialmente para Xiaomi)
+    if (!isDeviceReady) {
+        return (
+            <div className="flex flex-col gap-6 max-w-4xl mx-auto w-full">
                 <Card className="shadow-lg border-l-4 border-l-primary/60">
                     <CardHeader className="pb-4">
                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">

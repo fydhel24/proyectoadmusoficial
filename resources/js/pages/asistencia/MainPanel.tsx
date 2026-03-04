@@ -41,6 +41,11 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
     const [successModalOpen, setSuccessModalOpen] = useState(false);
     const [needsRefresh, setNeedsRefresh] = useState(false);
 
+    // Detectar si es mobile (esta verificación es estática, no cambia)
+    const isMobile = typeof window !== 'undefined'
+        ? /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+        : false;
+
     const handleCompanyChange = (value: string) => {
         try {
             setCompanyId(value);
@@ -208,33 +213,58 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
                 <CardContent>
                     <div className="flex flex-col md:flex-row gap-4 items-center p-4 bg-muted/30 rounded-lg border">
                         <div className="flex-1 w-full">
-                            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1 mb-2">
+                            <label htmlFor="company-select" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1 mb-2">
                                 <Building2 className="w-3 h-3" />
                                 Empresa (Obligatorio)
                             </label>
-                            <Select
-                                value={companyId}
-                                onValueChange={handleCompanyChange}
-                                disabled={loading}
-                            >
-                                <SelectTrigger className={`w-full bg-background ${
-                                    !companyId ? 'border-red-500/50 focus:ring-red-500/20' : ''
-                                }`}>
-                                    <SelectValue placeholder="Selecciona la empresa..." />
-                                </SelectTrigger>
-                                <SelectContent>
+                            {isMobile ? (
+                                // Select nativo HTML para mobile - más confiable
+                                <select
+                                    id="company-select"
+                                    value={companyId}
+                                    onChange={(e) => handleCompanyChange(e.target.value)}
+                                    disabled={loading}
+                                    className={`w-full px-3 py-2 rounded-md border bg-background text-foreground ${
+                                        !companyId
+                                            ? 'border-red-500/50'
+                                            : 'border-input'
+                                    } focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50 disabled:cursor-not-allowed`}
+                                >
+                                    <option value="">Selecciona la empresa...</option>
                                     {empresas && Array.isArray(empresas) && empresas.length > 0 && empresas.map(emp => {
-                                        // Validar que emp tenga id y name
                                         if (!emp || !emp.id || !emp.name) return null;
-                                        const empId = String(emp.id);
                                         return (
-                                            <SelectItem key={`emp-${emp.id}`} value={empId}>
+                                            <option key={`emp-${emp.id}`} value={String(emp.id)}>
                                                 {emp.name}
-                                            </SelectItem>
+                                            </option>
                                         );
                                     })}
-                                </SelectContent>
-                            </Select>
+                                </select>
+                            ) : (
+                                // Select de shadcn para desktop
+                                <Select
+                                    value={companyId}
+                                    onValueChange={handleCompanyChange}
+                                    disabled={loading}
+                                >
+                                    <SelectTrigger className={`w-full bg-background ${
+                                        !companyId ? 'border-red-500/50 focus:ring-red-500/20' : ''
+                                    }`}>
+                                        <SelectValue placeholder="Selecciona la empresa..." />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {empresas && Array.isArray(empresas) && empresas.length > 0 && empresas.map(emp => {
+                                            if (!emp || !emp.id || !emp.name) return null;
+                                            const empId = String(emp.id);
+                                            return (
+                                                <SelectItem key={`emp-${emp.id}`} value={empId}>
+                                                    {emp.name}
+                                                </SelectItem>
+                                            );
+                                        })}
+                                    </SelectContent>
+                                </Select>
+                            )}
                         </div>
                         <Button
                             onClick={handleMarkAttendance}

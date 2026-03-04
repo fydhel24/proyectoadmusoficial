@@ -3,7 +3,7 @@ import axios from 'axios';
 import { startAuthentication } from '@simplewebauthn/browser';
 import { router } from '@inertiajs/react';
 import {
-    Clock, MapPin, Building2, AlertTriangle, Fingerprint, Loader2, CheckCircle2, Lock
+    Clock, MapPin, Building2, AlertTriangle, Fingerprint, Loader2, CheckCircle2, Lock, X
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -40,18 +40,16 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
     const [companyId, setCompanyId] = useState<string>('');
     const [successModalOpen, setSuccessModalOpen] = useState(false);
     const [needsRefresh, setNeedsRefresh] = useState(false);
+    const [mobileModalOpen, setMobileModalOpen] = useState(false);
 
     // Detectar si es mobile (esta verificación es estática, no cambia)
     const isMobile = typeof window !== 'undefined'
         ? /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
         : false;
 
-    const handleCompanyChange = (value: string) => {
-        try {
-            setCompanyId(value);
-        } catch (error) {
-            console.error('Error al cambiar empresa:', error);
-        }
+    const handleCompanySelect = (id: string) => {
+        setCompanyId(id);
+        setMobileModalOpen(false);
     };
 
     const handleMarkAttendance = async () => {
@@ -218,33 +216,75 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
                                 Empresa (Obligatorio)
                             </label>
                             {isMobile ? (
-                                // Select nativo HTML para mobile - más confiable
-                                <select
-                                    id="company-select"
-                                    value={companyId}
-                                    onChange={(e) => handleCompanyChange(e.target.value)}
-                                    disabled={loading}
-                                    className={`w-full px-3 py-2 rounded-md border bg-background text-foreground ${
-                                        !companyId
-                                            ? 'border-red-500/50'
-                                            : 'border-input'
-                                    } focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50 disabled:cursor-not-allowed`}
-                                >
-                                    <option value="">Selecciona la empresa...</option>
-                                    {empresas && Array.isArray(empresas) && empresas.length > 0 && empresas.map(emp => {
-                                        if (!emp || !emp.id || !emp.name) return null;
-                                        return (
-                                            <option key={`emp-${emp.id}`} value={String(emp.id)}>
-                                                {emp.name}
-                                            </option>
-                                        );
-                                    })}
-                                </select>
+                                // Modal personalizado para mobile
+                                <>
+                                    <button
+                                        onClick={() => setMobileModalOpen(true)}
+                                        disabled={loading}
+                                        className={`w-full px-3 py-2 rounded-md border text-left bg-background text-foreground ${
+                                            !companyId
+                                                ? 'border-red-500/50 text-muted-foreground'
+                                                : 'border-input'
+                                        } focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors`}
+                                    >
+                                        {companyId
+                                            ? empresas.find(e => String(e.id) === companyId)?.name
+                                            : 'Selecciona la empresa...'}
+                                    </button>
+
+                                    {/* Modal Mobile para seleccionar empresa */}
+                                    {mobileModalOpen && (
+                                        <div
+                                            className="fixed inset-0 z-50 flex items-end bg-black/40"
+                                            onClick={() => setMobileModalOpen(false)}
+                                        >
+                                            <div
+                                                className="w-full bg-background rounded-t-2xl p-4 flex flex-col max-h-[70vh]"
+                                                onClick={(e) => e.stopPropagation()}
+                                            >
+                                                <div className="flex justify-between items-center mb-4">
+                                                    <h3 className="text-lg font-bold">Selecciona una empresa</h3>
+                                                    <button
+                                                        onClick={() => setMobileModalOpen(false)}
+                                                        className="p-1 hover:bg-muted rounded-md transition-colors"
+                                                    >
+                                                        <X className="w-5 h-5" />
+                                                    </button>
+                                                </div>
+                                                <div className="flex-1 overflow-y-auto space-y-2">
+                                                    {empresas && Array.isArray(empresas) && empresas.length > 0 && empresas.map(emp => {
+                                                        if (!emp || !emp.id || !emp.name) return null;
+                                                        const isSelected = String(emp.id) === companyId;
+                                                        return (
+                                                            <button
+                                                                key={`emp-${emp.id}`}
+                                                                onClick={() => handleCompanySelect(String(emp.id))}
+                                                                className={`w-full px-4 py-3 rounded-lg text-left transition-colors ${
+                                                                    isSelected
+                                                                        ? 'bg-primary text-primary-foreground font-semibold'
+                                                                        : 'bg-muted hover:bg-muted/80 text-foreground'
+                                                                }`}
+                                                            >
+                                                                {emp.name}
+                                                            </button>
+                                                        );
+                                                    })}
+                                                </div>
+                                                <button
+                                                    onClick={() => setMobileModalOpen(false)}
+                                                    className="w-full mt-4 px-4 py-2 rounded-lg bg-muted hover:bg-muted/80 text-foreground transition-colors font-medium"
+                                                >
+                                                    Cerrar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </>
                             ) : (
                                 // Select de shadcn para desktop
                                 <Select
                                     value={companyId}
-                                    onValueChange={handleCompanyChange}
+                                    onValueChange={handleCompanySelect}
                                     disabled={loading}
                                 >
                                     <SelectTrigger className={`w-full bg-background ${

@@ -36,30 +36,67 @@ interface MainPanelProps {
 
 export function MainPanel({ asistencias, empresas }: MainPanelProps) {
     const [loading, setLoading] = useState(false);
-    const [companyId, setCompanyId] = useState<string>('');
+    const [companyId, setCompanyId] = useState<string>(() => {
+        // Recuperar del sessionStorage si existe
+        if (typeof window !== 'undefined') {
+            return sessionStorage.getItem('selectedCompanyId') || '';
+        }
+        return '';
+    });
     const [successModalOpen, setSuccessModalOpen] = useState(false);
     const [needsRefresh, setNeedsRefresh] = useState(false);
     const [mobileModalOpen, setMobileModalOpen] = useState(false);
-    const [isMobile, setIsMobile] = useState(false);
+    const [isMobile, setIsMobile] = useState(true); // Default true para Xiaomi
+    const [isDeviceReady, setIsDeviceReady] = useState(false);
 
-    // Detectar si es mobile - Mejorado con viewport y userAgent
+    // Detectar si es mobile - Mejorado con viewport y userAgent incluyendo Xiaomi
     useEffect(() => {
         const detectMobile = () => {
-            const isMobileDevice =
-                /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-                (typeof window !== 'undefined' && window.innerWidth <= 768) ||
-                (typeof window !== 'undefined' && window.matchMedia('(pointer:coarse)').matches);
+            const ua = navigator.userAgent || '';
+
+            // Patrones más específicos incluyendo navegadores de Xiaomi
+            const mobilePatterns = [
+                /Android/i,
+                /webOS/i,
+                /iPhone/i,
+                /iPad/i,
+                /iPod/i,
+                /BlackBerry/i,
+                /IEMobile/i,
+                /Opera Mini/i,
+                /MIUI/i, // Xiaomi específicamente
+                /XiaoMi/i, // Xiaomi variante
+                /MI[\s_]?[A-Z0-9]+/i, // Xiaomi Mi Series
+                /Redmi/i // Xiaomi Redmi
+            ];
+
+            const isMobileUserAgent = mobilePatterns.some(pattern => pattern.test(ua));
+            const isSmallViewport = typeof window !== 'undefined' && window.innerWidth <= 768;
+            const hasTouchSupport = typeof window !== 'undefined' && (
+                'ontouchstart' in window ||
+                navigator.maxTouchPoints > 0 ||
+                // @ts-expect-error - IE/Edge compatible check
+                (window.navigator && 'msMaxTouchPoints' in window.navigator && (window.navigator as { msMaxTouchPoints?: number }).msMaxTouchPoints > 0)
+            );
+
+            // Detectar mobile: userAgent + viewport + touch
+            const isMobileDevice = isMobileUserAgent || isSmallViewport || hasTouchSupport;
 
             setIsMobile(isMobileDevice);
+            setIsDeviceReady(true);
         };
 
         detectMobile();
 
         // Detectar cambios de tamaño de ventana (responsive)
         const handleResize = () => detectMobile();
-        window.addEventListener('resize', handleResize);
+        window.addEventListener('resize', handleResize, { passive: true });
+        window.addEventListener('orientationchange', detectMobile, { passive: true });
 
-        return () => window.removeEventListener('resize', handleResize);
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            window.removeEventListener('orientationchange', detectMobile);
+        };
     }, []);
 
     const handleCompanySelect = (id: string) => {
@@ -72,7 +109,15 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
             return;
         }
 
+        // Guardar en sessionStorage para persistencia
+        try {
+            sessionStorage.setItem('selectedCompanyId', id);
+        } catch (e) {
+            console.warn('No se pudo guardar en sessionStorage:', e);
+        }
+
         setCompanyId(id);
+
         // Cerrar modal mobile con delay para permitir visual feedback
         setTimeout(() => {
             setMobileModalOpen(false);
@@ -217,6 +262,13 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
         setNeedsRefresh(false);
         setCompanyId('');
 
+        // Limpiar sessionStorage
+        try {
+            sessionStorage.removeItem('selectedCompanyId');
+        } catch (e) {
+            console.warn('No se pudo limpiar sessionStorage:', e);
+        }
+
         // Pequeño delay para permitir que los estados se actualicen antes de recargar
         setTimeout(() => {
             router.visit('/asistencia', {
@@ -225,6 +277,34 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
             });
         }, 100);
     };
+
+    // Fallback while device is being detected (especialmente para Xiaomi)
+    if (!isDeviceReady) {
+        return (
+            <div className="flex flex-col gap-6 max-w-4xl mx-auto w-full">
+                <Card className="shadow-lg border-l-4 border-l-primary/60">
+                    <CardHeader className="pb-4">
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                            <div>
+                                <CardTitle className="text-2xl flex items-center gap-2">
+                                    <Fingerprint className="text-primary" />
+                                    Marcar Asistencia
+                                </CardTitle>
+                                <p className="text-sm text-muted-foreground mt-1">
+                                    Inicializando módulo...
+                                </p>
+                            </div>
+                        </div>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="flex justify-center items-center h-20">
+                            <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-col gap-6 max-w-4xl mx-auto w-full">

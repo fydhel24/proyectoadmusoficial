@@ -219,6 +219,7 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
                                 // Modal personalizado para mobile
                                 <>
                                     <button
+                                        type="button"
                                         onClick={() => setMobileModalOpen(true)}
                                         disabled={loading}
                                         className={`w-full px-3 py-2 rounded-md border text-left bg-background text-foreground ${
@@ -231,54 +232,6 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
                                             ? empresas.find(e => String(e.id) === companyId)?.name
                                             : 'Selecciona la empresa...'}
                                     </button>
-
-                                    {/* Modal Mobile para seleccionar empresa */}
-                                    {mobileModalOpen && (
-                                        <div
-                                            className="fixed inset-0 z-50 flex items-end bg-black/40"
-                                            onClick={() => setMobileModalOpen(false)}
-                                        >
-                                            <div
-                                                className="w-full bg-background rounded-t-2xl p-4 flex flex-col max-h-[70vh]"
-                                                onClick={(e) => e.stopPropagation()}
-                                            >
-                                                <div className="flex justify-between items-center mb-4">
-                                                    <h3 className="text-lg font-bold">Selecciona una empresa</h3>
-                                                    <button
-                                                        onClick={() => setMobileModalOpen(false)}
-                                                        className="p-1 hover:bg-muted rounded-md transition-colors"
-                                                    >
-                                                        <X className="w-5 h-5" />
-                                                    </button>
-                                                </div>
-                                                <div className="flex-1 overflow-y-auto space-y-2">
-                                                    {empresas && Array.isArray(empresas) && empresas.length > 0 && empresas.map(emp => {
-                                                        if (!emp || !emp.id || !emp.name) return null;
-                                                        const isSelected = String(emp.id) === companyId;
-                                                        return (
-                                                            <button
-                                                                key={`emp-${emp.id}`}
-                                                                onClick={() => handleCompanySelect(String(emp.id))}
-                                                                className={`w-full px-4 py-3 rounded-lg text-left transition-colors ${
-                                                                    isSelected
-                                                                        ? 'bg-primary text-primary-foreground font-semibold'
-                                                                        : 'bg-muted hover:bg-muted/80 text-foreground'
-                                                                }`}
-                                                            >
-                                                                {emp.name}
-                                                            </button>
-                                                        );
-                                                    })}
-                                                </div>
-                                                <button
-                                                    onClick={() => setMobileModalOpen(false)}
-                                                    className="w-full mt-4 px-4 py-2 rounded-lg bg-muted hover:bg-muted/80 text-foreground transition-colors font-medium"
-                                                >
-                                                    Cerrar
-                                                </button>
-                                            </div>
-                                        </div>
-                                    )}
                                 </>
                             ) : (
                                 // Select de shadcn para desktop
@@ -421,6 +374,59 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+
+            {/* Modal Mobile para seleccionar empresa - Fuera del Card*/}
+            {mobileModalOpen && isMobile && (
+                <div
+                    className="fixed inset-0 z-[9999] flex items-end bg-black/50"
+                    onClick={() => setMobileModalOpen(false)}
+                    style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
+                >
+                    <div
+                        className="w-full bg-background rounded-t-2xl p-4 flex flex-col max-h-[70vh] overflow-hidden"
+                        onClick={(e) => e.stopPropagation()}
+                        style={{ maxWidth: '100%' }}
+                    >
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-lg font-bold">Selecciona una empresa</h3>
+                            <button
+                                type="button"
+                                onClick={() => setMobileModalOpen(false)}
+                                className="p-1 hover:bg-muted rounded-md transition-colors"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+                        <div className="flex-1 overflow-y-auto space-y-2 pr-2">
+                            {empresas && Array.isArray(empresas) && empresas.length > 0 && empresas.map(emp => {
+                                if (!emp || !emp.id || !emp.name) return null;
+                                const isSelected = String(emp.id) === companyId;
+                                return (
+                                    <button
+                                        key={`emp-modal-${emp.id}`}
+                                        type="button"
+                                        onClick={() => handleCompanySelect(String(emp.id))}
+                                        className={`w-full px-4 py-3 rounded-lg text-left transition-colors font-medium ${
+                                            isSelected
+                                                ? 'bg-primary text-primary-foreground'
+                                                : 'bg-muted hover:bg-muted/80 text-foreground'
+                                        }`}
+                                    >
+                                        {emp.name}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setMobileModalOpen(false)}
+                            className="w-full mt-4 px-4 py-2 rounded-lg bg-muted hover:bg-muted/80 text-foreground transition-colors font-medium"
+                        >
+                            Cerrar
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

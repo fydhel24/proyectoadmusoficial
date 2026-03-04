@@ -217,7 +217,6 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
                                     <SelectValue placeholder="Selecciona la empresa..." />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="none" className="text-muted-foreground italic">Ninguna (oficina general)</SelectItem>
                                     {empresas && Array.isArray(empresas) && empresas.length > 0 && empresas.map(emp => {
                                         // Validar que emp tenga id y name
                                         if (!emp || !emp.id || !emp.name) return null;

@@ -14,13 +14,13 @@ class AsistenciaController extends Controller
     {
         $user = clone $request->user();
         $hasDevice = $user->webAuthnCredentials()->exists();
-        
+
         $asistencias = Asistencia::with('company')
             ->where('user_id', $user->id)
             ->orderBy('fecha_marcacion', 'desc')
             ->take(30)
             ->get();
-            
+
         $empresas = collect();
 
         if ($user->hasRole('camarografo')) {
@@ -61,14 +61,14 @@ class AsistenciaController extends Controller
     {
         // AssertedRequest de Laragear automáticamente valida la firma criptográfica (Passkey).
         // Si llega a esta línea, la biometría fue exitosa.
-        
+
         $validated = $request->validate([
             'latitud' => 'required|numeric',
             'longitud' => 'required|numeric',
             'company_id' => 'nullable|exists:companies,id',
         ]);
 
-        Asistencia::create([
+        $asistencia = Asistencia::create([
             'user_id' => $request->user()->id,
             'company_id' => $validated['company_id'] ?? null,
             'latitud' => $validated['latitud'],
@@ -76,7 +76,13 @@ class AsistenciaController extends Controller
             'fecha_marcacion' => now(),
         ]);
 
-        return back()->with('success', 'Asistencia marcada correctamente.');
+        // Devolver JSON en lugar de redirección (para compatibilidad con axios/mobile)
+        return response()->json([
+            'success' => true,
+            'message' => 'Asistencia marcada correctamente.',
+            'data' => $asistencia,
+            'status' => 200
+        ], 200);
     }
 
     public function revoke(Request $request)

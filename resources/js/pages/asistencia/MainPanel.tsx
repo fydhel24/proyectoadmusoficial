@@ -199,8 +199,8 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
                 const response = await axios.post('/asistencia', payload);
 
                 // Validar que la respuesta sea exitosa
-                if (!response.data || response.status !== 200) {
-                    throw new Error('Respuesta inválida del servidor');
+                if (response.status !== 200 || !response.data?.success) {
+                    throw new Error('Respuesta inválida del servidor: ' + JSON.stringify(response.data));
                 }
 
                 // Mostrar Modal de Éxito en lugar de solo el toast
@@ -212,7 +212,13 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
             } catch (error: unknown) {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const err = error as any;
-                console.error('Attendance error:', error);
+                console.error('Attendance error - Detalles:', {
+                    message: err?.message,
+                    name: err?.name,
+                    status: err?.response?.status,
+                    data: err?.response?.data,
+                    error: error
+                });
 
                 let errorMessage = "Falló la verificación. Intenta nuevamente.";
 
@@ -228,6 +234,10 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
                     errorMessage = err.response.data.message;
                 } else if (err?.message === 'Network Error') {
                     errorMessage = "Error de conexión. Verifica tu internet.";
+                } else if (err?.message?.includes('JSON')) {
+                    errorMessage = "Error de respuesta del servidor (JSON inválido). Intenta nuevamente.";
+                } else {
+                    errorMessage = err?.message || "Error desconocido. Por favor, intenta nuevamente.";
                 }
 
                 toast.error(errorMessage, { id: 'attendance', duration: 4000 });
@@ -269,19 +279,22 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
             console.warn('No se pudo limpiar sessionStorage:', e);
         }
 
-        // Pequeño delay para permitir que los estados se actualicen antes de recargar
-        setTimeout(() => {
-            router.visit('/asistencia', {
-                method: 'get',
-                preserveScroll: true
-            });
-        }, 100);
-    };
-
-    // Fallback while device is being detected (especialmente para Xiaomi)
-    if (!isDeviceReady) {
-        return (
-            <div className="flex flex-col gap-6 max-w-4xl mx-auto w-full">
+        // En lugar de router.visit en Redmi, usar location.reload()
+        // Esto es más confiable en navegadores móviles
+        try {
+            // Pequeño delay para permitir que los estados se actualicen antes de recargar
+            setTimeout(() => {
+                // Usar location.reload en lugar de router.visit para Redmi
+                if (typeof window !== 'undefined') {
+                    window.location.href = '/asistencia';
+                } else {
+                    router.visit('/asistencia');
+                }
+            }, 100);
+        } catch (e) {
+            console.error('Error al recargar página:', e);
+            router.visit('/asistencia');
+        }
                 <Card className="shadow-lg border-l-4 border-l-primary/60">
                     <CardHeader className="pb-4">
                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -481,19 +494,22 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
             </div>
 
             {/* MODAL DE ÉXITO VISUAL */}
+            {successModalOpen && (
             <AlertDialog
                 open={successModalOpen}
                 onOpenChange={(open) => {
-                    if (!open && needsRefresh) {
-                        closeSuccessModal();
-                    } else if (!open) {
-                        setSuccessModalOpen(false);
+                    if (!open) {
+                        if (needsRefresh) {
+                            closeSuccessModal();
+                        } else {
+                            setSuccessModalOpen(false);
+                        }
                     }
                 }}
             >
-                <AlertDialogContent className="max-w-md text-center rounded-2xl border-0 shadow-2xl animate-in fade-in scale-in-95 duration-200">
+                <AlertDialogContent className="max-w-md text-center rounded-2xl border-0 shadow-2xl">
                     <AlertDialogHeader className="flex flex-col items-center space-y-4">
-                        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center animate-bounce">
+                        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
                             <CheckCircle2 className="w-12 h-12 text-green-600" />
                         </div>
                         <AlertDialogTitle className="text-2xl font-bold text-center text-green-600">
@@ -505,7 +521,7 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
                     </AlertDialogHeader>
                     <AlertDialogFooter className="sm:justify-center mt-6 flex-col gap-2 w-full">
                         <Button
-                            className="w-full h-12 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-all active:scale-95"
+                            className="w-full h-12 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-all"
                             onClick={closeSuccessModal}
                             disabled={loading}
                         >
@@ -521,6 +537,7 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+            )}
 
             {/* Modal Mobile para seleccionar empresa - Completamente mejorado */}
             {mobileModalOpen && isMobile && (

@@ -3,7 +3,7 @@ import axios from 'axios';
 import { startAuthentication } from '@simplewebauthn/browser';
 import { router } from '@inertiajs/react';
 import {
-    Clock, MapPin, Building2, AlertTriangle, Fingerprint, Loader2, CheckCircle2
+    Clock, MapPin, Building2, AlertTriangle, Fingerprint, Loader2, CheckCircle2, Lock
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -52,9 +52,9 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
     }, [empresas]);
 
     const handleMarkAttendance = async () => {
-        // VALIDACIÓN: Si hay empresas en la lista, obligar a seleccionar una.
-        if (empresas && empresas.length > 0 && (!companyId || companyId === 'none' || companyId === '')) {
-            toast.warning("Por favor, selecciona la empresa para la cual estás marcando asistencia.", {
+        // VALIDACIÓN: Siempre debe seleccionar una empresa real (no vacío)
+        if (!companyId || companyId === '' || companyId === 'none') {
+            toast.warning("Por favor, selecciona una empresa para marcar asistencia.", {
                 id: 'attendance-warning',
                 icon: <AlertTriangle className="w-5 h-5 text-amber-500" />,
                 duration: 5000
@@ -95,7 +95,7 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
                 const asseResp = await startAuthentication(authOptions);
 
                 // 3. Enviar al Endpoint de Asistencia con los datos GPS + ID Empresa + Firma
-                // Convertir companyId a número si no es 'none', si no pasar null
+                // Convertir companyId a número (es obligatorio)
                 let normalizedCompanyId = null;
                 if (companyId && companyId !== 'none' && companyId !== '') {
                     const parsed = parseInt(companyId, 10);
@@ -107,6 +107,11 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
                         setLoading(false);
                         return;
                     }
+                } else {
+                    // Si no hay companyId válido, es error (no debería llegar aquí por validación anterior)
+                    toast.error("Debes seleccionar una empresa válida.", { id: 'attendance' });
+                    setLoading(false);
+                    return;
                 }
 
                 const payload = {
@@ -213,7 +218,9 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
                                 }}
                                 disabled={loading}
                             >
-                                <SelectTrigger className={`w-full bg-background ${empresas && empresas.length > 0 && !companyId ? 'border-amber-500/50 focus:ring-amber-500/20' : ''}`}>
+                                <SelectTrigger className={`w-full bg-background ${
+                                    !companyId ? 'border-red-500/50 focus:ring-red-500/20' : ''
+                                }`}>
                                     <SelectValue placeholder="Selecciona la empresa..." />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -232,15 +239,21 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
                         </div>
                         <Button
                             onClick={handleMarkAttendance}
-                            disabled={loading}
+                            disabled={loading || !companyId}
                             size="lg"
-                            className="w-full md:w-auto mt-4 md:mt-2 h-12 shadow-md relative overflow-hidden group"
+                            className="w-full md:w-auto mt-4 md:mt-2 h-12 shadow-md relative overflow-hidden group disabled:opacity-60 disabled:cursor-not-allowed"
+                            title={!companyId ? "Selecciona una empresa para marcar asistencia" : "Marcar asistencia"}
                         >
                             <span className="absolute inset-0 w-full h-full bg-white/20 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></span>
                             {loading ? (
                                 <>
                                     <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                                     Procesando...
+                                </>
+                            ) : !companyId ? (
+                                <>
+                                    <Lock className="w-5 h-5 mr-2" />
+                                    Selecciona Empresa
                                 </>
                             ) : (
                                 <>

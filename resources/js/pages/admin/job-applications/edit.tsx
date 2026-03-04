@@ -7,7 +7,7 @@ import AppLayout from '@/layouts/app-layout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft, FileText, IdCard, Phone, Upload, User } from 'lucide-react';
 import React, { useState } from 'react';
-import { Toaster, toast } from 'sonner';
+import { toast } from 'sonner';
 
 interface JobApplication {
     id: number;
@@ -270,7 +270,6 @@ export default function Edit({ application }: Props) {
                 </Card>
             </div>
 
-            <Toaster richColors position="top-right" />
         </AppLayout>
     );
 }

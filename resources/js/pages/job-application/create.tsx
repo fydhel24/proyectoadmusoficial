@@ -11,7 +11,7 @@ import { Head, useForm } from '@inertiajs/react';
 import { gsap } from 'gsap';
 import { Briefcase, FileText, IdCard, Phone, Upload, User, X } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
-import { Toaster, toast } from 'sonner';
+import { toast } from 'sonner';
 import Footer from '../home/footer';
 
 export default function Create() {
@@ -350,7 +350,6 @@ export default function Create() {
                     </div>
                 </div>
 
-                <Toaster richColors position="top-right" />
             </main>
 
             <Footer />

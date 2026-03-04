@@ -29,7 +29,14 @@ createInertiaApp({
         createRoot(el).render(
             <>
                 <App {...props} />
-                <Toaster richColors position="top-right" />
+                <Toaster
+                    richColors
+                    position="top-right"
+                    expand={false}
+                    visibleToasts={1}
+                    gap={8}
+                    closeButton
+                />
             </>,
         );
     },

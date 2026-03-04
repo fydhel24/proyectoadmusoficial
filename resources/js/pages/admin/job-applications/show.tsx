@@ -4,7 +4,6 @@ import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Toaster } from 'sonner';
 import { Download, Edit, ArrowLeft, FileText, User, Phone, IdCard, Calendar } from 'lucide-react';
 
 interface JobApplication {
@@ -254,7 +253,6 @@ export default function Show({ application }: Props) {
                 </div>
             </div>
 
-            <Toaster richColors position="top-right" />
         </AppLayout>
     );
 }

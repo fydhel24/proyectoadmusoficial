@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import { Edit, Eye, FileText, Loader2, Phone, Search, Trash2, User, Download } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
-import { toast, Toaster } from 'sonner';
+import { toast } from 'sonner';
 
 interface JobApplication {
     id: number;
@@ -616,7 +616,6 @@ export default function Index({ applications, filters }: Props) {
                 </DialogContent>
             </Dialog>
 
-            <Toaster richColors position="top-right" />
         </AppLayout>
     );
 }

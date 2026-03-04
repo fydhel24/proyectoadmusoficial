@@ -39,6 +39,7 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
     const [loading, setLoading] = useState(false);
     const [companyId, setCompanyId] = useState<string>('');
     const [successModalOpen, setSuccessModalOpen] = useState(false);
+    const [needsRefresh, setNeedsRefresh] = useState(false);
 
     // Efecto para sincronizar companyId con las empresas disponibles
     // Solo re-ejecutar cuando empresas cambia, no cuando companyId cambia (evita infinite loop)
@@ -57,7 +58,7 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
             toast.warning("Por favor, selecciona una empresa para marcar asistencia.", {
                 id: 'attendance-warning',
                 icon: <AlertTriangle className="w-5 h-5 text-amber-500" />,
-                duration: 5000
+                duration: 3000
             });
             return;
         }
@@ -66,7 +67,7 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
         toast.loading("Obteniendo tu ubicación GPS...", { id: 'attendance' });
 
         if (!navigator.geolocation) {
-            toast.error("Tu navegador no soporta geolocalización.", { id: 'attendance' });
+            toast.error("Tu navegador no soporta geolocalización.", { id: 'attendance', duration: 3000 });
             setLoading(false);
             return;
         }
@@ -76,7 +77,8 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
 
             // Validar coordenadas válidas
             if (!latitude || !longitude) {
-                toast.error("No se pudo obtener una ubicación válida. Intenta nuevamente.", { id: 'attendance' });
+                toast.dismiss('attendance');
+                toast.error("No se pudo obtener una ubicación válida. Intenta nuevamente.", { id: 'attendance', duration: 3000 });
                 setLoading(false);
                 return;
             }
@@ -109,7 +111,8 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
                     }
                 } else {
                     // Si no hay companyId válido, es error (no debería llegar aquí por validación anterior)
-                    toast.error("Debes seleccionar una empresa válida.", { id: 'attendance' });
+                    toast.dismiss('attendance');
+                    toast.error("Debes seleccionar una empresa válida.", { id: 'attendance', duration: 3000 });
                     setLoading(false);
                     return;
                 }
@@ -132,6 +135,7 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
                 toast.dismiss('attendance');
                 setSuccessModalOpen(true);
                 setCompanyId('');
+                setNeedsRefresh(true);
 
             } catch (error: unknown) {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -154,7 +158,7 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
                     errorMessage = "Error de conexión. Verifica tu internet.";
                 }
 
-                toast.error(errorMessage, { id: 'attendance', duration: 5000 });
+                toast.error(errorMessage, { id: 'attendance', duration: 4000 });
             } finally {
                 setLoading(false);
             }
@@ -170,7 +174,7 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
                 gpsMessage = "Tiempo agotado al obtener ubicación. Intenta nuevamente en un lugar abierto.";
             }
 
-            toast.error(gpsMessage, { id: 'attendance', duration: 5000 });
+            toast.error(gpsMessage, { id: 'attendance', duration: 3000 });
             setLoading(false);
         }, {
             enableHighAccuracy: true,
@@ -181,10 +185,10 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
 
     const closeSuccessModal = () => {
         setSuccessModalOpen(false);
-        // Recargar para actualizar el historial de asistencias
-        setTimeout(() => {
-            router.reload();
-        }, 300);
+        setNeedsRefresh(false);
+        // En lugar de recargar, simplemente navegar a la misma página para refrescar los datos
+        // Esto evita problemas de navegación y es más eficiente
+        router.visit('/asistencia');
     };
 
     return (
@@ -318,7 +322,19 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
             </div>
 
             {/* MODAL DE ÉXITO VISUAL */}
-            <AlertDialog open={successModalOpen} onOpenChange={setSuccessModalOpen}>
+            <AlertDialog
+                open={successModalOpen}
+                onOpenChange={(open) => {
+                    if (!open) {
+                        // Si el usuario cierra el modal clickeando afuera, igual debe refrescar
+                        if (needsRefresh) {
+                            router.visit('/asistencia');
+                        } else {
+                            setSuccessModalOpen(false);
+                        }
+                    }
+                }}
+            >
                 <AlertDialogContent className="max-w-md text-center">
                     <AlertDialogHeader className="flex flex-col items-center">
                         <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-4">
@@ -333,6 +349,7 @@ export function MainPanel({ asistencias, empresas }: MainPanelProps) {
                         <Button
                             className="w-full sm:w-auto min-w-[150px] bg-green-600 hover:bg-green-700"
                             onClick={closeSuccessModal}
+                            disabled={loading}
                         >
                             De acuerdo, continuar
                         </Button>
